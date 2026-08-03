@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "types": ["electron-vite/node"]
+  },
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts"]
+}

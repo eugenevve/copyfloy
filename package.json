@@ -1,0 +1,24 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "npx electron --version && electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview"
+  },
+  "dependencies": {
+    "react-router": "8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "electron": "43.2.0",
+    "electron-vite": "5.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "7.0.2"
+  }
+}
