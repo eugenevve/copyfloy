@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 
+import { exePath } from "@main/utils/exePath";
 import { app } from "electron";
 
 export class AutoStartService {
@@ -7,8 +8,6 @@ export class AutoStartService {
 
   public update(openAtLogin: boolean, runAsAdmin: boolean): void {
     if (!app.isPackaged || process.platform !== "win32") return;
-
-    const exePath = app.getPath("exe");
 
     // Autostart via Task Scheduler (for administrators so that Windows does not block the program from launching)
     if (openAtLogin && runAsAdmin) {

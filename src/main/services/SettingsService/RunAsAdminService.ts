@@ -1,6 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 
+import { exePath } from "@main/utils/exePath";
 import { app } from "electron";
 
 const execAsync = promisify(exec);
@@ -9,7 +10,6 @@ export class RunAsAdminService {
   public async update(enable: boolean): Promise<void> {
     if (!app.isPackaged || process.platform !== "win32") return;
 
-    const exePath = app.getPath("exe");
     const regPath = "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     const value = "~ RUNASADMIN";
 
