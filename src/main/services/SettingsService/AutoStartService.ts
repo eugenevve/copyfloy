@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 
+import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
 import { app } from "electron";
 
@@ -7,7 +8,7 @@ export class AutoStartService {
   private readonly TASK_NAME = "BackupProgramAutoStart";
 
   public update(openAtLogin: boolean, runAsAdmin: boolean): void {
-    if (!app.isPackaged || process.platform !== "win32") return;
+    if (!isPackagedWindows) return;
 
     // Autostart via Task Scheduler (for administrators so that Windows does not block the program from launching)
     if (openAtLogin && runAsAdmin) {
