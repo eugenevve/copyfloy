@@ -1,6 +1,7 @@
 import { iconPath } from "@main/utils/iconPath";
 import { app, BrowserWindow, Menu, nativeImage, NativeImage, Tray } from "electron";
 
+import packageJson from "../../../../package.json";
 import { appState } from "../AppState/AppState";
 
 // Manages the application tray icon and its interactions
@@ -13,7 +14,7 @@ export class TrayService {
   init(): void {
     this.tray = new Tray(this.createTrayIcon());
 
-    this.tray.setToolTip("backup-program");
+    this.tray.setToolTip(packageJson.name);
 
     this.tray.on("click", () => {
       this.showWindow();

@@ -4,8 +4,10 @@ import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
 import { app } from "electron";
 
+import packageJson from "../../../../package.json";
+
 export class AutoStartService {
-  private readonly taskName = "BackupProgramAutoStart";
+  private readonly TASK_NAME = `${packageJson.name}-auto-start`;
 
   update(openAtLogin: boolean, runAsAdmin: boolean): void {
     if (!isPackagedWindows) return;
@@ -18,7 +20,7 @@ export class AutoStartService {
 
       const command =
         `schtasks /create ` +
-        `/tn "${this.taskName}" ` +
+        `/tn "${this.TASK_NAME}" ` +
         `/tr "\\"${exePath}\\"" ` +
         `/sc onlogon ` +
         `/rl highest ` +
@@ -32,7 +34,7 @@ export class AutoStartService {
 
     // Normal program startup (system registry)
     if (openAtLogin) {
-      exec(`schtasks /delete /tn "${this.taskName}" /f`, () => {});
+      exec(`schtasks /delete /tn "${this.TASK_NAME}" /f`, () => {});
 
       app.setLoginItemSettings({
         openAtLogin: true,
@@ -47,6 +49,6 @@ export class AutoStartService {
       openAtLogin: false,
     });
 
-    exec(`schtasks /delete /tn "${this.taskName}" /f`, () => {});
+    exec(`schtasks /delete /tn "${this.TASK_NAME}" /f`, () => {});
   }
 }
