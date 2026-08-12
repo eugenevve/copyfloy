@@ -1,5 +1,6 @@
 {
   "name": "backup-program",
+  "appId": "com.backupprogram.app",
   "version": "1.0.0",
   "private": true,
   "main": "./out/main/index.js",
@@ -11,13 +12,20 @@
     "lint:css": "stylelint \"src/**/*.{css,scss}\""
   },
   "dependencies": {
+    "@electron-toolkit/preload": "3.0.2",
+    "@electron-toolkit/utils": "4.0.0",
+    "electron-updater": "6.8.9",
+    "fs-extra": "11.4.0",
+    "node-cron": "4.6.0",
     "react-router": "8.3.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",
+    "@types/fs-extra": "11.0.4",
     "@types/node": "26.1.2",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "5.2.0",
     "electron": "43.2.0",
     "electron-vite": "5.0.0",
     "eslint": "9.39.4",
