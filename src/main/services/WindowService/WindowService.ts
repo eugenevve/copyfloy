@@ -87,7 +87,7 @@ export class WindowService {
       },
 
       onMaximize: (isMaximized) => {
-        window.webContents.send("window-maximized-change", isMaximized);
+        window.webContents.send("window:maximized-change", isMaximized);
       },
 
       onClose: (event) => {

@@ -8,19 +8,19 @@ export class WindowIpc {
 
   // Registers all IPC handlers related to the main window
   init(): void {
-    ipcMain.on("window-close", () => {
+    ipcMain.on("window:close", () => {
       this.windowService.close();
     });
 
-    ipcMain.on("window-minimize", () => {
+    ipcMain.on("window:minimize", () => {
       this.windowService.minimize();
     });
 
-    ipcMain.on("window-maximize", () => {
+    ipcMain.on("window:maximize", () => {
       this.windowService.toggleMaximize();
     });
 
-    ipcMain.handle("window-is-maximized", () => {
+    ipcMain.handle("window:is-maximized", () => {
       return this.windowService.isMaximized();
     });
   }
