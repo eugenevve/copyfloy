@@ -4,21 +4,26 @@ import { ipcMain } from "electron";
 
 import { SettingsService } from "./SettingsService";
 
-// Registers IPC handlers for application settings
-export function registerSettingsIpc(settingsService: SettingsService): void {
-  // Returns the current application settings
-  ipcMain.handle("settings:get", () => {
-    return settingsService.getSettings();
-  });
+// IPC handlers for application settings
+export class SettingsIpc {
+  constructor(private readonly settingsService: SettingsService) {}
 
-  // Saves new settings received from the renderer
-  ipcMain.handle("settings:save", async (_, newSettings: Partial<IAppSettings>) => {
-    await settingsService.updateSettings(newSettings);
-    return settingsService.getSettings();
-  });
+  init(): void {
+    // Returns the current application settings
+    ipcMain.handle("settings:get", () => {
+      return this.settingsService.getSettings();
+    });
 
-  // Returns whether the application is running with administrator privileges
-  ipcMain.handle("app:is-admin", async () => {
-    return checkIsAdmin();
-  });
+    // Saves new settings received from the renderer
+    ipcMain.handle("settings:save", async (_, newSettings: Partial<IAppSettings>) => {
+      await this.settingsService.updateSettings(newSettings);
+
+      return this.settingsService.getSettings();
+    });
+
+    // Returns whether the application is running with administrator privileges
+    ipcMain.handle("app:is-admin", () => {
+      return checkIsAdmin();
+    });
+  }
 }

@@ -1,34 +1,33 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow } from "electron";
 import { autoUpdater } from "electron-updater";
 
 import { getUpdateWindowHtml } from "./SetupUpdaterHtml";
 
 // Service responsible for application updates
 export class SetupUpdater {
-  // Registers IPC handlers used by the Renderer process
-  // to control the update process
-  public initIpc(): void {
+  // Initializes the updater configuration
+  init(): void {
     autoUpdater.autoInstallOnAppQuit = true;
     autoUpdater.autoDownload = false;
+  }
 
-    // Check whether a new version is available
-    ipcMain.handle("updater:check", async () => {
-      return autoUpdater.checkForUpdates();
-    });
+  // Checks whether a new version is available
+  check() {
+    return autoUpdater.checkForUpdates();
+  }
 
-    // Start downloading the available update
-    ipcMain.handle("updater:download", async () => {
-      return autoUpdater.downloadUpdate();
-    });
+  // Starts downloading the available update
+  download() {
+    return autoUpdater.downloadUpdate();
+  }
 
-    // Close the application and install the downloaded update
-    ipcMain.handle("updater:install", () => {
-      this.quitAndInstall();
-    });
+  // Closes the application and installs the downloaded update
+  install(): void {
+    this.quitAndInstall();
   }
 
   // Subscribes to autoUpdater events and forwards them to the Renderer
-  public initEvents(mainWindow: BrowserWindow): void {
+  initEvents(mainWindow: BrowserWindow): void {
     autoUpdater.on("update-available", (info) => {
       this.sendToRenderer(mainWindow, "updater:available", info.version);
     });

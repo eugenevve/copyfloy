@@ -1,5 +1,5 @@
-import { exec } from "child_process";
-import { promisify } from "util";
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
 
 import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
@@ -10,7 +10,7 @@ const execAsync = promisify(exec);
 // Uses the AppCompatFlags registry key, which allows Windows
 // to automatically request administrator rights when launching an application
 export class RunAsAdminService {
-  public async update(enable: boolean): Promise<void> {
+  async update(enable: boolean): Promise<void> {
     if (!isPackagedWindows) return;
 
     // Registry section responsible for application compatibility settings

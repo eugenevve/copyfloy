@@ -1,36 +1,38 @@
-import { exec } from "child_process";
+import { exec } from "node:child_process";
 
 import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
 import { app } from "electron";
 
 export class AutoStartService {
-  private readonly TASK_NAME = "BackupProgramAutoStart";
+  private readonly taskName = "BackupProgramAutoStart";
 
-  public update(openAtLogin: boolean, runAsAdmin: boolean): void {
+  update(openAtLogin: boolean, runAsAdmin: boolean): void {
     if (!isPackagedWindows) return;
 
     // Autostart via Task Scheduler (for administrators so that Windows does not block the program from launching)
     if (openAtLogin && runAsAdmin) {
-      app.setLoginItemSettings({ openAtLogin: false });
+      app.setLoginItemSettings({
+        openAtLogin: false,
+      });
 
-      const cmd =
+      const command =
         `schtasks /create ` +
-        `/tn "${this.TASK_NAME}" ` +
+        `/tn "${this.taskName}" ` +
         `/tr "\\"${exePath}\\"" ` +
         `/sc onlogon ` +
         `/rl highest ` +
         `/it ` +
         `/f`;
 
-      exec(cmd);
+      exec(command);
 
       return;
     }
 
     // Normal program startup (system registry)
     if (openAtLogin) {
-      exec(`schtasks /delete /tn "${this.TASK_NAME}" /f`, () => {});
+      exec(`schtasks /delete /tn "${this.taskName}" /f`, () => {});
 
       app.setLoginItemSettings({
         openAtLogin: true,
@@ -45,6 +47,6 @@ export class AutoStartService {
       openAtLogin: false,
     });
 
-    exec(`schtasks /delete /tn "${this.TASK_NAME}" /f`, () => {});
+    exec(`schtasks /delete /tn "${this.taskName}" /f`, () => {});
   }
 }

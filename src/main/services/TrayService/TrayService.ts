@@ -1,20 +1,16 @@
 import { iconPath } from "@main/utils/iconPath";
-import { Tray, Menu, nativeImage, BrowserWindow, app, NativeImage } from "electron";
+import { app, BrowserWindow, Menu, nativeImage, NativeImage, Tray } from "electron";
 
-import { AppState } from "../AppState/AppState";
+import { appState } from "../AppState/AppState";
 
-// Application management service in the system tray
+// Manages the application tray icon and its interactions
 export class TrayService {
   private tray: Tray | null = null;
 
-  // Reference to the main window to control its display
-  constructor(
-    private readonly mainWindow: BrowserWindow,
-    private readonly appState: AppState
-  ) {}
+  constructor(private readonly mainWindow: BrowserWindow) {}
 
   // Initializes the tray icon and its events
-  public init(): void {
+  init(): void {
     this.tray = new Tray(this.createTrayIcon());
 
     this.tray.setToolTip("backup-program");
@@ -51,7 +47,7 @@ export class TrayService {
       {
         label: "Close",
         click: () => {
-          this.appState.setIsQuitting(true);
+          appState.isQuitting = true;
           app.quit();
         },
       },
@@ -60,12 +56,12 @@ export class TrayService {
 
   // Restores and focuses the main window
   private showWindow(): void {
-    if (!this.mainWindow.isVisible()) {
-      this.mainWindow.show();
-    }
-
     if (this.mainWindow.isMinimized()) {
       this.mainWindow.restore();
+    }
+
+    if (!this.mainWindow.isVisible()) {
+      this.mainWindow.show();
     }
 
     this.mainWindow.focus();

@@ -24,12 +24,12 @@ export class SettingsService {
   }
 
   // Returns current application settings
-  public getSettings(): IAppSettings {
+  getSettings(): IAppSettings {
     return this.settings;
   }
 
   // Applies new settings
-  public async updateSettings(newSettings: Partial<IAppSettings>): Promise<void> {
+  async updateSettings(newSettings: Partial<IAppSettings>): Promise<void> {
     const previousSettings = { ...this.settings };
 
     this.settings = {
@@ -44,7 +44,7 @@ export class SettingsService {
   }
 
   // Saves the current window state
-  public updateWindowState(state: IWindowState): void {
+  updateWindowState(state: IWindowState): void {
     this.settings.windowState = state;
     this.saveSettings();
   }

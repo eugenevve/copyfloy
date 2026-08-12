@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 import { IAppSettings } from "@shared/types/window";
 import { app } from "electron";
@@ -10,7 +10,7 @@ export class SettingsStorage {
   private readonly settingsPath = path.join(app.getPath("userData"), "settings.json");
 
   // Reading settings from disk
-  public load(): Partial<IAppSettings> | null {
+  load(): Partial<IAppSettings> | null {
     if (!fs.existsSync(this.settingsPath)) {
       return null;
     }
@@ -24,7 +24,7 @@ export class SettingsStorage {
   }
 
   // Saving settings to disk
-  public save(settings: IAppSettings): void {
+  save(settings: IAppSettings): void {
     try {
       fs.writeJsonSync(this.settingsPath, settings, {
         spaces: 2,
