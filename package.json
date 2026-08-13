@@ -36,6 +36,9 @@
     "eslint-plugin-react-refresh": "0.5.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "stylelint": "17.14.1",
+    "stylelint-config-standard": "40.0.0",
+    "stylelint-order": "8.1.1",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0"
   }
