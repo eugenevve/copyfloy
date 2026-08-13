@@ -6,9 +6,5 @@
       "@app/*": ["./src/renderer/src/*"]
     }
   },
-  "include": [
-    "src/renderer/**/*.ts",
-    "src/renderer/**/*.tsx",
-    "src/renderer/**/*.d.ts"
-  ]
+  "include": ["src/preload/index.d.ts", "src/preload/api.ts", "src/renderer/**/*.ts", "src/renderer/**/*.tsx"]
 }
