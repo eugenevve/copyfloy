@@ -1,11 +1,11 @@
 # Copyflow (active development)
 
-![Electron](https://img.shields.io/badge/Electron-43-47848F?logo=electron&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-Electron%20Vite-646CFF?logo=vite&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
+[![Electron](https://img.shields.io/badge/Electron-43-47848F?style=for-the-badge&logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-Electron_Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://electron-vite.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)](./LICENSE)
 
 A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
 
