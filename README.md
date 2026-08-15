@@ -166,7 +166,7 @@ The goal is not simply to generate code with AI, but to use AI as a development 
 
 Follows the standard Electron architecture with a clear separation between the **main process**, **preload layer**, and **renderer application**.
 
-For a detailed overview of the application architecture, services, data flow, and task lifecycle, see: [Architecture Documentation](./ARCHITECTURE.md)
+For a detailed overview of the application architecture, services, data flow, and task lifecycle, see: [Architecture Documentation](./docs/ARCHITECTURE.md)
 
 ```text
 src/
