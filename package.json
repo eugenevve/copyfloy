@@ -1,12 +1,57 @@
 {
   "name": "Copyflow",
-  "appId": "com.сopyflow.app",
+  "appId": "com.copyflow.app",
   "version": "1.0.0",
+  "author": "Copyflow",
   "private": true,
   "main": "./out/main/index.js",
+  "build": {
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "resources/icon.ico",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "shortcutName": "${name}",
+      "uninstallDisplayName": "${name}",
+      "artifactName": "${name}-setup-${version}.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "unicode": true,
+      "license": "LICENSE",
+      "installerIcon": "resources/icon.ico",
+      "uninstallerIcon": "resources/icon.ico",
+      "installerHeaderIcon": "resources/icon.ico"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "eugenevve",
+        "repo": "copyflow",
+        "private": false
+      }
+    ]
+  },
   "scripts": {
     "dev": "npx electron --version && electron-vite dev",
     "build": "npm run lint:css && npm run lint && electron-vite build",
+    "build:win": "npm run build && electron-builder --win",
     "preview": "electron-vite preview",
     "lint": "eslint . --max-warnings=0",
     "lint:css": "stylelint \"src/**/*.{css,scss}\""
@@ -26,6 +71,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "electron": "43.2.0",
+    "electron-builder": "26.15.3",
     "electron-vite": "5.0.0",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
