@@ -51,10 +51,12 @@
   "scripts": {
     "dev": "npx electron --version && electron-vite dev",
     "build": "npm run lint:css && npm run lint && electron-vite build",
-    "build:win": "npm run build && electron-builder --win",
     "preview": "electron-vite preview",
+    "build:win": "npm run build && electron-builder --win",
     "lint": "eslint . --max-warnings=0",
-    "lint:css": "stylelint \"src/**/*.{css,scss}\""
+    "lint:fix": "eslint . --fix",
+    "lint:css": "stylelint \"src/**/*.{css,scss}\"",
+    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix"
   },
   "dependencies": {
     "@electron-toolkit/preload": "3.0.2",
