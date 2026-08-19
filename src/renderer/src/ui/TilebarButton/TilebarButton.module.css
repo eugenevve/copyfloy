@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-s);
+  border: none;
+  background: var(--color-background);
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+  fill: var(--color-content);
+}
+
+.content svg {
+  display: flex;
+  flex-direction: column;
+  width: 11px;
+  height: 11px;
+}
+
+.primary {
+  --color-background: var(--background);
+  --color-content: var(--content-primary);
+}
+
+.secondary {
+  --color-background: var(--background);
+  --color-content: var(--content-primary);
+}
+
+.primary:hover {
+  --color-background: var(--content-secondary);
+  --color-content: var(--content-primary);
+}
+
+.secondary:hover {
+  --color-background: var(--red);
+  --color-content: var(--white);
+}
