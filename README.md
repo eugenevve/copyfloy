@@ -7,6 +7,8 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)](./LICENSE)
 
+> ⚠️ Project is currently under active development. The application is not yet considered production-ready.
+
 A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
 
 Application allows you to create copy tasks with a source and destination, configure an execution schedule, exclude specific files or directories, and run tasks automatically in the background.
@@ -273,6 +275,46 @@ npm run preview
 ```
 
 The project includes an `electron-builder.yml` configuration for application packaging.
+
+---
+
+<br />
+
+## 📦 Windows Installer
+
+Create a Windows installer:
+
+```bash
+npm run build:win
+```
+
+This command first creates the production build and then packages the application using `electron-builder`.
+
+The generated files are placed in the `dist` directory.
+
+The Windows installer uses the NSIS target and provides:
+
+- a selectable installation directory;
+- desktop shortcut creation;
+- application and installer icons;
+- uninstaller support;
+- MIT license information during installation.
+
+The packaging configuration is defined in `package.json`.
+
+### Build output
+
+After a successful build, the Windows installer will be available in:
+
+```text
+dist/
+```
+
+with a filename similar to:
+
+```text
+Copyflow-setup-1.0.0.exe
+```
 
 ---
 
