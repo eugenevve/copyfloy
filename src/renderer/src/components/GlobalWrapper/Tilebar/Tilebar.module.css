@@ -3,8 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding-left: var(--spacing-xs);
-  background: var(--background);
-  border-bottom: var(--border);
+  background: var(--content-secondary);
   -webkit-app-region: drag;
 }
 
