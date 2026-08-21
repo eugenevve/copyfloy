@@ -307,13 +307,7 @@ The packaging configuration is defined in `package.json`.
 After a successful build, the Windows installer will be available in:
 
 ```text
-dist/
-```
-
-with a filename similar to:
-
-```text
-Copyflow-setup-1.0.0.exe
+dist/Copyflow-setup-1.0.0.exe
 ```
 
 ---
