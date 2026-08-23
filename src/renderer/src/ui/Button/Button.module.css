@@ -1,0 +1,59 @@
+.container {
+  width: fit-content;
+  height: 30px;
+  padding: 0 var(--spacing-m);
+  border-radius: var(--spacing-l);
+}
+
+.icon {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50%;
+}
+
+.container,
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background: var(--background);
+  color: var(--color);
+  font-size: 16px;
+  transition: var(--transition);
+  fill: var(--color);
+  gap: var(--spacing-s);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-family);
+}
+
+.container svg,
+.icon svg {
+  width: 12px;
+  height: 12px;
+  fill: var(--color);
+}
+
+.container:disabled,
+.icon:disabled {
+  cursor: default;
+}
+
+.primary {
+  --color: var(--background-primary);
+  --background: var(--content-primary);
+}
+
+.secondary {
+  --color: var(--content-primary);
+  --background: var(--content-secondary);
+}
+
+.primary:not(:disabled):hover {
+  opacity: 0.8;
+}
+
+.secondary:not(:disabled):hover {
+  opacity: 0.8;
+}
