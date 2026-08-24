@@ -7,7 +7,10 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)](./LICENSE)
 
-> ⚠️ Project is currently under active development. The application is not yet considered production-ready.
+> [!WARNING]
+> **Experimental - not ready for public consumption.** This SDK is under active
+> development, has not been security audited, and may change without notice. Do
+> not use it for production workloads or with production credentials.
 
 A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
 
@@ -65,9 +68,9 @@ An important part of this project is the development process itself.
 
 Application is being developed with the help of several free AI tools, with each model being used for a different role in the development workflow:
 
-- **ChatGPT** — general-purpose development assistance, architecture discussions, implementation, documentation, and everyday development tasks.
-- **Claude** — solving complex and fundamental technical problems, exploring architectural approaches, and working through more challenging engineering decisions.
-- **Gemini** — refining concepts, improving existing solutions, exploring alternative approaches, and helping iterate on the project's overall direction.
+- **ChatGPT** - general-purpose development assistance, architecture discussions, implementation, documentation, and everyday development tasks.
+- **Claude** - solving complex and fundamental technical problems, exploring architectural approaches, and working through more challenging engineering decisions.
+- **Gemini** - refining concepts, improving existing solutions, exploring alternative approaches, and helping iterate on the project's overall direction.
 
 Rather than relying on a single AI model, the project uses a **multi-model development approach**, where different AI systems are used according to their strengths.
 
@@ -143,22 +146,22 @@ The goal is not simply to generate code with AI, but to use AI as a development 
 
 ### Production
 
-- **Electron** — desktop application runtime
-- **React** — frontend UI
-- **TypeScript** — application development
-- **React Router** — frontend routing
-- **fs-extra** — file and directory operations
-- **node-cron** — task scheduling
-- **electron-updater** — application updates
-- **Electron Toolkit** — Electron preload and utility helpers
+- **Electron** - desktop application runtime
+- **React** - frontend UI
+- **TypeScript** - application development
+- **React Router** - frontend routing
+- **fs-extra** - file and directory operations
+- **node-cron** - task scheduling
+- **electron-updater** - application updates
+- **Electron Toolkit** - Electron preload and utility helpers
 
 ### Development
 
-- **Vite / electron-vite** — development and build tooling
-- **ESLint** — JavaScript/TypeScript linting
-- **Stylelint** — CSS/SCSS linting
-- **TypeScript ESLint** — TypeScript-aware linting
-- **Prettier ESLint configuration** — formatting compatibility
+- **Vite / electron-vite** - development and build tooling
+- **ESLint** - JavaScript/TypeScript linting
+- **Stylelint** - CSS/SCSS linting
+- **TypeScript ESLint** - TypeScript-aware linting
+- **Prettier ESLint configuration** - formatting compatibility
 
 ---
 
