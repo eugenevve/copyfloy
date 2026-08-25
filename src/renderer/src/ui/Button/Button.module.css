@@ -6,9 +6,11 @@
 }
 
 .icon {
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 50%;
+  max-width: 30px !important;
+  max-height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  border-radius: var(--spacing-l);
 }
 
 .container,
@@ -50,10 +52,19 @@
   --background: var(--content-secondary);
 }
 
+.empty {
+  --color: var(--content-primary);
+}
+
 .primary:not(:disabled):hover {
   opacity: 0.8;
 }
 
 .secondary:not(:disabled):hover {
   opacity: 0.8;
+}
+
+.empty:not(:disabled):hover {
+  --color: var(--content-primary);
+  --background: var(--content-secondary);
 }
