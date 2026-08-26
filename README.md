@@ -1,4 +1,6 @@
-# Copyflow
+<h1 align="center">📁 Copyflow</h1>
+
+<div align="center">
 
 [![Electron](https://img.shields.io/badge/Electron-43-1a1a1a?style=for-the-badge&logo=electron&logoColor=white&labelColor=000000)](https://www.electronjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-Electron_Vite-1a1a1a?style=for-the-badge&logo=vite&logoColor=white&labelColor=000000)](https://electron-vite.org/)
@@ -9,6 +11,8 @@
 [![Stylelint](https://img.shields.io/badge/Stylelint-17-1a1a1a?style=for-the-badge&logo=stylelint&logoColor=white&labelColor=000000)](https://stylelint.io/)
 [![Platform](https://img.shields.io/badge/Platform-Windows-1a1a1a?style=for-the-badge&labelColor=000000)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-1a1a1a?style=for-the-badge&labelColor=000000)](./LICENSE)
+
+</div>
 
 <img src="./resources/readme.png" />
 
