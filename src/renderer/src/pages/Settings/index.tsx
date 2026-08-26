@@ -1,10 +1,10 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { FC } from "react";
 
-export const Home: FC = () => {
+export const Settings: FC = () => {
   return (
     <PageWrapper>
-      Home
+      Settings
     </PageWrapper>
   );
 };
