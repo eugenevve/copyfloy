@@ -1,6 +1,6 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
-import { ArrowLineIcon, GearIcon, HomeIcon } from "@app/ui/Icons";
+import { ArrowLineIcon, HomeIcon } from "@app/ui/Icons";
 import { Line } from "@app/ui/Line";
 import { classNames } from "@app/utils/classNames";
 import { AppPath } from "@app/utils/router";
@@ -32,11 +32,11 @@ export const Sidebar: FC = () => {
       label: "Home",
       icon: <HomeIcon />,
     },
-    {
-      path: AppPath.SETTINGS,
-      label: "Settings",
-      icon: <GearIcon />,
-    },
+    // {
+    //   path: AppPath.SETTINGS,
+    //   label: "Settings",
+    //   icon: <GearIcon />,
+    // },
   ];
 
   return (
