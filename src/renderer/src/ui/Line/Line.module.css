@@ -1,0 +1,5 @@
+.container {
+  width: 100%;
+  height: var(--spacing-xxs);
+  background: var(--content-secondary);
+}
