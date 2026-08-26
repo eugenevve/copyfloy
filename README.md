@@ -1,4 +1,4 @@
-# Copyflow (active development)
+# Copyflow
 
 [![Electron](https://img.shields.io/badge/Electron-43-1a1a1a?style=for-the-badge&logo=electron&logoColor=white&labelColor=000000)](https://www.electronjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-Electron_Vite-1a1a1a?style=for-the-badge&logo=vite&logoColor=white&labelColor=000000)](https://electron-vite.org/)
@@ -10,14 +10,16 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-1a1a1a?style=for-the-badge&labelColor=000000)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-1a1a1a?style=for-the-badge&labelColor=000000)](./LICENSE)
 
+<img src="./resources/readme.png" />
+
+---
+
+<br />
+
 > [!WARNING]
 > **Experimental - not ready for public consumption.** This SDK is under active
 > development, has not been security audited, and may change without notice. Do
 > not use it for production workloads or with production credentials.
-
-A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
-
-Application allows you to create copy tasks with a source and destination, configure an execution schedule, exclude specific files or directories, and run tasks automatically in the background.
 
 ---
 
@@ -25,7 +27,11 @@ Application allows you to create copy tasks with a source and destination, confi
 
 ## ✨ About
 
-Application is designed to simplify recurring local file copy operations between drives, folders, removable storage devices, and other accessible locations.
+A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
+
+Application allows you to create copy tasks with a source and destination, configure an execution schedule, exclude specific files or directories, and run tasks automatically in the background.
+
+Is designed to simplify recurring local file copy operations between drives, folders, removable storage devices, and other accessible locations.
 
 A task consists of a single source and destination:
 
