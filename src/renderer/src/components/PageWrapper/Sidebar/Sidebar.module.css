@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: calc(30px + (var(--spacing-s) * 2));
+  height: 100%;
+  padding: var(--spacing-s);
+  border-right: var(--border);
+  gap: var(--spacing-m);
+  transition: var(--transition);
+}
+
+.container.open {
+  width: 150px;
+}
+
+.button {
+  width: 100%;
+}
+
+.icon {
+  transform: rotate(180deg);
+}
