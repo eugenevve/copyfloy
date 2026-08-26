@@ -1,0 +1,14 @@
+.container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--spacing-s);
+  overflow: auto;
+  gap: var(--spacing-m);
+}
