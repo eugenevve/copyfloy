@@ -14,8 +14,6 @@
 
 ---
 
-<br />
-
 > [!WARNING]
 > **Experimental - not ready for public consumption.** This SDK is under active
 > development, has not been security audited, and may change without notice. Do
