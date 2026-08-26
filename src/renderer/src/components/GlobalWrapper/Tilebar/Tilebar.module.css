@@ -2,8 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: var(--spacing-xs);
-  background: var(--content-secondary);
+  padding-left: var(--spacing-s);
+  background: var(--background);
+  border-bottom: var(--border);
   -webkit-app-region: drag;
 }
 
