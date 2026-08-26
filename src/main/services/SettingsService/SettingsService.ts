@@ -16,6 +16,7 @@ export class SettingsService {
     closeAction: SettingsAction.MINIMIZE,
     autoStart: false,
     runAsAdmin: false,
+    isSidebarOpen: true,
   };
 
   // Loading settings data from a file

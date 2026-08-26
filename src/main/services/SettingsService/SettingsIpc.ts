@@ -25,5 +25,17 @@ export class SettingsIpc {
     ipcMain.handle("app:is-admin", () => {
       return checkIsAdmin();
     });
+
+    // Returns the current sidebar setting
+    ipcMain.on("settings:get-sidebar", (event) => {
+      event.returnValue = this.settingsService.getSettings().isSidebarOpen;
+    });
+
+    // Sets the sidebar setting
+    ipcMain.handle("settings:set-sidebar", async (_, isSidebarOpen: boolean) => {
+      await this.settingsService.updateSettings({
+        isSidebarOpen,
+      });
+    });
   }
 }

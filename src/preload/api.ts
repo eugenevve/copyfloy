@@ -35,6 +35,10 @@ export const api = {
       };
     },
     isAdmin: (): Promise<boolean> => ipcRenderer.invoke("app:is-admin"),
+    sidebar: {
+      get: (): boolean => ipcRenderer.sendSync("settings:get-sidebar") as boolean,
+      set: (isOpen: boolean): Promise<void> => ipcRenderer.invoke("settings:set-sidebar", isOpen),
+    },
   },
   tasks: {
     get: (): Promise<Task[]> => ipcRenderer.invoke("tasks:get-all"),

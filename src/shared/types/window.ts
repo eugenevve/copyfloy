@@ -11,6 +11,7 @@ export interface IAppSettings {
   autoStart: boolean;
   runAsAdmin: boolean;
   windowState?: IWindowState;
+  isSidebarOpen: boolean;
 }
 
 export enum SettingsAction {
