@@ -3,7 +3,8 @@
     "composite": true,
     "jsx": "react-jsx",
     "paths": {
-      "@app/*": ["./src/renderer/src/*"]
+      "@app/*": ["./src/renderer/src/*"],
+      "@shared/*": ["./src/shared/*"],
     }
   },
   "include": ["src/preload/index.d.ts", "src/preload/api.ts", "src/renderer/**/*.ts", "src/renderer/**/*.tsx"]
