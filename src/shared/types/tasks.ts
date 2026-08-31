@@ -1,14 +1,14 @@
 import { IScheduleConfig } from "./schedule";
 
 export interface ITaskItem {
-  task: Task;
+  task: ITask;
   onRun: () => void;
   onEdit: () => void;
   onSchedule: () => void;
   onDelete: () => void;
 }
 
-export interface Task {
+export interface ITask {
   id: number;
   name: string;
   type: TaskType;

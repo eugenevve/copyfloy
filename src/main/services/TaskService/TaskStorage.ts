@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { Task } from "@shared/types/tasks";
+import { ITask } from "@shared/types/tasks";
 import { app } from "electron";
 
 // Storage for Task entities
@@ -10,12 +10,12 @@ export class TaskStorage {
   readonly dataPath = path.join(app.getPath("userData"), "tasks.json");
 
   // Reads all tasks from the default tasks.json
-  load(): Task[] {
+  load(): ITask[] {
     return this.loadFromFile(this.dataPath);
   }
 
   // Reads tasks from a specific JSON file
-  loadFromFile(filePath: string): Task[] {
+  loadFromFile(filePath: string): ITask[] {
     if (!fs.existsSync(filePath)) {
       return [];
     }
@@ -23,7 +23,7 @@ export class TaskStorage {
     try {
       const content = fs.readFileSync(filePath, "utf-8");
 
-      return JSON.parse(content) as Task[];
+      return JSON.parse(content) as ITask[];
     } catch (error) {
       console.error(`[TaskStorage] Failed to read tasks from "${filePath}":`, error);
 
@@ -32,12 +32,12 @@ export class TaskStorage {
   }
 
   // Saves tasks to the default tasks.json
-  save(tasks: Task[]): void {
+  save(tasks: ITask[]): void {
     this.saveToFile(tasks, this.dataPath);
   }
 
   // Saves tasks to a specific JSON file
-  saveToFile(tasks: Task[], filePath: string): void {
+  saveToFile(tasks: ITask[], filePath: string): void {
     try {
       this.ensureDirectory(filePath);
 

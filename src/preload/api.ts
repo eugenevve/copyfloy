@@ -1,4 +1,4 @@
-import { Task, TaskType } from "@shared/types/tasks";
+import { ITask, TaskType } from "@shared/types/tasks";
 import { IAppSettings } from "@shared/types/window";
 import { ipcRenderer, IpcRendererEvent } from "electron";
 
@@ -41,14 +41,14 @@ export const api = {
     },
   },
   tasks: {
-    get: (): Promise<Task[]> => ipcRenderer.invoke("tasks:get-all"),
-    save: (task: Omit<Task, "id">): Promise<Task[]> => ipcRenderer.invoke("tasks:save", task),
-    update: (task: Task): Promise<Task[]> => ipcRenderer.invoke("tasks:update", task),
-    delete: (id: number): Promise<Task[]> => ipcRenderer.invoke("tasks:delete", id),
-    run: (task: Task): Promise<void> => ipcRenderer.invoke("tasks:run", task),
+    get: (): Promise<ITask[]> => ipcRenderer.invoke("tasks:get-all"),
+    save: (task: Omit<ITask, "id">): Promise<ITask[]> => ipcRenderer.invoke("tasks:save", task),
+    update: (task: ITask): Promise<ITask[]> => ipcRenderer.invoke("tasks:update", task),
+    delete: (id: number): Promise<ITask[]> => ipcRenderer.invoke("tasks:delete", id),
+    run: (task: ITask): Promise<void> => ipcRenderer.invoke("tasks:run", task),
     export: (): Promise<boolean> => ipcRenderer.invoke("tasks:export"),
-    import: (): Promise<Task[] | "invalid_json" | null> => ipcRenderer.invoke("tasks:import"),
-    saveBulk: (tasks: Task[]): Promise<Task[]> => ipcRenderer.invoke("tasks:save-bulk", tasks),
+    import: (): Promise<ITask[] | "invalid_json" | null> => ipcRenderer.invoke("tasks:import"),
+    saveBulk: (tasks: ITask[]): Promise<ITask[]> => ipcRenderer.invoke("tasks:save-bulk", tasks),
     openDialog: (type: TaskType): Promise<string | null> => ipcRenderer.invoke("dialog:open", type),
     openExceptionDialog: (sourcePath: string, mode: TaskType.FILE | TaskType.FOLDER): Promise<string[] | null> =>
       ipcRenderer.invoke("dialog:open-exception", sourcePath, mode),

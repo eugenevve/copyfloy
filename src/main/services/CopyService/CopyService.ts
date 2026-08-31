@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { Task } from "@shared/types/tasks";
+import { ITask } from "@shared/types/tasks";
 import fs from "fs-extra";
 
 import { NotificationService } from "../NotificationService/NotificationService";
@@ -8,7 +8,7 @@ import { NotificationService } from "../NotificationService/NotificationService"
 // Service responsible for executing file and folder copy operations
 export class CopyService {
   // Copies a source file or directory to a target directory and honors the task's excluded paths
-  async run(task: Task): Promise<void> {
+  async run(task: ITask): Promise<void> {
     try {
       const destination = path.join(task.target, path.basename(task.source));
 

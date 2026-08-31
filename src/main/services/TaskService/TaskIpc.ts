@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { Task, TaskType } from "@shared/types/tasks";
+import { ITask, TaskType } from "@shared/types/tasks";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 
 import { TaskStorage } from "./TaskStorage";
@@ -17,10 +17,10 @@ export class TaskIpc {
 
   init(): void {
     // Create a new task
-    ipcMain.handle("tasks:save", (_, newTask: Omit<Task, "id">) => {
+    ipcMain.handle("tasks:save", (_, newTask: Omit<ITask, "id">) => {
       const tasks = this.taskStorage.load();
 
-      const taskWithId: Task = {
+      const taskWithId: ITask = {
         id: Date.now(),
         ...newTask,
       };
@@ -39,7 +39,7 @@ export class TaskIpc {
     });
 
     // Update a task
-    ipcMain.handle("tasks:update", (_, updatedTask: Task) => {
+    ipcMain.handle("tasks:update", (_, updatedTask: ITask) => {
       const tasks = this.taskStorage.load().map((task) => {
         return task.id === updatedTask.id ? updatedTask : task;
       });
@@ -51,7 +51,7 @@ export class TaskIpc {
     });
 
     // Run a task manually
-    ipcMain.handle("tasks:run", async (_, task: Task) => {
+    ipcMain.handle("tasks:run", async (_, task: ITask) => {
       await this.copyService.run(task);
     });
 
@@ -100,7 +100,7 @@ export class TaskIpc {
     });
 
     // Save imported tasks
-    ipcMain.handle("tasks:save-bulk", (_, tasks: Task[]) => {
+    ipcMain.handle("tasks:save-bulk", (_, tasks: ITask[]) => {
       this.taskStorage.save(tasks);
       this.scheduler.rescheduleAll(tasks);
 

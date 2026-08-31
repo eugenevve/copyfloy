@@ -1,5 +1,5 @@
 import { ScheduleType } from "@shared/types/schedule";
-import { Task } from "@shared/types/tasks";
+import { ITask } from "@shared/types/tasks";
 import cron, { ScheduledTask } from "node-cron";
 
 import { convertToCron } from "./ScheduleUtils";
@@ -9,15 +9,15 @@ export class SchedulerService {
   // Active cron jobs: task ID -> cron job
   private readonly jobs = new Map<number, ScheduledTask>();
 
-  constructor(private readonly onTaskScheduled: (task: Task) => void) {}
+  constructor(private readonly onTaskScheduled: (task: ITask) => void) {}
 
   // Initialize the scheduler
-  init(tasks: Task[]): void {
+  init(tasks: ITask[]): void {
     this.rescheduleAll(tasks);
   }
 
   // Restarts the schedule for all provided tasks
-  rescheduleAll(tasks: Task[]): void {
+  rescheduleAll(tasks: ITask[]): void {
     this.stopAll();
 
     for (const task of tasks) {
@@ -39,7 +39,7 @@ export class SchedulerService {
   }
 
   // Creates a cron job for a specific task
-  private scheduleTask(task: Task): void {
+  private scheduleTask(task: ITask): void {
     if (!task.schedule) {
       return;
     }
