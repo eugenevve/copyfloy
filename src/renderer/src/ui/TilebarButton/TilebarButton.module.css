@@ -15,8 +15,8 @@
 .content svg {
   display: flex;
   flex-direction: column;
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
 }
 
 .primary {
@@ -30,11 +30,11 @@
 }
 
 .primary:hover {
-  --color-background: var(--content-secondary);
+  --color-background: var(--content-gray-dark);
   --color-content: var(--content-primary);
 }
 
 .secondary:hover {
   --color-background: var(--red);
-  --color-content: var(--white);
+  --color-content: var(--white-primary);
 }

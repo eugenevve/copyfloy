@@ -4,7 +4,7 @@
   align-items: center;
   padding-left: var(--spacing-s);
   background: var(--background);
-  border-bottom: var(--border);
+  border-bottom: var(--border-primary);
   -webkit-app-region: drag;
 }
 

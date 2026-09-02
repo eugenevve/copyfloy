@@ -4,7 +4,7 @@
   width: calc(30px + (var(--spacing-s) * 2));
   height: 100%;
   padding: var(--spacing-s);
-  border-right: var(--border);
+  border-right: var(--border-primary);
   gap: var(--spacing-m);
   transition: var(--transition);
 }
