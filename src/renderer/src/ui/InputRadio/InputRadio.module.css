@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  width: fit-content;
+  padding: var(--spacing-xxs);
+  cursor: pointer;
+}
+
+.input {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border: var(--border-primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.input:checked {
+  border: 3px solid var(--content-primary);
+}
+
+.container.disabled,
+.input:disabled {
+  color: var(--content-gray-light);
+  cursor: not-allowed;
+}
+
+.label {
+  font-weight: var(--heading);
+}
