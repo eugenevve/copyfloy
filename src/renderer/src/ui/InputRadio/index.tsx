@@ -6,9 +6,9 @@ import { IInputRadio } from "./InputRadio.types";
 
 export const InputRadio: FC<IInputRadio> = ({ disabled, label, ...props }) => {
   return (
-    <label className={classNames(styles.container, (label && styles.label) || "", (disabled && styles.disabled) || "")}>
+    <label className={classNames(styles.container, (disabled && styles.disabled) || "")}>
       <input type="radio" {...props} disabled={disabled} className={styles.input} />
-      {label}
+      <div className={styles.label}>{label}</div>
     </label>
   );
 };
