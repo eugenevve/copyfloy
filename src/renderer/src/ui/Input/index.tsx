@@ -3,19 +3,18 @@ import { FC } from "react";
 
 import styles from "./Input.module.css";
 import { IInput } from "./Input.types";
+import { Button } from "../Button";
+import { ButtonKind } from "../Button/Button.types";
 
-export const Input: FC<IInput> = ({ disabled, icon, className, ...props }) => {
+export const Input: FC<IInput> = ({ disabled, className, icon, onClick, ...props }) => {
   return (
-    <div
-      className={classNames(
-        styles.container,
-        className || "",
-        (icon && styles.icon) || "",
-        (disabled && styles.disabled) || ""
-      )}
-    >
+    <div className={classNames(styles.container, className || "", (disabled && styles.disabled) || "")}>
       <input {...props} disabled={disabled} className={styles.input} />
-      {icon}
+      {icon && (
+        <Button kind={ButtonKind.SECONDARY} className={styles.button} onClick={onClick} icon>
+          {icon}
+        </Button>
+      )}
     </div>
   );
 };

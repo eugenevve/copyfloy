@@ -1,13 +1,10 @@
 .container {
   display: flex;
-  flex-direction: row;
   align-items: center;
+  height: 30px;
   border: var(--border-primary);
-  border-radius: var(--spacing-m);
-  background: var(--background-secondary);
-  color: var(--content-primary);
-  padding-right: var(--spacing-s);
-  gap: var(--spacing-s);
+  border-radius: var(--spacing-xl);
+  background: var(--content-gray-dark);
 }
 
 .container:focus-within {
@@ -15,11 +12,13 @@
 }
 
 .input {
+  display: flex;
   flex: 1;
-  padding: var(--spacing-s);
+  height: 30px;
+  padding: var(--spacing-m);
   border: none;
-  border-radius: var(--spacing-m);
-  background: var(--background-secondary);
+  border-radius: var(--spacing-xl);
+  background: var(--content-gray-dark);
   color: var(--content-primary);
   font-size: 16px;
   font-weight: var(--heading);
@@ -38,12 +37,11 @@
   outline: none;
 }
 
-.icon {
-  cursor: pointer;
+.container:has(.button) .input {
+  padding: 0;
+  padding-left: var(--spacing-m) !important;
 }
 
-.icon svg {
-  width: 12px;
-  height: 12px;
-  fill: var(--content-primary);
+.button {
+  border-radius: 0 50% 50% 0;
 }
