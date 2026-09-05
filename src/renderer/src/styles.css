@@ -1,6 +1,6 @@
 @font-face {
-  font-family: Figtree;
-  src: url("./fonts/Figtree.ttf") format("truetype");
+  font-family: Huninn;
+  src: url("./fonts/Huninn.ttf") format("truetype");
 }
 
 :root {
@@ -37,7 +37,7 @@
   --heading: 500;
 
   /* font-family */
-  --font-family: "Figtree";
+  --font-family: "Huninn";
 
   /* transition */
   --transition: 200ms;
