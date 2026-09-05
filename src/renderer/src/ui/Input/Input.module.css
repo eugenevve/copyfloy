@@ -3,7 +3,7 @@
   align-items: center;
   height: 30px;
   border: var(--border-primary);
-  border-radius: var(--spacing-xl);
+  border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
 }
 
@@ -17,7 +17,7 @@
   height: 30px;
   padding: var(--spacing-m);
   border: none;
-  border-radius: var(--spacing-xl);
+  border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
   color: var(--content-primary);
   font-size: 16px;
