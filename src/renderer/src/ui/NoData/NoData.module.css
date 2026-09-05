@@ -1,0 +1,5 @@
+.container {
+  padding: var(--spacing-s);
+  font-weight: var(--heading);
+  text-align: center;
+}
