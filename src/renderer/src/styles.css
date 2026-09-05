@@ -19,6 +19,9 @@
   --dark-gray-primary: #262626;
   --dark-gray-secondary: #5e5e5e;
 
+  /* blur */
+  --blackout: rgb(0 0 0 / 70%);
+
   /* spacing */
   --spacing-xxs: 1px;
   --spacing-xs: 3px;
