@@ -16,6 +16,7 @@
   background: var(--background-secondary);
   max-height: 94%;
   overflow-y: hidden;
+  animation: scale-in var(--transition);
 }
 
 .header {
@@ -44,4 +45,16 @@
   border-radius: 0 0 var(--spacing-l) var(--spacing-l);
   gap: var(--spacing-m);
   overflow-y: auto;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
