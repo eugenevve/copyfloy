@@ -23,6 +23,7 @@ export default defineConfig({
     resolve: {
       alias: {
         "@app": resolve("src/renderer/src"),
+        "@shared": resolve("src/shared"),
       },
     },
   },
