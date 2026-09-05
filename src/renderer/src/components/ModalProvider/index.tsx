@@ -1,6 +1,6 @@
 import { useState, FC } from "react";
 
-import { ModalAlert } from "./components/ModalAlert";
+import { ModalAlert } from "./ModalAlert";
 import { ModalContext } from "./ModalContext";
 import { IModalProvider, ModalConfig } from "./ModalProvider.types";
 
