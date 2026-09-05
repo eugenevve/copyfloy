@@ -12,7 +12,7 @@ export const Modal: FC<IModal> = ({ title, width, onClose, children }) => {
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.container} style={{ width: width }}>
+      <div className={styles.container} style={{ width: width }} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.title}>{title}</div>
           <Button kind={ButtonKind.SECONDARY} onClick={onClose} icon>
