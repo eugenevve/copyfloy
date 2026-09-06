@@ -1,5 +1,16 @@
 .container {
   display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.label {
+  font-weight: var(--heading);
+}
+
+.content {
+  display: flex;
   align-items: center;
   height: 30px;
   border: var(--border-primary);
@@ -7,7 +18,7 @@
   background: var(--content-gray-dark);
 }
 
-.container:focus-within {
+.content:focus-within {
   outline: var(--border-secondary);
 }
 
@@ -30,14 +41,14 @@
   color: var(--content-gray-light);
 }
 
-.container.disabled,
+.content.disabled,
 .input:disabled {
   cursor: not-allowed;
   color: var(--color-gray);
   outline: none;
 }
 
-.container:has(.button) .input {
+.content:has(.button) .input {
   padding: 0;
   padding-left: var(--spacing-m) !important;
 }

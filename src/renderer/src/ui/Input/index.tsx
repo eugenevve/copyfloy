@@ -6,15 +6,18 @@ import { IInput } from "./Input.types";
 import { Button } from "../Button";
 import { ButtonKind } from "../Button/Button.types";
 
-export const Input: FC<IInput> = ({ disabled, className, icon, onClick, ...props }) => {
+export const Input: FC<IInput> = ({ label, disabled, className, icon, onClick, ...props }) => {
   return (
-    <div className={classNames(styles.container, className || "", (disabled && styles.disabled) || "")}>
-      <input {...props} disabled={disabled} className={styles.input} />
-      {icon && (
-        <Button kind={ButtonKind.SECONDARY} className={styles.button} onClick={onClick} icon>
-          {icon}
-        </Button>
-      )}
+    <div className={styles.container}>
+      {label && <div className={styles.label}>{label}</div>}
+      <div className={classNames(styles.content, className || "", (disabled && styles.disabled) || "")}>
+        <input {...props} disabled={disabled} className={styles.input} />
+        {icon && (
+          <Button kind={ButtonKind.SECONDARY} className={styles.button} onClick={onClick} icon>
+            {icon}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

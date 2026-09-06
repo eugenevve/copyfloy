@@ -1,13 +1,14 @@
 import { InputHTMLAttributes, ReactNode } from "react";
 
-export type IInput = InputHTMLAttributes<HTMLInputElement> & (InputWithIcon | InputWithoutIcon);
-
-type InputWithIcon = {
-  icon: ReactNode;
-  onClick: () => void;
-};
-
-type InputWithoutIcon = {
-  icon?: never;
-  onClick?: never;
-};
+export type IInput = InputHTMLAttributes<HTMLInputElement> & {
+  label?: string;
+} & (
+    | {
+        icon: ReactNode;
+        onClick: () => void;
+      }
+    | {
+        icon?: never;
+        onClick?: never;
+      }
+  );
