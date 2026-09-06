@@ -19,6 +19,6 @@ export interface ITask {
 }
 
 export enum TaskType {
-  FILE = "file",
   FOLDER = "folder",
+  FILE = "file",
 }

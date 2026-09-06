@@ -50,7 +50,7 @@ export const api = {
     import: (): Promise<ITask[] | "invalid_json" | null> => ipcRenderer.invoke("tasks:import"),
     saveBulk: (tasks: ITask[]): Promise<ITask[]> => ipcRenderer.invoke("tasks:save-bulk", tasks),
     openDialog: (type: TaskType): Promise<string | null> => ipcRenderer.invoke("dialog:open", type),
-    openExceptionDialog: (sourcePath: string, mode: TaskType.FILE | TaskType.FOLDER): Promise<string[] | null> =>
+    openExceptionDialog: (sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE): Promise<string[] | null> =>
       ipcRenderer.invoke("dialog:open-exception", sourcePath, mode),
   },
   updater: {

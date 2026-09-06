@@ -126,7 +126,7 @@ export class TaskIpc {
     // Select exceptions
     ipcMain.handle(
       "dialog:open-exception",
-      async (event, sourcePath: string, mode: TaskType.FILE | TaskType.FOLDER) => {
+      async (event, sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE) => {
         const window = BrowserWindow.fromWebContents(event.sender);
 
         if (!window) {
