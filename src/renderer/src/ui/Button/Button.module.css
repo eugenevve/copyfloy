@@ -40,7 +40,7 @@
 
 .container:disabled,
 .icon:disabled {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .primary {
