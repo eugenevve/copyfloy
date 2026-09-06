@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+.radioGroup {
+  flex-direction: row;
+  gap: var(--spacing-s);
+}
+
+.group {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--spacing-s);
+  width: 100%;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.button {
+  margin-left: auto;
+}
+
+.hint {
+  color: var(--content-gray-light);
+}
