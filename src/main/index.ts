@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 
 import packageJson from "../../package.json";
 import { appState } from "./services/AppState/AppState";
+import { DiscordPresenceService } from "./services/DiscordPresence/DiscordPresenceService";
 import { SettingsIpc } from "./services/SettingsService/SettingsIpc";
 import { SettingsService } from "./services/SettingsService/SettingsService";
 import { UpdaterIpc } from "./services/SetupUpdater/SetupIpc";
@@ -21,6 +22,7 @@ const windowIpc = new WindowIpc(windowService);
 const taskService = new TaskService();
 const updater = new SetupUpdater();
 const updaterIpc = new UpdaterIpc(updater);
+const discordPresence = new DiscordPresenceService();
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -61,6 +63,17 @@ function configureApplication(): void {
 function initializeServices(): void {
   taskService.init();
   updater.init();
+
+  discordPresence.init();
+  discordPresence.setActivity({
+    details: "Taking care of files",
+    state: app.isPackaged ? "Staying Busy" : "Developing",
+    largeImageKey: "app",
+    largeImageText: "Copyfloy",
+    // smallImageKey: "app",
+    // smallImageText: "Copyfloy",
+    startTimestamp: Date.now(),
+  });
 }
 
 function registerIpcHandlers(): void {
@@ -104,6 +117,7 @@ function setupGlobalHandlers(): void {
 
 app.on("before-quit", () => {
   appState.isQuitting = true;
+  discordPresence.destroy();
 });
 
 app.on("window-all-closed", () => {
