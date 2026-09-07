@@ -19,9 +19,9 @@
 ---
 
 > [!WARNING]
-> **Experimental - not ready for public consumption.** This SDK is under active
-> development, has not been security audited, and may change without notice. Do
-> not use it for production workloads or with production credentials.
+> **Experimental - not ready for public use.**
+> This application is under active development and may contain bugs or incomplete features.
+> It may change without notice and is not recommended for production use.
 
 ---
 
