@@ -56,7 +56,7 @@ export const getUpdateWindowHtml = (): string => `
     </style>
   </head>
   <body>
-    <div class="title">Copyflow</div>
+    <div class="title">Copyfloy</div>
     <div class="subtext">Update system...</div>
     <div class="spinner"></div>
   </body>

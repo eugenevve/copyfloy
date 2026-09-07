@@ -1,8 +1,8 @@
 {
-  "name": "Copyflow",
-  "appId": "com.copyflow.app",
+  "name": "Copyfloy",
+  "appId": "com.copyfloy.app",
   "version": "1.0.0",
-  "author": "Copyflow",
+  "author": "Copyfloy",
   "private": true,
   "main": "./out/main/index.js",
   "build": {
@@ -43,7 +43,7 @@
       {
         "provider": "github",
         "owner": "eugenevve",
-        "repo": "copyflow",
+        "repo": "copyfloy",
         "private": false
       }
     ]

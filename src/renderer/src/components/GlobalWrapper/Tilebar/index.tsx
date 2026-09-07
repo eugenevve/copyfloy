@@ -22,7 +22,7 @@ export const Tilebar: FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>Copyflow {isAdmin && "(administrator)"}</div>
+      <div className={styles.title}>Copyfloy {isAdmin && "(administrator)"}</div>
       <div className={styles.controls}>
         <TilebarButton onClick={handleMinimize}>
           <LineIcon />

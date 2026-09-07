@@ -1,4 +1,4 @@
-<h1 align="center">📁 Copyflow</h1>
+<h1 align="center">📁 Copyfloy</h1>
 
 <div align="center">
 
@@ -226,8 +226,8 @@ The renderer communicates with the backend through IPC handlers rather than acce
 Clone the repository:
 
 ```bash
-git clone https://github.com/eugenevve/copyflow.git
-cd copyflow
+git clone https://github.com/eugenevve/copyfloy.git
+cd copyfloy
 ```
 
 Install dependencies:
@@ -321,7 +321,7 @@ The packaging configuration is defined in `package.json`.
 After a successful build, the Windows installer will be available in:
 
 ```text
-dist/Copyflow-setup-1.0.0.exe
+dist/Copyfloy-setup-1.0.0.exe
 ```
 
 ---
