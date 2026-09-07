@@ -1,13 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 
-export const InfoApp: FC = () => {
-  const [tasksCount, setTasksCount] = useState(0);
+import { IInfoApp } from "./InfoApp.types";
 
-  useEffect(() => {
-    void window.api.tasks.get().then((tasks) => {
-      setTasksCount(tasks.length);
-    });
-  }, []);
-
-  return <div>Tasks: {tasksCount}</div>;
+export const InfoApp: FC<IInfoApp> = ({ count }) => {
+  return <div>Tasks: {count}</div>;
 };
