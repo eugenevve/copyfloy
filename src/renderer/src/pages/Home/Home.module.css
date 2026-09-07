@@ -1,0 +1,13 @@
+.container,
+.header {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.container {
+  flex-direction: column;
+}
+
+.header {
+  align-items: center;
+}
