@@ -5,14 +5,14 @@ export const getUpdateWindowHtml = (): string => `
     <meta charset="UTF-8" />
     <style>
       :root {
-        --background: #ffffff;
-        --title: #111111;
-        --subtitle: #838383;
+        --background: #f7f7f7;
+        --title: #0a0a0a;
+        --subtitle: #a8a8a8;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --background: #111111;
-          --title: #ffffff;
+          --background: #0a0a0a;
+          --title: #f7f7f7;
         }
       }
       body {

@@ -6,7 +6,7 @@ export interface IModalProvider {
 
 export interface IModalContext {
   showAlert: (title: string, description: string) => void;
-  showConfirm: (title: string, description: string, onConfirm: () => void) => void;
+  showConfirm: (title: string, description: string, onConfirm: ConfirmCallback) => void;
 }
 
 export interface ModalConfig {

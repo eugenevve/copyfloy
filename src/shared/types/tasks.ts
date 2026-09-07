@@ -3,8 +3,8 @@ import { IScheduleConfig } from "./schedule";
 export interface ITaskItem {
   task: ITask;
   onRun: () => void;
-  onEdit: () => void;
   onSchedule: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }
 

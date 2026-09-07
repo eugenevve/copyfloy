@@ -39,6 +39,7 @@
 
 .input::placeholder {
   color: var(--content-gray-light);
+  user-select: none;
 }
 
 .content.disabled,
