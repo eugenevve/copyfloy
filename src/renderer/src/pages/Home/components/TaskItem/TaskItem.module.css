@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--spacing-l);
+  background: var(--content-gray-dark);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.icon {
+  fill: var(--content-primary);
+  width: 14px;
+  height: 14px;
+}
+
+.source {
+  display: -webkit-box;
+  color: var(--content-gray-light);
+  font-size: 14px;
+  -webkit-line-clamp: 1;
+  line-clamp: inherit;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
