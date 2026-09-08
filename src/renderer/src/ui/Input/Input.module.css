@@ -46,7 +46,6 @@
 .input:disabled {
   cursor: not-allowed;
   color: var(--color-gray);
-  outline: none;
 }
 
 .content:has(.button) .input {

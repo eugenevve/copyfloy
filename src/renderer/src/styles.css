@@ -19,7 +19,7 @@
   --dark-gray-primary: #262626;
   --dark-gray-secondary: #5e5e5e;
 
-  /* blur */
+  /* blackout-color */
   --blackout: rgb(0 0 0 / 70%);
 
   /* spacing */
@@ -33,11 +33,11 @@
   --border-primary: var(--spacing-xxs) solid var(--content-gray-dark);
   --border-secondary: var(--spacing-xxs) solid var(--content-gray-light);
 
-  /* font-weight */
-  --heading: 500;
-
   /* font-family */
   --font-family: "Huninn";
+
+  /* font-weight */
+  --heading: 500;
 
   /* transition */
   --transition: 200ms;
