@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.label {
+  font-weight: var(--heading);
+}
+
+.list {
+  display: flex;
+  gap: var(--spacing-s);
+}
