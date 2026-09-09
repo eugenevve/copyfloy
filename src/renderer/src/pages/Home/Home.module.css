@@ -17,6 +17,11 @@
   gap: var(--spacing-s);
 }
 
+.input,
+.input input {
+  width: 200px;
+}
+
 .select {
   width: 120px;
 }

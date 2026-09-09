@@ -1,6 +1,7 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
+import { Input } from "@app/ui/Input";
 import { Select } from "@app/ui/Select";
 import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
 import { ITask, TaskType } from "@shared/types/tasks";
@@ -14,6 +15,8 @@ import styles from "./Home.module.css";
 
 export const Home: FC = () => {
   const { showConfirm } = useModal();
+
+  const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TaskType | "all">("all");
 
   const [tasks, setTasks] = useState<ITask[]>([]);
@@ -30,7 +33,11 @@ export const Home: FC = () => {
     void window.api.tasks.get().then(setTasks);
   }, []);
 
-  const filteredTasks = typeFilter === "all" ? tasks : tasks.filter((task) => task.type === typeFilter);
+  const filteredTasks = tasks.filter((task) => {
+    const matchesType = typeFilter === "all" || task.type === typeFilter;
+    const matchesSearch = task.name.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   const handleRun = (task: ITask) => {
     try {
@@ -98,12 +105,20 @@ export const Home: FC = () => {
               <InfoApp count={filteredTasks.length} />
               <Button onClick={() => setTaskOpen(true)}>Add task</Button>
             </div>
-            <Select
-              options={TYPE_OPTIONS_FILTER}
-              value={typeFilter}
-              onChange={(value) => setTypeFilter(value as TaskType | "all")}
-              className={styles.select}
-            />
+            <div className={styles.section}>
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search name..."
+                className={styles.input}
+              />
+              <Select
+                options={TYPE_OPTIONS_FILTER}
+                value={typeFilter}
+                onChange={(value) => setTypeFilter(value as TaskType | "all")}
+                className={styles.select}
+              />
+            </div>
           </div>
           <TaskList
             items={filteredTasks}
