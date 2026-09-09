@@ -4,6 +4,7 @@ import { Button } from "@app/ui/Button";
 import { ITask } from "@shared/types/tasks";
 import { FC, useEffect, useState } from "react";
 
+import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
 import { InfoApp } from "./components/InfoApp";
 import { TaskList } from "./components/TaskList";
@@ -13,9 +14,8 @@ export const Home: FC = () => {
   const { showConfirm } = useModal();
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [isTaskOpen, setTaskOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<ITask | null>(null);
-  // const [isScheduleOpen, setScheduleOpen] = useState(false);
-  // const [schedulingTask, setSchedulingTask] = useState<ITask | null>(null);
+  const [isInitTask, setInitTask] = useState<ITask | null>(null);
+  const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
 
   const fetchTasks = async () => {
     const data = await window.api.tasks.get();
@@ -34,14 +34,35 @@ export const Home: FC = () => {
     }
   };
 
-  // const handleSchedule = (task: ITask) => {
-  //   setSchedulingTask(task);
-  //   setScheduleOpen(true);
-  // };
+  // Modal Schedule
+  const handleSchedule = (task: ITask) => {
+    setInitScheduling(task);
+  };
 
-  const handleEdit = (task: ITask) => {
-    setEditingTask(task);
+  const handleCloseSchedule = () => {
+    setInitScheduling(null);
+  };
+
+  const handleSaveSchedule = async () => {
+    await fetchTasks();
+    handleCloseSchedule();
+  };
+
+  // Modal Task
+  const handleTask = (task: ITask) => {
+    setInitTask(task);
     setTaskOpen(true);
+  };
+
+  const handleCloseTask = () => {
+    setInitTask(null);
+    setTaskOpen(false);
+  };
+
+  const handleSaveTask = async () => {
+    await fetchTasks();
+    setTaskOpen(false);
+    setInitTask(null);
   };
 
   const handleDelete = (id: number) => {
@@ -73,28 +94,20 @@ export const Home: FC = () => {
           <TaskList
             items={tasks}
             onRun={handleRun}
-            onSchedule={() => {}}
-            onEdit={handleEdit}
+            onSchedule={handleSchedule}
+            onEdit={handleTask}
             onDelete={(task) => handleDelete(task.id)}
           />
         </div>
       </PageWrapper>
-      {isTaskOpen && (
-        <EditTaskFormModal
-          initialData={editingTask}
-          onClose={() => {
-            setTaskOpen(false);
-            setEditingTask(null);
-          }}
-          onSaved={async () => {
-            await fetchTasks();
-            setTaskOpen(false);
-            setEditingTask(null);
-          }}
+      {isTaskOpen && <EditTaskFormModal initialData={isInitTask} onClose={handleCloseTask} onSaved={handleSaveTask} />}
+      {isInitScheduling && (
+        <EditSchedulerFormModal
+          initialData={isInitScheduling}
+          onClose={handleCloseSchedule}
+          onSaved={handleSaveSchedule}
         />
       )}
-      {/* TODO: Modal Scheduler */}
-      {/* {isScheduleOpen && <></>} */}
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
-import { FileIcon, FolderIcon, PenIcon, PlayIcon, TrashIcon } from "@app/ui/Icons";
+import { ClockIcon, FileIcon, FolderIcon, PenIcon, PlayIcon, TrashIcon } from "@app/ui/Icons";
 import { ITaskItem, TaskType } from "@shared/types/tasks";
 import type { FC } from "react";
 
@@ -11,12 +11,12 @@ const TYPE_ICONS = {
   [TaskType.FILE]: FileIcon,
 };
 
-export const TaskItem: FC<ITaskItem> = ({ task, onRun, onEdit, /* onSchedule */ onDelete }) => {
+export const TaskItem: FC<ITaskItem> = ({ task, onRun, onEdit, onSchedule, onDelete }) => {
   const TypeIcon = TYPE_ICONS[task.type];
 
   const items = [
     { Icon: PlayIcon, onClick: onRun },
-    // { Icon: ClockIcon, onClick: onSchedule },
+    { Icon: ClockIcon, onClick: onSchedule },
     { Icon: PenIcon, onClick: onEdit },
     { Icon: TrashIcon, onClick: onDelete },
   ];
