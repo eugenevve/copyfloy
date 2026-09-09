@@ -6,20 +6,13 @@ import { Input } from "@app/ui/Input";
 import { Line } from "@app/ui/Line";
 import { Modal } from "@app/ui/Modal";
 import { Select } from "@app/ui/Select";
+import { TYPE_OPTIONS_SCHEDULE } from "@app/utils/options";
 import { ScheduleType } from "@shared/types/schedule";
 import { ITask } from "@shared/types/tasks";
 import { ChangeEvent, FC, useState } from "react";
 
 import styles from "./EditSchedulerFormModal.module.css";
 import { IEditSchedulerFormModal } from "./EditSchedulerFormModal.types";
-
-const TYPE_OPTIONS = [
-  { label: "Disabled", value: ScheduleType.DISABLED },
-  { label: "Every day", value: ScheduleType.DAILY },
-  { label: "Every hour", value: ScheduleType.HOURLY },
-  { label: "Every N minutes", value: ScheduleType.MINUTES },
-  { label: "By day of week", value: ScheduleType.WEEKLY },
-];
 
 export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialData, onClose, onSaved }) => {
   const { showConfirm } = useModal();
@@ -102,7 +95,7 @@ export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialDat
         label="Schedule type"
         value={type}
         onChange={(value) => setType(value as ScheduleType)}
-        options={TYPE_OPTIONS}
+        options={TYPE_OPTIONS_SCHEDULE}
       />
       {(type === ScheduleType.DAILY || type === ScheduleType.WEEKLY) && (
         <>

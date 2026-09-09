@@ -4,7 +4,7 @@ import { ButtonKind } from "@app/ui/Button/Button.types";
 import { Input } from "@app/ui/Input";
 import { Modal } from "@app/ui/Modal";
 import { RadioGroup } from "@app/ui/RadioGroup";
-import { IRadioOption } from "@app/ui/RadioGroup/RadioGroup.types";
+import { TYPE_OPTIONS_EDIT } from "@app/utils/options";
 import { ScheduleType } from "@shared/types/schedule";
 import { TaskType } from "@shared/types/tasks";
 import { useState, type ChangeEvent, type FC } from "react";
@@ -13,11 +13,6 @@ import styles from "./EditTaskFormModal.module.css";
 import { FormField, IEditTaskFormModal } from "./EditTaskFormModal.types";
 import { ExceptionChoiceModal } from "../ExceptionChoiceModal";
 import { ExceptionsList } from "../ExceptionsList";
-
-const TYPE_OPTIONS: IRadioOption<TaskType>[] = [
-  { label: "Folder", value: TaskType.FOLDER },
-  { label: "File", value: TaskType.FILE },
-];
 
 export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose, onSaved }) => {
   const { showConfirm } = useModal();
@@ -111,7 +106,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
         <div className={styles.container}>
           <Input label="Task name" value={name} onChange={handleNameChange} placeholder="Example: Photo backup" />
           <RadioGroup
-            options={TYPE_OPTIONS}
+            options={TYPE_OPTIONS_EDIT}
             value={type}
             disabled={isEditMode}
             onChange={handleTypeChange}
