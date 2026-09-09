@@ -1,13 +1,22 @@
-.container,
-.header {
+.container {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-s);
 }
 
-.container {
-  flex-direction: column;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-s);
 }
 
-.header {
+.section {
+  display: flex;
   align-items: center;
+  gap: var(--spacing-s);
+}
+
+.select {
+  width: 120px;
 }

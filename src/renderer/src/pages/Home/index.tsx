@@ -1,7 +1,9 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
-import { ITask } from "@shared/types/tasks";
+import { Select } from "@app/ui/Select";
+import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
+import { ITask, TaskType } from "@shared/types/tasks";
 import { FC, useEffect, useState } from "react";
 
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
@@ -12,6 +14,8 @@ import styles from "./Home.module.css";
 
 export const Home: FC = () => {
   const { showConfirm } = useModal();
+  const [typeFilter, setTypeFilter] = useState<TaskType | "all">("all");
+
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [isTaskOpen, setTaskOpen] = useState(false);
   const [isInitTask, setInitTask] = useState<ITask | null>(null);
@@ -25,6 +29,8 @@ export const Home: FC = () => {
   useEffect(() => {
     void window.api.tasks.get().then(setTasks);
   }, []);
+
+  const filteredTasks = typeFilter === "all" ? tasks : tasks.filter((task) => task.type === typeFilter);
 
   const handleRun = (task: ITask) => {
     try {
@@ -88,11 +94,19 @@ export const Home: FC = () => {
       <PageWrapper>
         <div className={styles.container}>
           <div className={styles.header}>
-            <InfoApp count={tasks.length} />
-            <Button onClick={() => setTaskOpen(true)}>Add task</Button>
+            <div className={styles.section}>
+              <InfoApp count={filteredTasks.length} />
+              <Button onClick={() => setTaskOpen(true)}>Add task</Button>
+            </div>
+            <Select
+              options={TYPE_OPTIONS_FILTER}
+              value={typeFilter}
+              onChange={(value) => setTypeFilter(value as TaskType | "all")}
+              className={styles.select}
+            />
           </div>
           <TaskList
-            items={tasks}
+            items={filteredTasks}
             onRun={handleRun}
             onSchedule={handleSchedule}
             onEdit={handleTask}
