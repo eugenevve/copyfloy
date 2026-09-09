@@ -12,7 +12,7 @@ export const TaskList: FC<ITaskList> = ({ items, onRun, onSchedule, onEdit, onDe
 
   return (
     <div className={styles.container}>
-      {items.map((item) => (
+      {items.toReversed().map((item) => (
         <TaskItem
           key={item.id}
           task={item}
