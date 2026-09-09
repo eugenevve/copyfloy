@@ -10,5 +10,4 @@ export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 export enum ButtonKind {
   PRIMARY = "primary",
   SECONDARY = "secondary",
-  EMPTY = "empty",
 }

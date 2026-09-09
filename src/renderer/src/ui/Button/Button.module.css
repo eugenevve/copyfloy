@@ -53,19 +53,12 @@
   --background: var(--content-gray-dark);
 }
 
-.empty {
-  --color: var(--content-primary);
-}
-
-.primary:not(:disabled):hover {
-  opacity: 0.8;
-}
-
+.primary:not(:disabled):hover,
 .secondary:not(:disabled):hover {
   opacity: 0.8;
 }
 
-.empty:not(:disabled):hover {
-  --color: var(--content-primary);
-  --background: var(--content-gray-dark);
+.primary:not(:disabled):active,
+.secondary:not(:disabled):active {
+  transform: translateY(1px);
 }
