@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  width: calc(30px + (var(--spacing-s) * 2));
+  width: calc(var(--control-size) + (var(--spacing-s) * 2));
   height: 100%;
   padding: var(--spacing-s);
   border-right: var(--border-primary);

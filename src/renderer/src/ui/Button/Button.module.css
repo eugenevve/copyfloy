@@ -1,15 +1,15 @@
 .container {
   width: fit-content;
-  height: 30px;
+  height: var(--control-size);
   padding: 0 var(--spacing-m);
   border-radius: var(--spacing-l);
 }
 
 .icon {
-  max-width: 30px !important;
-  max-height: 30px !important;
-  min-width: 30px !important;
-  min-height: 30px !important;
+  max-width: var(--control-size) !important;
+  max-height: var(--control-size) !important;
+  min-width: var(--control-size) !important;
+  min-height: var(--control-size) !important;
   border-radius: var(--spacing-l);
 }
 

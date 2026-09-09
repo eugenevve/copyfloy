@@ -12,7 +12,7 @@
 .content {
   display: flex;
   align-items: center;
-  height: 30px;
+  height: var(--control-size);
   border: var(--border-primary);
   border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
@@ -25,7 +25,7 @@
 .input {
   display: flex;
   flex: 1;
-  height: 30px;
+  height: var(--control-size);
   padding: var(--spacing-m);
   border: none;
   border-radius: var(--spacing-l);

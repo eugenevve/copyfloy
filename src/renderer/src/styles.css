@@ -29,6 +29,9 @@
   --spacing-m: 11px;
   --spacing-l: 15px;
 
+  /* size-elements */
+  --control-size: 28px;
+
   /* border */
   --border-primary: var(--spacing-xxs) solid var(--content-gray-dark);
   --border-secondary: var(--spacing-xxs) solid var(--content-gray-light);

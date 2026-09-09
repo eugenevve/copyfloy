@@ -16,8 +16,8 @@
 }
 
 .button svg {
-  width: 30px !important;
-  height: 30px !important;
+  width: var(--control-size) !important;
+  height: var(--control-size) !important;
 }
 
 .cancelButton {
