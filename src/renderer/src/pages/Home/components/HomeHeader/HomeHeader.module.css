@@ -2,13 +2,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
 }
 
 .section {
   display: flex;
   align-items: center;
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
 }
 
 .input {
