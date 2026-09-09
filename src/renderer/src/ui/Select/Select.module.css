@@ -21,6 +21,10 @@
   color: var(--content-primary);
 }
 
+.select:active {
+  transform: none !important;
+}
+
 .icon {
   transition: var(--transition);
 }
