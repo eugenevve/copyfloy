@@ -3,25 +3,3 @@
   flex-direction: column;
   gap: var(--spacing-s);
 }
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-s);
-}
-
-.section {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s);
-}
-
-.input,
-.input input {
-  width: 200px;
-}
-
-.select {
-  width: 120px;
-}

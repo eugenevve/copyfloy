@@ -1,47 +1,33 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useModal } from "@app/hooks/useModal";
-import { Button } from "@app/ui/Button";
-import { Input } from "@app/ui/Input";
-import { Select } from "@app/ui/Select";
-import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
-import { ITask, TaskType } from "@shared/types/tasks";
-import { FC, useEffect, useState } from "react";
+import { useTaskFilter } from "@app/hooks/useTaskFilter";
+import { useTasks } from "@app/hooks/useTasks";
+import { ITask } from "@shared/types/tasks";
+import { FC, useState } from "react";
 
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
-import { InfoApp } from "./components/InfoApp";
+import { HomeHeader } from "./components/HomeHeader";
 import { TaskList } from "./components/TaskList";
 import styles from "./Home.module.css";
 
 export const Home: FC = () => {
   const { showConfirm } = useModal();
 
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<TaskType | "all">("all");
-
-  const [tasks, setTasks] = useState<ITask[]>([]);
-  const [isTaskOpen, setTaskOpen] = useState(false);
-  const [isInitTask, setInitTask] = useState<ITask | null>(null);
-  const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
-
-  const fetchTasks = async () => {
-    const data = await window.api.tasks.get();
-    setTasks(data);
-  };
-
-  useEffect(() => {
-    void window.api.tasks.get().then(setTasks);
-  }, []);
-
-  const filteredTasks = tasks.filter((task) => {
-    const matchesType = typeFilter === "all" || task.type === typeFilter;
-    const matchesSearch = task.name.toLowerCase().includes(search.toLowerCase());
-    return matchesType && matchesSearch;
+  const [isTaskModal, setTaskModal] = useState<{
+    open: boolean;
+    task: ITask | null;
+  }>({
+    open: false,
+    task: null,
   });
+  const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
+  const { tasks, fetchTasks, runTask, deleteTask } = useTasks();
+  const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
   const handleRun = (task: ITask) => {
     try {
-      void window.api.tasks.run(task);
+      void runTask(task);
     } catch (error) {
       console.error("Error running task:", error);
     }
@@ -62,20 +48,30 @@ export const Home: FC = () => {
   };
 
   // Modal Task
-  const handleTask = (task: ITask) => {
-    setInitTask(task);
-    setTaskOpen(true);
+  const handleAddTask = () => {
+    setTaskModal({
+      open: true,
+      task: null,
+    });
+  };
+
+  const handleEditTask = (task: ITask) => {
+    setTaskModal({
+      open: true,
+      task,
+    });
   };
 
   const handleCloseTask = () => {
-    setInitTask(null);
-    setTaskOpen(false);
+    setTaskModal({
+      open: false,
+      task: null,
+    });
   };
 
   const handleSaveTask = async () => {
     await fetchTasks();
-    setTaskOpen(false);
-    setInitTask(null);
+    handleCloseTask();
   };
 
   const handleDelete = (id: number) => {
@@ -87,8 +83,7 @@ export const Home: FC = () => {
       `Are you sure you want to delete the task: ${taskName}? This action cannot be undone.`,
       async () => {
         try {
-          const updatedTasks = await window.api.tasks.delete(id);
-          setTasks(updatedTasks);
+          await deleteTask(id);
         } catch (error) {
           console.error("Error deleting task:", error);
         }
@@ -100,36 +95,26 @@ export const Home: FC = () => {
     <>
       <PageWrapper>
         <div className={styles.container}>
-          <div className={styles.header}>
-            <div className={styles.section}>
-              <InfoApp count={filteredTasks.length} />
-              <Button onClick={() => setTaskOpen(true)}>Add task</Button>
-            </div>
-            <div className={styles.section}>
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search name..."
-                className={styles.input}
-              />
-              <Select
-                options={TYPE_OPTIONS_FILTER}
-                value={typeFilter}
-                onChange={(value) => setTypeFilter(value as TaskType | "all")}
-                className={styles.select}
-              />
-            </div>
-          </div>
+          <HomeHeader
+            count={filteredTasks.length}
+            onAddTask={handleAddTask}
+            search={search}
+            onSearchChange={setSearch}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+          />
           <TaskList
             items={filteredTasks}
             onRun={handleRun}
             onSchedule={handleSchedule}
-            onEdit={handleTask}
+            onEdit={handleEditTask}
             onDelete={(task) => handleDelete(task.id)}
           />
         </div>
       </PageWrapper>
-      {isTaskOpen && <EditTaskFormModal initialData={isInitTask} onClose={handleCloseTask} onSaved={handleSaveTask} />}
+      {isTaskModal.open && (
+        <EditTaskFormModal initialData={isTaskModal.task} onClose={handleCloseTask} onSaved={handleSaveTask} />
+      )}
       {isInitScheduling && (
         <EditSchedulerFormModal
           initialData={isInitScheduling}

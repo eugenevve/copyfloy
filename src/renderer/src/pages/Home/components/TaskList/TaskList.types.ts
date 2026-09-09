@@ -2,8 +2,8 @@ import { ITask } from "@shared/types/tasks";
 
 export interface ITaskList {
   items: ITask[];
-  onRun: (item: ITask) => void;
-  onSchedule: (item: ITask) => void;
-  onEdit: (item: ITask) => void;
-  onDelete: (item: ITask) => void;
+  onRun: (task: ITask) => void;
+  onSchedule: (task: ITask) => void;
+  onEdit: (task: ITask) => void;
+  onDelete: (task: ITask) => void;
 }
