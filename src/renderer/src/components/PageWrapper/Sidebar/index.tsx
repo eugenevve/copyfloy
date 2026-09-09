@@ -1,3 +1,4 @@
+import { ThemeButton } from "@app/theme/ThemeButton";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ArrowLineIcon, HomeIcon } from "@app/ui/Icons";
@@ -46,18 +47,23 @@ export const Sidebar: FC = () => {
         <ArrowLineIcon className={isSidebarOpen && styles.icon} />
       </Button>
       <Line />
-      {items.map(({ path, label, icon }) => (
-        <Button
-          key={path}
-          kind={getKind(path)}
-          icon={!isSidebarOpen}
-          className={styles.button}
-          onClick={() => void navigate(path)}
-        >
-          {isSidebarOpen && label}
-          {icon}
-        </Button>
-      ))}
+      <div className={styles.list}>
+        <div className={styles.menu}>
+          {items.map(({ path, label, icon }) => (
+            <Button
+              key={path}
+              kind={getKind(path)}
+              icon={!isSidebarOpen}
+              className={styles.button}
+              onClick={() => void navigate(path)}
+            >
+              {isSidebarOpen && label}
+              {icon}
+            </Button>
+          ))}
+        </div>
+        <ThemeButton label={isSidebarOpen} />
+      </div>
     </div>
   );
 };
