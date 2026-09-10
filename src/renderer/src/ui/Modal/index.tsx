@@ -7,7 +7,7 @@ import { Button } from "../Button";
 import { ButtonKind } from "../Button/Button.types";
 import { XmarkIcon } from "../Icons";
 
-export const Modal: FC<IModal> = ({ title, width, onClose, children }) => {
+export const Modal: FC<IModal> = ({ title, width, onClose, children, showCloseButton = true }) => {
   useEscapeKey(onClose);
 
   return (
@@ -15,9 +15,11 @@ export const Modal: FC<IModal> = ({ title, width, onClose, children }) => {
       <div className={styles.container} style={{ width: width }} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.title}>{title}</div>
-          <Button kind={ButtonKind.SECONDARY} onClick={onClose} icon>
-            <XmarkIcon />
-          </Button>
+          {showCloseButton && (
+            <Button kind={ButtonKind.SECONDARY} onClick={onClose} icon>
+              <XmarkIcon />
+            </Button>
+          )}
         </div>
         <div className={styles.content}>{children}</div>
       </div>

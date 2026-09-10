@@ -32,13 +32,14 @@ export const ModalProvider: FC<IModalProvider> = ({ children }) => {
   return (
     <ModalContext.Provider value={{ showAlert, showConfirm }}>
       {children}
-      <ModalAlert
-        isOpen={config.isOpen}
-        title={config.title}
-        description={config.description}
-        onClose={close}
-        onConfirm={config.onConfirm ? handleConfirm : undefined}
-      />
+      {config.isOpen && (
+        <ModalAlert
+          title={config.title}
+          description={config.description}
+          onClose={close}
+          onConfirm={config.onConfirm ? handleConfirm : undefined}
+        />
+      )}
     </ModalContext.Provider>
   );
 };
