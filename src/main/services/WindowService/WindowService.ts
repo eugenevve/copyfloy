@@ -1,6 +1,7 @@
 import { join } from "node:path";
 
 import { is } from "@electron-toolkit/utils";
+import { isWindows } from "@main/utils/environment";
 import iconPath from "@resources/icon.png?asset";
 import { IWindowState, SettingsAction } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
@@ -149,7 +150,7 @@ export class WindowService {
 
     // Windows can report resize borders differently when display scaling
     // is enabled. Use the actual window bounds in this case
-    if (process.platform === "win32" && !isMaximized) {
+    if (isWindows && !isMaximized) {
       const display = screen.getDisplayMatching(bounds);
 
       if (display.scaleFactor > 1) {

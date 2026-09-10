@@ -13,6 +13,7 @@ import { TrayService } from "./services/TrayService/TrayService";
 import { WindowIpc } from "./services/WindowService/WindowIpc";
 import { WindowService } from "./services/WindowService/WindowService";
 import { WindowStateService } from "./services/WindowService/WindowStateService";
+import { isWindows } from "./utils/environment";
 
 const settingsService = new SettingsService();
 const settingsIpc = new SettingsIpc(settingsService);
@@ -55,7 +56,7 @@ function configureApplication(): void {
   const appIdName = packageJson.appId;
   electronApp.setAppUserModelId(appIdName);
 
-  if (process.platform === "win32") {
+  if (isWindows) {
     app.setAppUserModelId(appIdName);
   }
 }
