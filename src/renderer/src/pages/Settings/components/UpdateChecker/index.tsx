@@ -70,7 +70,7 @@ export const UpdateChecker: FC = () => {
     [UpdateStatus.IDLE]: "Check for updates",
     [UpdateStatus.CHECKING]: "Examination...",
     [UpdateStatus.AVAILABLE]: "Download the update",
-    [UpdateStatus.DOWNLOADING]: `Loading ${progress}%...`,
+    [UpdateStatus.DOWNLOADING]: `Loading ${progress}%`,
     [UpdateStatus.READY]: "Restart and update",
   }[status];
 
