@@ -60,10 +60,14 @@ export class SetupUpdater {
 
     // Close application windows before starting the installer
     BrowserWindow.getAllWindows().forEach((window) => {
-      if (!window.isDestroyed()) {
+      if (window.isResizable()) {
         window.destroy();
       }
     });
+
+    if (!app.isPackaged) {
+      return;
+    }
 
     // Give the update status window a moment to become visible
     setTimeout(() => {
