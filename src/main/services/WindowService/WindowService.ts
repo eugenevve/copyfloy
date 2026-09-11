@@ -24,13 +24,15 @@ export class WindowService {
   createMainWindow(): BrowserWindow {
     const isSilentStart = process.argv.includes("--hidden");
     const windowState = this.windowStateService.getState();
+    const baseWidth = 720;
+    const baseHeight = 540;
 
     const window = new BrowserWindow({
-      width: windowState?.width ?? 700,
-      height: windowState?.height ?? 500,
+      width: windowState?.width ?? baseWidth,
+      height: windowState?.height ?? baseHeight,
       useContentSize: false,
-      minWidth: 600,
-      minHeight: 450,
+      minWidth: baseWidth,
+      minHeight: baseHeight,
       show: false,
       autoHideMenuBar: true,
       frame: false,
