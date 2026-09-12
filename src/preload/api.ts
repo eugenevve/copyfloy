@@ -39,6 +39,10 @@ export const api = {
       get: (): boolean => ipcRenderer.sendSync("settings:get-sidebar") as boolean,
       set: (isOpen: boolean): Promise<void> => ipcRenderer.invoke("settings:set-sidebar", isOpen),
     },
+    zoom: {
+      get: (): Promise<number> => ipcRenderer.invoke("settings:get-zoom"),
+      set: (factor: number): Promise<void> => ipcRenderer.invoke("settings:set-zoom", factor),
+    },
   },
   tasks: {
     get: (): Promise<ITask[]> => ipcRenderer.invoke("tasks:get-all"),
