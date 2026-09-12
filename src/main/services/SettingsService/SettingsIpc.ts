@@ -37,5 +37,16 @@ export class SettingsIpc {
         isSidebarOpen,
       });
     });
+
+    // Getting the page scale
+    ipcMain.handle("settings:get-zoom", (event) => {
+      return event.sender.getZoomFactor();
+    });
+
+    // Set scale + save to settings service
+    ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
+      event.sender.setZoomFactor(zoomFactor);
+      await this.settingsService.updateSettings({ zoomFactor });
+    });
   }
 }
