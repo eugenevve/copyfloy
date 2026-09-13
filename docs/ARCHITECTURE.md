@@ -153,9 +153,7 @@ Application can continue running in the Windows system tray.
 
 By default, closing the main window does not necessarily terminate the application. Instead, the application can remain active in the tray so scheduled tasks can continue running.
 
-The exact close behavior can be controlled through application settings.
-
-This allows application to work as a background utility without keeping the main window visible.
+The exact close behavior can be controlled through application settings. This allows application to work as a background utility without keeping the main window visible.
 
 ---
 
