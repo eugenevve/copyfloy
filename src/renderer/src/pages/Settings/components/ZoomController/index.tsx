@@ -1,21 +1,26 @@
 import { Button } from "@app/ui/Button";
 import { MinusIcon, PlusIcon } from "@app/ui/Icons";
+import { MAX_ZOOM, MIN_ZOOM, ZOOM_STEP } from "@app/utils/zoomNumber";
 import React, { useState, useEffect } from "react";
 
 import styles from "./ZoomController.module.css";
-
-const ZOOM_STEP = 0.1; // Step 10%
-const MIN_ZOOM = 0.5; // Min 50%
-const MAX_ZOOM = 3.0; // Max 300%
 
 export const ZoomController: React.FC = () => {
   const [zoomFactor, setZoomFactor] = useState<number>(1.0);
 
   useEffect(() => {
-    if (window.api?.settings?.zoom.get) {
-      void window.api.settings.zoom.get().then((currentZoom) => {
-        setZoomFactor(currentZoom);
+    if (window.api?.settings?.zoom?.get) {
+      void window.api.settings.zoom.get().then(setZoomFactor);
+    }
+
+    if (window.api?.settings?.onUpdate) {
+      const unsubscribe = window.api.settings.onUpdate((newSettings) => {
+        if (typeof newSettings.zoomFactor === "number") {
+          setZoomFactor(newSettings.zoomFactor);
+        }
       });
+
+      return () => unsubscribe();
     }
   }, []);
 

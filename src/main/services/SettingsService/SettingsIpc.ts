@@ -46,7 +46,8 @@ export class SettingsIpc {
     // Set scale + save to settings service
     ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
       event.sender.setZoomFactor(zoomFactor);
-      await this.settingsService.updateSettings({ zoomFactor });
+      const updatedSettings = await this.settingsService.updateSettings({ zoomFactor });
+      event.sender.send("settings:updated", updatedSettings);
     });
   }
 }
