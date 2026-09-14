@@ -1,4 +1,5 @@
 import { checkIsAdmin } from "@main/utils/checkIsAdmin";
+import { clampZoom } from "@shared/constants/zoom";
 import { IAppSettings } from "@shared/types/window";
 import { ipcMain } from "electron";
 
@@ -45,9 +46,9 @@ export class SettingsIpc {
 
     // Set scale + save to settings service
     ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
-      event.sender.setZoomFactor(zoomFactor);
-      const updatedSettings = await this.settingsService.updateSettings({ zoomFactor });
-      event.sender.send("settings:updated", updatedSettings);
+      const clamped = clampZoom(zoomFactor);
+      event.sender.setZoomFactor(clamped);
+      await this.settingsService.updateSettings({ zoomFactor: clamped });
     });
   }
 }

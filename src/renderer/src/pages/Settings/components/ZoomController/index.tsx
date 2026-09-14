@@ -1,56 +1,31 @@
 import { Button } from "@app/ui/Button";
 import { MinusIcon, PlusIcon } from "@app/ui/Icons";
-import { MAX_ZOOM, MIN_ZOOM, ZOOM_STEP } from "@app/utils/zoomNumber";
-import React, { useState, useEffect } from "react";
+import { getZoom, initZoom, setZoom, subscribeZoom } from "@app/utils/zoomState";
+import { MAX_ZOOM, MIN_ZOOM, STANDART_ZOOM, ZOOM_STEP } from "@shared/constants/zoom";
+import { useEffect, useSyncExternalStore, FC } from "react";
 
 import styles from "./ZoomController.module.css";
 
-export const ZoomController: React.FC = () => {
-  const [zoomFactor, setZoomFactor] = useState<number>(1.0);
+export const ZoomController: FC = () => {
+  const zoomFactor = useSyncExternalStore(subscribeZoom, getZoom);
 
   useEffect(() => {
-    if (window.api?.settings?.zoom?.get) {
-      void window.api.settings.zoom.get().then(setZoomFactor);
-    }
-
-    if (window.api?.settings?.onUpdate) {
-      const unsubscribe = window.api.settings.onUpdate((newSettings) => {
-        if (typeof newSettings.zoomFactor === "number") {
-          setZoomFactor(newSettings.zoomFactor);
-        }
-      });
-
-      return () => unsubscribe();
-    }
+    void initZoom();
   }, []);
-
-  const changeZoom = async (newZoom: number) => {
-    const clampedZoom = Math.min(Math.max(newZoom, MIN_ZOOM), MAX_ZOOM);
-    const roundedZoom = Number(clampedZoom.toFixed(2));
-
-    if (window.api?.settings?.zoom.set) {
-      await window.api.settings.zoom.set(roundedZoom);
-      setZoomFactor(roundedZoom);
-    }
-  };
-
-  const handleZoomOut = () => void changeZoom(zoomFactor - ZOOM_STEP);
-  const handleZoomIn = () => void changeZoom(zoomFactor + ZOOM_STEP);
-  const handleReset = () => void changeZoom(1.0);
 
   return (
     <div className={styles.container}>
       <div className={styles.title}>Page Zoom</div>
       <div className={styles.section}>
-        <Button onClick={handleZoomOut} disabled={zoomFactor <= MIN_ZOOM} icon>
+        <Button onClick={() => setZoom(zoomFactor - ZOOM_STEP)} disabled={zoomFactor <= MIN_ZOOM} icon>
           <MinusIcon />
         </Button>
         <div>{Math.round(zoomFactor * 100)}%</div>
-        <Button onClick={handleZoomIn} disabled={zoomFactor >= MAX_ZOOM} icon>
+        <Button onClick={() => setZoom(zoomFactor + ZOOM_STEP)} disabled={zoomFactor >= MAX_ZOOM} icon>
           <PlusIcon />
         </Button>
       </div>
-      <Button onClick={handleReset} disabled={zoomFactor === 1.0}>
+      <Button onClick={() => setZoom(STANDART_ZOOM)} disabled={zoomFactor === STANDART_ZOOM}>
         Reset
       </Button>
     </div>
