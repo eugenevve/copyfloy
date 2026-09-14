@@ -3,11 +3,14 @@ import { HashRouter, Route, Routes } from "react-router";
 
 import { GlobalWrapper } from "./components/GlobalWrapper";
 import { ModalProvider } from "./components/ModalProvider";
+import { useZoomShortcuts } from "./hooks/useZoomShortcuts";
 import { Home } from "./pages/Home";
 import { Settings } from "./pages/Settings";
 import { AppPath } from "./utils/router";
 
 export const App: FC = () => {
+  useZoomShortcuts();
+
   return (
     <GlobalWrapper>
       <ModalProvider>

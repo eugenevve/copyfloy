@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  padding: var(--spacing-s);
+  border-radius: var(--spacing-l);
+  background: var(--content-gray-dark);
+}
+
+.title {
+  font-weight: var(--heading);
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+}

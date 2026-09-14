@@ -1,4 +1,5 @@
 import { checkIsAdmin } from "@main/utils/checkIsAdmin";
+import { clampZoom } from "@shared/constants/zoom";
 import { IAppSettings } from "@shared/types/window";
 import { ipcMain } from "electron";
 
@@ -36,6 +37,18 @@ export class SettingsIpc {
       await this.settingsService.updateSettings({
         isSidebarOpen,
       });
+    });
+
+    // Getting the page scale
+    ipcMain.handle("settings:get-zoom", (event) => {
+      return event.sender.getZoomFactor();
+    });
+
+    // Set scale + save to settings service
+    ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
+      const clamped = clampZoom(zoomFactor);
+      event.sender.setZoomFactor(clamped);
+      await this.settingsService.updateSettings({ zoomFactor: clamped });
     });
   }
 }

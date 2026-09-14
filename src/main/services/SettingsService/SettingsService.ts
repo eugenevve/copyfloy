@@ -17,6 +17,7 @@ export class SettingsService {
     autoStart: false,
     runAsAdmin: false,
     isSidebarOpen: true,
+    zoomFactor: 1,
   };
 
   // Loading settings data from a file

@@ -7,5 +7,5 @@
       "@shared/*": ["./src/shared/*"],
     }
   },
-  "include": ["src/preload/index.d.ts", "src/preload/api.ts", "src/renderer/**/*.ts", "src/renderer/**/*.tsx"]
+  "include": ["src/preload/index.d.ts", "src/preload/api.ts", "src/renderer/**/*.ts", "src/renderer/**/*.tsx", "./src/shared/**/*"]
 }

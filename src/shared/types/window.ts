@@ -12,6 +12,7 @@ export interface IAppSettings {
   runAsAdmin: boolean;
   windowState?: IWindowState;
   isSidebarOpen: boolean;
+  zoomFactor: number;
 }
 
 export enum SettingsAction {
