@@ -321,7 +321,7 @@ The packaging configuration is defined in `package.json`.
 After a successful build, the Windows installer will be available in:
 
 ```text
-dist/Copyfloy-setup-1.0.0.exe
+dist/Copyfloy-setup-0.0.0.exe
 ```
 
 ---
