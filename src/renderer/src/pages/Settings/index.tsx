@@ -1,6 +1,7 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { FC } from "react";
 
+import { RunAdmin } from "./components/RunAdmin";
 import { UpdateChecker } from "./components/UpdateChecker";
 import { ZoomController } from "./components/ZoomController";
 import styles from "./Settings.module.css";
@@ -11,6 +12,7 @@ export const Settings: FC = () => {
       <div className={styles.container}>
         <UpdateChecker />
         <ZoomController />
+        <RunAdmin />
       </div>
     </PageWrapper>
   );
