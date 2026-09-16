@@ -188,14 +188,15 @@ For a detailed overview of the application architecture, services, data flow, an
 src/
 ├── main/
 │   └── services/
-│       ├── AppState/
+│       ├── AppService/
 │       ├── CopyService/
+│       ├── DiscordService/
 │       ├── NotificationService/
 │       ├── SchedulerService/
 │       ├── SettingsService/
-│       ├── UpdaterService/
 │       ├── TaskService/
 │       ├── TrayService/
+│       ├── UpdaterService/
 │       └── WindowService/
 │
 ├── preload/

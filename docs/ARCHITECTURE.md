@@ -163,6 +163,13 @@ The exact close behavior can be controlled through application settings. This al
 
 The main process is organized into dedicated services, each responsible for a specific area of application functionality.
 
+### `AppService`
+
+Responsible for:
+
+- Information about the application package
+- Information about granted administrator privileges
+
 ### `CopyService`
 
 Responsible for:
@@ -174,26 +181,19 @@ Responsible for:
 - Reporting copy errors
 - Showing task completion notifications
 
-### `TaskService`
+### `DiscordService`
 
-Coordinates the task-related services:
+Responsible for:
 
-- Task storage
-- Copy operations
-- Scheduling
-- IPC communication
-
-### `TaskStorage`
-
-Responsible for persistent task storage in JSON format.
-
-### `SchedulerService`
-
-Responsible for scheduling and rescheduling tasks using `node-cron`.
+- The application's display status within the Discord profile activity status
 
 ### `NotificationService`
 
 Provides success and error notifications for task execution.
+
+### `SchedulerService`
+
+Responsible for scheduling and rescheduling tasks using `node-cron`.
 
 ### `SettingsService`
 
@@ -204,18 +204,23 @@ Manages application settings such as:
 - Window/application behavior
 - Other persistent application settings
 
+### `TaskService`
+
+Coordinates the task-related services:
+
+- Task storage
+- Copy operations
+- Scheduling
+- IPC communication
+
 ### `TrayService`
 
 Handles the Windows system tray integration.
-
-### `WindowService`
-
-Controls the main application window, including its state and window behavior.
 
 ### `UpdaterService`
 
 Provides application update functionality.
 
-### `AppState`
+### `WindowService`
 
-Contains application-level state management.
+Controls the main application window, including its state and window behavior.
