@@ -3,6 +3,7 @@ import { promisify } from "node:util";
 
 import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
+import { Logger } from "@main/utils/logger";
 
 const execAsync = promisify(exec);
 
@@ -25,7 +26,7 @@ export class RunAdminService {
         await execAsync(`reg delete "${regPath}" /v "${exePath}" /f`);
       }
     } catch (error) {
-      console.error("[RunAdmin] Failed to update registry:", error);
+      Logger.error("RunAdminService", "Failed to update registry", error);
     }
   }
 }

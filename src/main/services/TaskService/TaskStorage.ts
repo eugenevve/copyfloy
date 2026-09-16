@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { Logger } from "@main/utils/logger";
 import { ITask } from "@shared/types/tasks";
 import { app } from "electron";
 
@@ -25,7 +26,7 @@ export class TaskStorage {
 
       return JSON.parse(content) as ITask[];
     } catch (error) {
-      console.error(`[TaskStorage] Failed to read tasks from "${filePath}":`, error);
+      Logger.error("TaskStorage", `Failed to read tasks from "${filePath}"`, error);
 
       return [];
     }
@@ -43,7 +44,7 @@ export class TaskStorage {
 
       fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), "utf-8");
     } catch (error) {
-      console.error(`[TaskStorage] Failed to save tasks to "${filePath}":`, error);
+      Logger.error("TaskStorage", `Failed to save tasks to "${filePath}"`, error);
     }
   }
 

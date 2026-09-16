@@ -1,3 +1,4 @@
+import { Logger } from "@main/utils/logger";
 import { ScheduleType } from "@shared/types/schedule";
 import { ITask } from "@shared/types/tasks";
 import cron, { ScheduledTask } from "node-cron";
@@ -47,12 +48,12 @@ export class SchedulerService {
     const expression = convertToCron(task.schedule);
 
     if (!expression) {
-      console.warn(`[SchedulerService] Invalid schedule for task "${task.name}".`);
+      Logger.warn("SchedulerService", `Invalid schedule for task "${task.name}"`);
       return;
     }
 
     const job = cron.schedule(expression, () => {
-      console.log(`[SchedulerService] Scheduled task started: "${task.name}"`);
+      Logger.info("SchedulerService", `Scheduled task started "${task.name}"`);
 
       this.onTaskScheduled(task);
     });

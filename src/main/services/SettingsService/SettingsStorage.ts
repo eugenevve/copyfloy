@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { Logger } from "@main/utils/logger";
 import { IAppSettings } from "@shared/types/window";
 import { app } from "electron";
 import fs from "fs-extra";
@@ -18,7 +19,7 @@ export class SettingsStorage {
     try {
       return fs.readJsonSync(this.settingsPath) as Partial<IAppSettings>;
     } catch (error) {
-      console.error("[SettingsStorage] Failed to read settings:", error);
+      Logger.error("SettingsStorage", "Failed to read settings", error);
       return null;
     }
   }
@@ -30,7 +31,7 @@ export class SettingsStorage {
         spaces: 2,
       });
     } catch (error) {
-      console.error("[SettingsStorage] Failed to save settings:", error);
+      Logger.error("SettingsStorage", "Failed to save settings", error);
     }
   }
 }

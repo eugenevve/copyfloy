@@ -1,3 +1,4 @@
+import { Logger } from "@main/utils/logger";
 import { BrowserWindow, shell } from "electron";
 
 export interface WindowEventsOptions {
@@ -39,7 +40,7 @@ export class WindowEvents {
       if (!this.options.isSilentStart) {
         this.window.show();
       } else {
-        console.log("[Window] Application started in silent mode (--hidden flag)!");
+        Logger.info("WindowEvents", "Application started in silent mode");
       }
     });
 

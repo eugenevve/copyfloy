@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { Logger } from "@main/utils/logger";
 import { ITask } from "@shared/types/tasks";
 import fs from "fs-extra";
 
@@ -12,6 +13,8 @@ export class CopyService {
     try {
       const destination = path.join(task.target, path.basename(task.source));
 
+      Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);
+
       await fs.copy(task.source, destination, {
         overwrite: true,
 
@@ -21,12 +24,14 @@ export class CopyService {
         },
       });
 
+      Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
+
       // Show a notification when the task requests it
       if (task.schedule?.notify) {
         NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
       }
     } catch (error) {
-      console.error(`[CopyService] Failed to copy task "${task.name}":`, error);
+      Logger.error("CopyService", `Failed to copy task "${task.name}"`, error);
 
       NotificationService.error(`Failed to complete the task: "${task.name}"`);
     }
