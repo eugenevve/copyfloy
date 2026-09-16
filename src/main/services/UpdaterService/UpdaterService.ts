@@ -1,3 +1,4 @@
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { app, BrowserWindow } from "electron";
 import { autoUpdater } from "electron-updater";
 
@@ -28,24 +29,24 @@ export class UpdaterService {
 
   // Subscribes to autoUpdater events and forwards them to the Renderer
   initEvents(mainWindow: BrowserWindow): void {
-    autoUpdater.on("update-available", (info) => {
-      this.sendToRenderer(mainWindow, "updater:available", info.version);
+    autoUpdater.on(IPC_CHANNELS.updater.events.available, (info) => {
+      this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.available, info.version);
     });
 
-    autoUpdater.on("update-not-available", () => {
-      this.sendToRenderer(mainWindow, "updater:not-available");
+    autoUpdater.on(IPC_CHANNELS.updater.events.notAvailable, () => {
+      this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.notAvailable);
     });
 
-    autoUpdater.on("download-progress", (progress) => {
-      this.sendToRenderer(mainWindow, "updater:progress", Math.floor(progress.percent));
+    autoUpdater.on(IPC_CHANNELS.updater.events.progress, (progress) => {
+      this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.progress, Math.floor(progress.percent));
     });
 
-    autoUpdater.on("update-downloaded", () => {
-      this.sendToRenderer(mainWindow, "updater:downloaded");
+    autoUpdater.on(IPC_CHANNELS.updater.events.downloaded, () => {
+      this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.downloaded);
     });
 
-    autoUpdater.on("error", (error) => {
-      this.sendToRenderer(mainWindow, "updater:error", error.message);
+    autoUpdater.on(IPC_CHANNELS.updater.events.error, (error) => {
+      this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.error, error.message);
     });
   }
 

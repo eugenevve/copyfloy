@@ -14,7 +14,7 @@ export const Tilebar: FC = () => {
   const handleMaximize = () => window.api.window.maximize();
 
   useEffect(() => {
-    void window.api.env.isAdmin().then(setIsAdmin);
+    void window.api.app.isAdmin().then(setIsAdmin);
     void window.api.window.isMaximized().then(setIsMaximized);
     const unsubscribe = window.api.window.onMaximizedChange(setIsMaximized);
     return unsubscribe;

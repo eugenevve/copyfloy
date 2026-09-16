@@ -1,3 +1,4 @@
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ipcMain } from "electron";
 
 import { UpdaterService } from "./UpdaterService";
@@ -8,17 +9,17 @@ export class UpdaterIpc {
 
   init(): void {
     // Check whether a new version is available
-    ipcMain.handle("updater:check", () => {
+    ipcMain.handle(IPC_CHANNELS.updater.check, () => {
       return this.updater.check();
     });
 
     // Start downloading the available update
-    ipcMain.handle("updater:download", () => {
+    ipcMain.handle(IPC_CHANNELS.updater.download, () => {
       return this.updater.download();
     });
 
     // Close the application and install the downloaded update
-    ipcMain.handle("updater:install", () => {
+    ipcMain.handle(IPC_CHANNELS.updater.install, () => {
       this.updater.install();
     });
   }

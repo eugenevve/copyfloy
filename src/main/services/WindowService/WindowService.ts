@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { is } from "@electron-toolkit/utils";
 import { appState, isWindows } from "@main/utils/environment";
 import iconPath from "@resources/icon.png?asset";
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IWindowState, SettingsAction } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
 
@@ -89,7 +90,7 @@ export class WindowService {
       },
 
       onMaximize: (isMaximized) => {
-        window.webContents.send("window:maximized-change", isMaximized);
+        window.webContents.send(IPC_CHANNELS.window.maximizedChange, isMaximized);
       },
 
       onClose: (event) => {

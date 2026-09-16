@@ -1,3 +1,4 @@
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IAppSettings, IWindowState, SettingsAction } from "@shared/types/window";
 import { BrowserWindow } from "electron";
 
@@ -92,7 +93,7 @@ export class SettingsService {
   // Broadcasts updated settings to all renderer windows
   private broadcastSettings(): void {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send("settings:updated", this.settings);
+      window.webContents.send(IPC_CHANNELS.settings.updated, this.settings);
     });
   }
 }

@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 
@@ -17,7 +18,7 @@ export class TaskIpc {
 
   init(): void {
     // Create a new task
-    ipcMain.handle("tasks:save", (_, newTask: Omit<ITask, "id">) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.save, (_, newTask: Omit<ITask, "id">) => {
       const tasks = this.taskStorage.load();
 
       const taskWithId: ITask = {
@@ -34,12 +35,12 @@ export class TaskIpc {
     });
 
     // Get all tasks
-    ipcMain.handle("tasks:get-all", () => {
+    ipcMain.handle(IPC_CHANNELS.tasks.getAll, () => {
       return this.taskStorage.load();
     });
 
     // Update a task
-    ipcMain.handle("tasks:update", (_, updatedTask: ITask) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.update, (_, updatedTask: ITask) => {
       const tasks = this.taskStorage.load().map((task) => {
         return task.id === updatedTask.id ? updatedTask : task;
       });
@@ -51,12 +52,12 @@ export class TaskIpc {
     });
 
     // Run a task manually
-    ipcMain.handle("tasks:run", async (_, task: ITask) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.run, async (_, task: ITask) => {
       await this.copyService.run(task);
     });
 
     // Delete a task
-    ipcMain.handle("tasks:delete", (_, id: number) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.delete, (_, id: number) => {
       const tasks = this.taskStorage.load().filter((task) => task.id !== id);
 
       this.taskStorage.save(tasks);
@@ -66,7 +67,7 @@ export class TaskIpc {
     });
 
     // Export tasks
-    ipcMain.handle("tasks:export", async () => {
+    ipcMain.handle(IPC_CHANNELS.tasks.export, async () => {
       const tasks = this.taskStorage.load();
 
       const { filePath, canceled } = await dialog.showSaveDialog({
@@ -85,7 +86,7 @@ export class TaskIpc {
     });
 
     // Import tasks
-    ipcMain.handle("tasks:import", async () => {
+    ipcMain.handle(IPC_CHANNELS.tasks.import, async () => {
       const { filePaths, canceled } = await dialog.showOpenDialog({
         title: "Importing tasks",
         filters: [{ name: "JSON", extensions: ["json"] }],
@@ -100,7 +101,7 @@ export class TaskIpc {
     });
 
     // Save imported tasks
-    ipcMain.handle("tasks:save-bulk", (_, tasks: ITask[]) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: ITask[]) => {
       this.taskStorage.save(tasks);
       this.scheduler.rescheduleAll(tasks);
 
@@ -108,7 +109,7 @@ export class TaskIpc {
     });
 
     // Select a file or folder
-    ipcMain.handle("dialog:open", async (event, type: TaskType) => {
+    ipcMain.handle(IPC_CHANNELS.tasks.openDialog, async (event, type: TaskType) => {
       const window = BrowserWindow.fromWebContents(event.sender);
 
       if (!window) {
@@ -125,7 +126,7 @@ export class TaskIpc {
 
     // Select exceptions
     ipcMain.handle(
-      "dialog:open-exception",
+      IPC_CHANNELS.tasks.openExceptionDialog,
       async (event, sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE) => {
         const window = BrowserWindow.fromWebContents(event.sender);
 

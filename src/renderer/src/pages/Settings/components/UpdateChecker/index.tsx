@@ -10,7 +10,7 @@ export const UpdateChecker: FC = () => {
   const [status, setStatus] = useState<UpdateStatus>(UpdateStatus.IDLE);
   const [progress, setProgress] = useState(0);
 
-  const { appVersion, isPackaged } = window.api.env;
+  const { appVersion, isPackaged } = window.api.app;
 
   useEffect(() => {
     const unsubscribe = [

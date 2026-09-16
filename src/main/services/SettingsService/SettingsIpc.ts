@@ -1,3 +1,4 @@
+import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { clampZoom } from "@shared/constants/zoom";
 import { IAppSettings } from "@shared/types/window";
 import { ipcMain } from "electron";
@@ -9,44 +10,44 @@ export class SettingsIpc {
 
   init(): void {
     // Returns the current application settings
-    ipcMain.handle("settings:get", () => {
+    ipcMain.handle(IPC_CHANNELS.settings.get, () => {
       return this.settingsService.getSettings();
     });
 
     // Saves new settings received from the renderer
-    ipcMain.handle("settings:save", async (_, newSettings: Partial<IAppSettings>) => {
+    ipcMain.handle(IPC_CHANNELS.settings.save, async (_, newSettings: Partial<IAppSettings>) => {
       await this.settingsService.updateSettings(newSettings);
 
       return this.settingsService.getSettings();
     });
 
     // Returns whether the application is configured to run as administrator
-    ipcMain.handle("settings:get-run-as-admin", () => {
+    ipcMain.handle(IPC_CHANNELS.settings.getAdmin, () => {
       return this.settingsService.getSettings().runAdmin;
     });
 
     // Updates whether the application should run as administrator
-    ipcMain.handle("settings:set-run-as-admin", async (_, runAdmin: boolean) => {
+    ipcMain.handle(IPC_CHANNELS.settings.setAdmin, async (_, runAdmin: boolean) => {
       await this.settingsService.updateSettings({ runAdmin });
     });
 
     // Returns the current sidebar setting
-    ipcMain.on("settings:get-sidebar", (event) => {
+    ipcMain.on(IPC_CHANNELS.settings.getSidebar, (event) => {
       event.returnValue = this.settingsService.getSettings().sidebarOpen;
     });
 
     // Sets the sidebar setting
-    ipcMain.handle("settings:set-sidebar", async (_, sidebarOpen: boolean) => {
+    ipcMain.handle(IPC_CHANNELS.settings.setSidebar, async (_, sidebarOpen: boolean) => {
       await this.settingsService.updateSettings({ sidebarOpen });
     });
 
     // Getting the page scale
-    ipcMain.handle("settings:get-zoom", (event) => {
+    ipcMain.handle(IPC_CHANNELS.settings.getZoom, (event) => {
       return event.sender.getZoomFactor();
     });
 
     // Set scale + save to settings service
-    ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
+    ipcMain.handle(IPC_CHANNELS.settings.setZoom, async (event, zoomFactor: number) => {
       const clamped = clampZoom(zoomFactor);
 
       event.sender.setZoomFactor(clamped);
