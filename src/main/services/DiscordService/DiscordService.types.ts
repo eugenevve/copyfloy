@@ -1,4 +1,4 @@
-export interface IDiscordPresence {
+export interface IDiscordService {
   details?: string;
   state?: string;
   largeImageKey?: string;

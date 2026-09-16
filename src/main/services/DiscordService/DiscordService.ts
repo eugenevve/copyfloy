@@ -1,13 +1,13 @@
 import { Client } from "@xhayper/discord-rpc";
 
-import { IDiscordPresence } from "./DiscordPresence.types";
+import { IDiscordService } from "./DiscordService.types";
 
-export class DiscordPresenceService {
+export class DiscordService {
   private readonly client = new Client({
     clientId: "1546583553553338459",
   });
 
-  private currentPresence: IDiscordPresence | null = null;
+  private currentPresence: IDiscordService | null = null;
 
   public init(): void {
     this.client.on("ready", () => {
@@ -19,7 +19,7 @@ export class DiscordPresenceService {
     void this.client.login();
   }
 
-  public setActivity(presence: IDiscordPresence): void {
+  public setActivity(presence: IDiscordService): void {
     this.currentPresence = presence;
 
     if (!this.client.user) {

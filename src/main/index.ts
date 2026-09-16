@@ -3,7 +3,7 @@ import { app, BrowserWindow } from "electron";
 
 import { AppIpc } from "./services/AppService/AppIpc";
 import { AppService } from "./services/AppService/AppService";
-import { DiscordPresenceService } from "./services/DiscordPresence/DiscordPresenceService";
+import { DiscordService } from "./services/DiscordService/DiscordService";
 import { SettingsIpc } from "./services/SettingsService/SettingsIpc";
 import { SettingsService } from "./services/SettingsService/SettingsService";
 import { TaskService } from "./services/TaskService/TaskService";
@@ -25,7 +25,7 @@ const windowIpc = new WindowIpc(windowService);
 const taskService = new TaskService();
 const updater = new UpdaterService();
 const updaterIpc = new UpdaterIpc(updater);
-const discordPresence = new DiscordPresenceService();
+const discordService = new DiscordService();
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -58,8 +58,8 @@ function initializeServices(): void {
   taskService.init();
   updater.init();
 
-  discordPresence.init();
-  discordPresence.setActivity({
+  discordService.init();
+  discordService.setActivity({
     details: "Taking care of files",
     state: app.isPackaged ? "Staying Busy" : "Developing",
     largeImageKey: "app",
@@ -100,7 +100,7 @@ function registerApplicationEvents(): void {
 
 app.on("before-quit", () => {
   appState.isQuitting = true;
-  discordPresence.destroy();
+  discordService.destroy();
 });
 
 app.on("window-all-closed", () => {
