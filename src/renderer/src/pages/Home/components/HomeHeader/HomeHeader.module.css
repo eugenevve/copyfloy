@@ -1,6 +1,7 @@
 .container {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-s);
 }
@@ -11,8 +12,8 @@
   gap: var(--spacing-s);
 }
 
-.input {
-  width: 220px;
+.input input {
+  width: 170px;
 }
 
 .select {

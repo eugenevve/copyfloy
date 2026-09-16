@@ -28,6 +28,7 @@
   gap: var(--spacing-s);
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
   font-family: var(--font-family);
 }
 

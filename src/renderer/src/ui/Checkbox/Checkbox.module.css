@@ -34,7 +34,6 @@
 
 .container.disabled,
 .input:disabled + .checkbox {
-  background: var(--background-primary);
   color: var(--content-gray-light);
   border-color: var(--border-primary);
   cursor: not-allowed;
