@@ -7,15 +7,16 @@ export type { ElectronAPI } from "./api";
 
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", {
+    const exposedElectronApi = {
       ...electronAPI,
       shell: {
         openExternal: (url: string): Promise<void> => {
           return shell.openExternal(url);
         },
       },
-    });
+    };
 
+    contextBridge.exposeInMainWorld("electron", exposedElectronApi);
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);
