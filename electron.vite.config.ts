@@ -9,6 +9,7 @@ export default defineConfig({
         "@main": resolve("src/main"),
         "@shared": resolve("src/shared"),
         "@resources": resolve("resources"),
+        "@package": resolve("package.json"),
       },
     },
   },
@@ -16,6 +17,7 @@ export default defineConfig({
     resolve: {
       alias: {
         "@shared": resolve("src/shared"),
+        "@package": resolve("package.json"),
       },
     },
   },

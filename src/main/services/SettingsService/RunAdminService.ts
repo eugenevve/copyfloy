@@ -9,7 +9,7 @@ const execAsync = promisify(exec);
 // Service for managing the launch of applications as administrator in Windows
 // Uses the AppCompatFlags registry key, which allows Windows
 // to automatically request administrator rights when launching an application
-export class RunAsAdminService {
+export class RunAdminService {
   async update(enable: boolean): Promise<void> {
     if (!isPackagedWindows) return;
 
@@ -25,7 +25,7 @@ export class RunAsAdminService {
         await execAsync(`reg delete "${regPath}" /v "${exePath}" /f`);
       }
     } catch (error) {
-      console.error("[RunAsAdmin] Failed to update registry:", error);
+      console.error("[RunAdmin] Failed to update registry:", error);
     }
   }
 }

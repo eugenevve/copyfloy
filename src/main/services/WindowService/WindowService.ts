@@ -1,14 +1,13 @@
 import { join } from "node:path";
 
 import { is } from "@electron-toolkit/utils";
-import { isWindows } from "@main/utils/environment";
+import { appState, isWindows } from "@main/utils/environment";
 import iconPath from "@resources/icon.png?asset";
 import { IWindowState, SettingsAction } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
 
 import { WindowEvents } from "./WindowEvents";
 import { WindowStateService } from "./WindowStateService";
-import { appState } from "../AppState/AppState";
 import { SettingsService } from "../SettingsService/SettingsService";
 
 // Service responsible for creating and managing the main application window

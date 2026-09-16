@@ -1,8 +1,7 @@
+import { appState } from "@main/utils/environment";
 import { iconPath } from "@main/utils/iconPath";
+import packageJson from "@package";
 import { app, BrowserWindow, Menu, nativeImage, NativeImage, Tray } from "electron";
-
-import packageJson from "../../../../package.json";
-import { appState } from "../AppState/AppState";
 
 // Manages the application tray icon and its interactions
 export class TrayService {

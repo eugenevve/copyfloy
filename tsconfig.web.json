@@ -5,6 +5,7 @@
     "paths": {
       "@app/*": ["./src/renderer/src/*"],
       "@shared/*": ["./src/shared/*"],
+      "@package": ["./package.json"]
     }
   },
   "include": ["src/preload/index.d.ts", "src/preload/api.ts", "src/renderer/**/*.ts", "src/renderer/**/*.tsx", "./src/shared/**/*"]

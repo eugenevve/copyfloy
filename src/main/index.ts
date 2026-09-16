@@ -1,8 +1,8 @@
-import { electronApp, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { optimizer } from "@electron-toolkit/utils";
+import { app, BrowserWindow } from "electron";
 
-import packageJson from "../../package.json";
-import { appState } from "./services/AppState/AppState";
+import { AppIpc } from "./services/AppService/AppIpc";
+import { AppService } from "./services/AppService/AppService";
 import { DiscordPresenceService } from "./services/DiscordPresence/DiscordPresenceService";
 import { SettingsIpc } from "./services/SettingsService/SettingsIpc";
 import { SettingsService } from "./services/SettingsService/SettingsService";
@@ -13,8 +13,10 @@ import { TrayService } from "./services/TrayService/TrayService";
 import { WindowIpc } from "./services/WindowService/WindowIpc";
 import { WindowService } from "./services/WindowService/WindowService";
 import { WindowStateService } from "./services/WindowService/WindowStateService";
-import { isWindows } from "./utils/environment";
+import { appState } from "./utils/environment";
 
+const appService = new AppService();
+const appIpc = new AppIpc(appService);
 const settingsService = new SettingsService();
 const settingsIpc = new SettingsIpc(settingsService);
 const windowStateService = new WindowStateService(settingsService);
@@ -40,7 +42,7 @@ if (!gotTheLock) {
 }
 
 function initializeApplication(): void {
-  configureApplication();
+  appService.configure();
 
   initializeServices();
   registerIpcHandlers();
@@ -50,15 +52,6 @@ function initializeApplication(): void {
   initializeWindowDependentServices(mainWindow);
 
   registerApplicationEvents();
-}
-
-function configureApplication(): void {
-  const appIdName = packageJson.appId;
-  electronApp.setAppUserModelId(appIdName);
-
-  if (isWindows) {
-    app.setAppUserModelId(appIdName);
-  }
 }
 
 function initializeServices(): void {
@@ -78,11 +71,10 @@ function initializeServices(): void {
 }
 
 function registerIpcHandlers(): void {
+  appIpc.init();
   settingsIpc.init();
   windowIpc.init();
   updaterIpc.init();
-
-  setupGlobalHandlers();
 }
 
 function initializeWindowDependentServices(mainWindow: BrowserWindow): void {
@@ -103,16 +95,6 @@ function registerApplicationEvents(): void {
     } else {
       windowService.restoreOrCreate();
     }
-  });
-}
-
-function setupGlobalHandlers(): void {
-  ipcMain.on("get-is-packaged", (event) => {
-    event.returnValue = app.isPackaged;
-  });
-
-  ipcMain.on("ping", () => {
-    console.log("IPC Pong");
   });
 }
 

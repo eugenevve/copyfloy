@@ -2,21 +2,21 @@ import { IAppSettings, IWindowState, SettingsAction } from "@shared/types/window
 import { BrowserWindow } from "electron";
 
 import { AutoStartService } from "./AutoStartService";
-import { RunAsAdminService } from "./RunAsAdminService";
+import { RunAdminService } from "./RunAdminService";
 import { SettingsStorage } from "./SettingsStorage";
 
 // Service responsible for application settings
 export class SettingsService {
   private readonly settingsStorage = new SettingsStorage();
   private readonly autoStartService = new AutoStartService();
-  private readonly runAsAdminService = new RunAsAdminService();
+  private readonly runAdminService = new RunAdminService();
 
   // Default application settings
   private settings: IAppSettings = {
     closeAction: SettingsAction.MINIMIZE,
+    runAdmin: false,
     autoStart: false,
-    runAsAdmin: false,
-    isSidebarOpen: true,
+    sidebarOpen: true,
     zoomFactor: 1,
   };
 
@@ -67,20 +67,20 @@ export class SettingsService {
       ...loadedSettings,
     };
 
-    this.autoStartService.update(this.settings.autoStart, this.settings.runAsAdmin);
+    this.autoStartService.update(this.settings.autoStart, this.settings.runAdmin);
   }
 
   // Applies system-level changes
   private async applySystemSettings(previousSettings: IAppSettings): Promise<void> {
-    if (this.settings.runAsAdmin !== previousSettings.runAsAdmin) {
-      await this.runAsAdminService.update(this.settings.runAsAdmin);
+    if (this.settings.runAdmin !== previousSettings.runAdmin) {
+      await this.runAdminService.update(this.settings.runAdmin);
     }
 
     if (
       this.settings.autoStart !== previousSettings.autoStart ||
-      this.settings.runAsAdmin !== previousSettings.runAsAdmin
+      this.settings.runAdmin !== previousSettings.runAdmin
     ) {
-      this.autoStartService.update(this.settings.autoStart, this.settings.runAsAdmin);
+      this.autoStartService.update(this.settings.autoStart, this.settings.runAdmin);
     }
   }
 

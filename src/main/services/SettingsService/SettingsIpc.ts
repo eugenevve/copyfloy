@@ -1,11 +1,9 @@
-import { checkIsAdmin } from "@main/utils/checkIsAdmin";
 import { clampZoom } from "@shared/constants/zoom";
 import { IAppSettings } from "@shared/types/window";
 import { ipcMain } from "electron";
 
 import { SettingsService } from "./SettingsService";
 
-// IPC handlers for application settings
 export class SettingsIpc {
   constructor(private readonly settingsService: SettingsService) {}
 
@@ -22,21 +20,24 @@ export class SettingsIpc {
       return this.settingsService.getSettings();
     });
 
-    // Returns whether the application is running with administrator privileges
-    ipcMain.handle("app:is-admin", () => {
-      return checkIsAdmin();
+    // Returns whether the application is configured to run as administrator
+    ipcMain.handle("settings:get-run-as-admin", () => {
+      return this.settingsService.getSettings().runAdmin;
+    });
+
+    // Updates whether the application should run as administrator
+    ipcMain.handle("settings:set-run-as-admin", async (_, runAdmin: boolean) => {
+      await this.settingsService.updateSettings({ runAdmin });
     });
 
     // Returns the current sidebar setting
     ipcMain.on("settings:get-sidebar", (event) => {
-      event.returnValue = this.settingsService.getSettings().isSidebarOpen;
+      event.returnValue = this.settingsService.getSettings().sidebarOpen;
     });
 
     // Sets the sidebar setting
-    ipcMain.handle("settings:set-sidebar", async (_, isSidebarOpen: boolean) => {
-      await this.settingsService.updateSettings({
-        isSidebarOpen,
-      });
+    ipcMain.handle("settings:set-sidebar", async (_, sidebarOpen: boolean) => {
+      await this.settingsService.updateSettings({ sidebarOpen });
     });
 
     // Getting the page scale
@@ -47,7 +48,9 @@ export class SettingsIpc {
     // Set scale + save to settings service
     ipcMain.handle("settings:set-zoom", async (event, zoomFactor: number) => {
       const clamped = clampZoom(zoomFactor);
+
       event.sender.setZoomFactor(clamped);
+
       await this.settingsService.updateSettings({ zoomFactor: clamped });
     });
   }

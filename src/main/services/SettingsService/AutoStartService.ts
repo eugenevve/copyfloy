@@ -2,18 +2,17 @@ import { exec } from "node:child_process";
 
 import { isPackagedWindows } from "@main/utils/environment";
 import { exePath } from "@main/utils/exePath";
+import packageJson from "@package";
 import { app } from "electron";
-
-import packageJson from "../../../../package.json";
 
 export class AutoStartService {
   private readonly TASK_NAME = `${packageJson.name}-auto-start`;
 
-  update(openAtLogin: boolean, runAsAdmin: boolean): void {
+  update(openAtLogin: boolean, runAdmin: boolean): void {
     if (!isPackagedWindows) return;
 
     // Autostart via Task Scheduler (for administrators so that Windows does not block the program from launching)
-    if (openAtLogin && runAsAdmin) {
+    if (openAtLogin && runAdmin) {
       app.setLoginItemSettings({
         openAtLogin: false,
       });

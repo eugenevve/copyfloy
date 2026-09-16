@@ -1,8 +1,7 @@
+import packageJson from "@package";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { IAppSettings } from "@shared/types/window";
 import { ipcRenderer, IpcRendererEvent } from "electron";
-
-import packageJson from "../../package.json";
 
 export type ElectronAPI = typeof api;
 
@@ -34,14 +33,17 @@ export const api = {
         ipcRenderer.removeListener("settings:updated", listener);
       };
     },
-    isAdmin: (): Promise<boolean> => ipcRenderer.invoke("app:is-admin"),
+    runAdmin: {
+      get: (): Promise<boolean> => ipcRenderer.invoke("settings:get-run-as-admin"),
+      set: (isAdmin: boolean): Promise<void> => ipcRenderer.invoke("settings:set-run-as-admin", isAdmin),
+    },
     sidebar: {
       get: (): boolean => ipcRenderer.sendSync("settings:get-sidebar") as boolean,
       set: (isOpen: boolean): Promise<void> => ipcRenderer.invoke("settings:set-sidebar", isOpen),
     },
     zoom: {
       get: (): Promise<number> => ipcRenderer.invoke("settings:get-zoom"),
-      set: (factor: number): Promise<void> => ipcRenderer.invoke("settings:set-zoom", factor),
+      set: (isFactor: number): Promise<void> => ipcRenderer.invoke("settings:set-zoom", isFactor),
     },
   },
   tasks: {
@@ -109,6 +111,7 @@ export const api = {
   },
   env: {
     appVersion: packageJson.version,
-    isPackaged: ipcRenderer.sendSync("get-is-packaged") as boolean,
+    isPackaged: ipcRenderer.sendSync("app:is-packaged") as boolean,
+    isAdmin: (): Promise<boolean> => ipcRenderer.invoke("app:is-admin"),
   },
 };

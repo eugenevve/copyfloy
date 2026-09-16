@@ -4,7 +4,8 @@
     "types": ["electron-vite/node"],
     "paths": {
       "@main/*": ["./src/main/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@package": ["./package.json"]
     }
   },
   "include": ["./src/main/**/*.ts", "./src/preload/**/*.ts", "./src/shared/**/*", "electron.vite.config.*"]
