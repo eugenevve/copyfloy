@@ -1,10 +1,10 @@
 import { app, BrowserWindow } from "electron";
 import { autoUpdater } from "electron-updater";
 
-import { getUpdateWindowHtml } from "./SetupUpdaterHtml";
+import { getUpdateWindowHtml } from "./UpdaterServiceHtml";
 
 // Service responsible for application updates
-export class SetupUpdater {
+export class UpdaterService {
   // Initializes the updater configuration
   init(): void {
     autoUpdater.autoInstallOnAppQuit = true;

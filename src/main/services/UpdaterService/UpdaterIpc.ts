@@ -1,10 +1,10 @@
 import { ipcMain } from "electron";
 
-import { SetupUpdater } from "./SetupUpdater";
+import { UpdaterService } from "./UpdaterService";
 
 // IPC handlers for application updates
 export class UpdaterIpc {
-  constructor(private readonly updater: SetupUpdater) {}
+  constructor(private readonly updater: UpdaterService) {}
 
   init(): void {
     // Check whether a new version is available

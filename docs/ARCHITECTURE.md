@@ -212,7 +212,7 @@ Handles the Windows system tray integration.
 
 Controls the main application window, including its state and window behavior.
 
-### `SetupUpdater`
+### `UpdaterService`
 
 Provides application update functionality.
 

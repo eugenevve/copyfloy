@@ -193,7 +193,7 @@ src/
 │       ├── NotificationService/
 │       ├── SchedulerService/
 │       ├── SettingsService/
-│       ├── SetupUpdater/
+│       ├── UpdaterService/
 │       ├── TaskService/
 │       ├── TrayService/
 │       └── WindowService/
