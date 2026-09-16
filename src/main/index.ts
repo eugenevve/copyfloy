@@ -64,8 +64,6 @@ function initializeServices(): void {
     state: app.isPackaged ? "Staying Busy" : "Developing",
     largeImageKey: "app",
     largeImageText: "Copyfloy",
-    // smallImageKey: "app",
-    // smallImageText: "Copyfloy",
     startTimestamp: Date.now(),
   });
 }
