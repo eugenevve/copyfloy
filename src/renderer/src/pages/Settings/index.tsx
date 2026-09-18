@@ -10,9 +10,9 @@ export const Settings: FC = () => {
   return (
     <PageWrapper>
       <div className={styles.container}>
-        <UpdateChecker />
-        <ZoomController />
         <RunAdmin />
+        <ZoomController />
+        <UpdateChecker />
       </div>
     </PageWrapper>
   );
