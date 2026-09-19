@@ -1,7 +1,6 @@
 import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ITask, TaskType } from "@shared/types/tasks";
-import { IAppSettings } from "@shared/types/window";
 import { ipcRenderer } from "electron";
 
 import { invoke, receive, receiveNoData } from "./ipc";
@@ -23,21 +22,17 @@ export const api = {
       receive<boolean>(IPC_CHANNELS.window.maximizedChange, callback),
   },
   settings: {
-    get: (): Promise<IAppSettings> => invoke<IAppSettings>(IPC_CHANNELS.settings.get),
-    save: (settings: IAppSettings): Promise<void> => invoke<void>(IPC_CHANNELS.settings.save, settings),
-    onUpdate: (callback: (settings: IAppSettings) => void): (() => void) =>
-      receive<IAppSettings>(IPC_CHANNELS.settings.updated, callback),
-    runAdmin: {
-      get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getAdmin),
-      set: (isAdmin: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setAdmin, isAdmin),
+    sidebar: {
+      get: (): boolean => ipcRenderer.sendSync(IPC_CHANNELS.settings.getSidebar) as boolean,
+      set: (isOpen: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setSidebar, isOpen),
     },
     autoStart: {
       get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getAutoStart),
       set: (isStart: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setAutoStart, isStart),
     },
-    sidebar: {
-      get: (): boolean => ipcRenderer.sendSync(IPC_CHANNELS.settings.getSidebar) as boolean,
-      set: (isOpen: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setSidebar, isOpen),
+    runAdmin: {
+      get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getAdmin),
+      set: (isAdmin: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setAdmin, isAdmin),
     },
     zoom: {
       get: (): Promise<number> => invoke<number>(IPC_CHANNELS.settings.getZoom),
@@ -67,8 +62,7 @@ export const api = {
       receiveNoData(IPC_CHANNELS.updater.ipc.notAvailable, callback),
     onProgress: (callback: (percent: number) => void): (() => void) =>
       receive<number>(IPC_CHANNELS.updater.ipc.progress, callback),
-    onDownloaded: (callback: () => void): (() => void) => 
-      receiveNoData(IPC_CHANNELS.updater.ipc.downloaded, callback),
+    onDownloaded: (callback: () => void): (() => void) => receiveNoData(IPC_CHANNELS.updater.ipc.downloaded, callback),
     onError: (callback: (message: string) => void): (() => void) =>
       receive<string>(IPC_CHANNELS.updater.ipc.error, callback),
   },

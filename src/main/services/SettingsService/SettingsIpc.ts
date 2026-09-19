@@ -1,6 +1,5 @@
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { clampZoom } from "@shared/constants/zoom";
-import { IAppSettings } from "@shared/types/window";
 import { ipcMain } from "electron";
 
 import { SettingsService } from "./SettingsService";
@@ -9,26 +8,14 @@ export class SettingsIpc {
   constructor(private readonly settingsService: SettingsService) {}
 
   init(): void {
-    // Returns the current application settings
-    ipcMain.handle(IPC_CHANNELS.settings.get, () => {
-      return this.settingsService.getSettings();
+    // Returns the current sidebar setting
+    ipcMain.on(IPC_CHANNELS.settings.getSidebar, (event) => {
+      event.returnValue = this.settingsService.getSidebar();
     });
 
-    // Saves new settings received from the renderer
-    ipcMain.handle(IPC_CHANNELS.settings.save, async (_, newSettings: Partial<IAppSettings>) => {
-      await this.settingsService.updateSettings(newSettings);
-
-      return this.settingsService.getSettings();
-    });
-
-    // Returns whether the application is configured to run as administrator
-    ipcMain.handle(IPC_CHANNELS.settings.getAdmin, () => {
-      return this.settingsService.getSettings().runAdmin;
-    });
-
-    // Updates whether the application should run as administrator
-    ipcMain.handle(IPC_CHANNELS.settings.setAdmin, async (_, runAdmin: boolean) => {
-      await this.settingsService.updateSettings({ runAdmin });
+    // Sets the sidebar setting
+    ipcMain.handle(IPC_CHANNELS.settings.setSidebar, async (_, sidebarOpen: boolean) => {
+      await this.settingsService.setSidebar(sidebarOpen);
     });
 
     // Returns the current autostart setting
@@ -41,19 +28,19 @@ export class SettingsIpc {
       await this.settingsService.setAutoStart(autoStart);
     });
 
-    // Returns the current sidebar setting
-    ipcMain.on(IPC_CHANNELS.settings.getSidebar, (event) => {
-      event.returnValue = this.settingsService.getSettings().sidebarOpen;
+    // Returns whether the application is configured to run as administrator
+    ipcMain.handle(IPC_CHANNELS.settings.getAdmin, () => {
+      return this.settingsService.getAdmin();
     });
 
-    // Sets the sidebar setting
-    ipcMain.handle(IPC_CHANNELS.settings.setSidebar, async (_, sidebarOpen: boolean) => {
-      await this.settingsService.updateSettings({ sidebarOpen });
+    // Updates whether the application should run as administrator
+    ipcMain.handle(IPC_CHANNELS.settings.setAdmin, async (_, runAdmin: boolean) => {
+      await this.settingsService.setAdmin(runAdmin);
     });
 
     // Getting the page scale
-    ipcMain.handle(IPC_CHANNELS.settings.getZoom, (event) => {
-      return event.sender.getZoomFactor();
+    ipcMain.handle(IPC_CHANNELS.settings.getZoom, () => {
+      return this.settingsService.getZoom();
     });
 
     // Set scale + save to settings service
@@ -62,7 +49,7 @@ export class SettingsIpc {
 
       event.sender.setZoomFactor(clamped);
 
-      await this.settingsService.updateSettings({ zoomFactor: clamped });
+      await this.settingsService.setZoom(clamped);
     });
   }
 }

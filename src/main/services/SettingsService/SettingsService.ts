@@ -1,6 +1,4 @@
-import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IAppSettings, IWindowState, SettingsAction } from "@shared/types/window";
-import { BrowserWindow } from "electron";
 
 import { AutoStartService } from "./AutoStartService";
 import { RunAdminService } from "./RunAdminService";
@@ -15,9 +13,9 @@ export class SettingsService {
   // Default application settings
   private settings: IAppSettings = {
     closeAction: SettingsAction.MINIMIZE,
-    runAdmin: false,
-    autoStart: false,
     sidebarOpen: true,
+    autoStart: false,
+    runAdmin: false,
     zoomFactor: 1,
   };
 
@@ -32,7 +30,7 @@ export class SettingsService {
   }
 
   // Applies new settings
-  async updateSettings(newSettings: Partial<IAppSettings>): Promise<void> {
+  private async updateSettings(newSettings: Partial<IAppSettings>): Promise<void> {
     const previousSettings = { ...this.settings };
 
     this.settings = {
@@ -41,17 +39,43 @@ export class SettingsService {
     };
 
     await this.applySystemSettings(previousSettings);
-
     this.saveSettings();
-    this.broadcastSettings();
   }
 
+  // SideBar
+  getSidebar(): boolean {
+    return this.settings.sidebarOpen;
+  }
+
+  async setSidebar(sidebarOpen: boolean): Promise<void> {
+    await this.updateSettings({ sidebarOpen });
+  }
+
+  // Admin
+  getAdmin(): boolean {
+    return this.settings.runAdmin;
+  }
+
+  async setAdmin(runAdmin: boolean): Promise<void> {
+    await this.updateSettings({ runAdmin });
+  }
+
+  // Auto Start
   getAutoStart(): boolean {
     return this.settings.autoStart;
   }
 
   async setAutoStart(autoStart: boolean): Promise<void> {
     await this.updateSettings({ autoStart });
+  }
+
+  // Zoom
+  getZoom(): number {
+    return this.settings.zoomFactor;
+  }
+
+  async setZoom(zoomFactor: number): Promise<void> {
+    await this.updateSettings({ zoomFactor });
   }
 
   // Saves the current window state
@@ -96,12 +120,5 @@ export class SettingsService {
   // Saves settings to disk
   private saveSettings(): void {
     this.settingsStorage.save(this.settings);
-  }
-
-  // Broadcasts updated settings to all renderer windows
-  private broadcastSettings(): void {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send(IPC_CHANNELS.settings.updated, this.settings);
-    });
   }
 }
