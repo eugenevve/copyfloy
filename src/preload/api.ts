@@ -31,6 +31,10 @@ export const api = {
       get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getAdmin),
       set: (isAdmin: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setAdmin, isAdmin),
     },
+    autoStart: {
+      get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getAutoStart),
+      set: (isStart: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setAutoStart, isStart),
+    },
     sidebar: {
       get: (): boolean => ipcRenderer.sendSync(IPC_CHANNELS.settings.getSidebar) as boolean,
       set: (isOpen: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setSidebar, isOpen),

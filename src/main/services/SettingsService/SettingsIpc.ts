@@ -31,6 +31,16 @@ export class SettingsIpc {
       await this.settingsService.updateSettings({ runAdmin });
     });
 
+    // Returns the current autostart setting
+    ipcMain.handle(IPC_CHANNELS.settings.getAutoStart, () => {
+      return this.settingsService.getAutoStart();
+    });
+
+    // Sets the autostart setting
+    ipcMain.handle(IPC_CHANNELS.settings.setAutoStart, async (_, autoStart: boolean) => {
+      await this.settingsService.setAutoStart(autoStart);
+    });
+
     // Returns the current sidebar setting
     ipcMain.on(IPC_CHANNELS.settings.getSidebar, (event) => {
       event.returnValue = this.settingsService.getSettings().sidebarOpen;

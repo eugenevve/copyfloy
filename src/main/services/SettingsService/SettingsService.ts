@@ -46,6 +46,14 @@ export class SettingsService {
     this.broadcastSettings();
   }
 
+  getAutoStart(): boolean {
+    return this.settings.autoStart;
+  }
+
+  async setAutoStart(autoStart: boolean): Promise<void> {
+    await this.updateSettings({ autoStart });
+  }
+
   // Saves the current window state
   updateWindowState(state: IWindowState): void {
     this.settings.windowState = state;

@@ -15,6 +15,8 @@ export const IPC_CHANNELS = {
     save: "settings:save",
     getAdmin: "settings:get-admin",
     setAdmin: "settings:set-admin",
+    getAutoStart: "settings:get-auto-start",
+    setAutoStart: "settings:set-auto-start",
     getSidebar: "settings:get-sidebar",
     setSidebar: "settings:set-sidebar",
     getZoom: "settings:get-zoom",
