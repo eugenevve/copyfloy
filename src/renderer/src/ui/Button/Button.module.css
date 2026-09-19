@@ -41,7 +41,8 @@
 
 .container:disabled,
 .icon:disabled {
-  cursor: not-allowed;
+  cursor: default;
+  opacity: var(--opacity-disabled);
 }
 
 .primary {

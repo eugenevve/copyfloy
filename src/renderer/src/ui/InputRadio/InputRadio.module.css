@@ -25,7 +25,7 @@
 .container.disabled,
 .input:disabled {
   color: var(--content-gray-light);
-  cursor: not-allowed;
+  cursor: default;
 }
 
 .label {

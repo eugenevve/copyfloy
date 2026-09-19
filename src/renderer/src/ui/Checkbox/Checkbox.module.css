@@ -29,14 +29,14 @@
 }
 
 .input:disabled + .checkbox {
-  border: var(--border-primary);
+  opacity: var(--opacity-disabled);
 }
 
 .container.disabled,
 .input:disabled + .checkbox {
   color: var(--content-gray-light);
   border-color: var(--border-primary);
-  cursor: not-allowed;
+  cursor: default;
 }
 
 .check {
