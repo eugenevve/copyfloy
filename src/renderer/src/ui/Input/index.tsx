@@ -8,9 +8,9 @@ import { ButtonKind } from "../Button/Button.types";
 
 export const Input: FC<IInput> = ({ label, disabled, className, icon, onClick, ...props }) => {
   return (
-    <div className={classNames(styles.container, className || "")}>
+    <div className={classNames(styles.container, disabled ? styles.disabled : "", className || "")}>
       {label && <div className={styles.label}>{label}</div>}
-      <div className={classNames(styles.content, className || "", (disabled && styles.disabled) || "")}>
+      <div className={classNames(styles.content, className || "")}>
         <input {...props} disabled={disabled} className={styles.input} />
         {icon && (
           <Button kind={ButtonKind.SECONDARY} className={styles.button} onClick={onClick} icon>

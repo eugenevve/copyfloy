@@ -42,10 +42,9 @@
   user-select: none;
 }
 
-.content.disabled,
-.input:disabled {
-  cursor: not-allowed;
-  color: var(--color-gray);
+.container:has(.input:disabled) {
+  cursor: default;
+  opacity: var(--opacity-disabled);
 }
 
 .content:has(.button) .input {
