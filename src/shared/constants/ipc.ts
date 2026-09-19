@@ -19,6 +19,8 @@ export const IPC_CHANNELS = {
     setAdmin: "settings:set-admin",
     getZoom: "settings:get-zoom",
     setZoom: "settings:set-zoom",
+    getTray: "settings:get-tray",
+    setTray: "settings:set-tray",
   },
   tasks: {
     save: "tasks:save",

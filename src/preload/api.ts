@@ -38,6 +38,10 @@ export const api = {
       get: (): Promise<number> => invoke<number>(IPC_CHANNELS.settings.getZoom),
       set: (factor: number): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setZoom, factor),
     },
+    minimizeTray: {
+      get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getTray),
+      set: (minimizeTray: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setTray, minimizeTray),
+    },
   },
   tasks: {
     get: (): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.getAll),

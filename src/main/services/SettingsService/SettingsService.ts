@@ -1,4 +1,4 @@
-import { IAppSettings, IWindowState, SettingsAction } from "@shared/types/window";
+import { IAppSettings, IWindowState } from "@shared/types/window";
 
 import { AutoStartService } from "./AutoStartService";
 import { RunAdminService } from "./RunAdminService";
@@ -12,11 +12,11 @@ export class SettingsService {
 
   // Default application settings
   private settings: IAppSettings = {
-    closeAction: SettingsAction.MINIMIZE,
     sidebarOpen: true,
     autoStart: false,
     runAdmin: false,
     zoomFactor: 1,
+    minimizeTray: true,
   };
 
   // Loading settings data from a file
@@ -76,6 +76,15 @@ export class SettingsService {
 
   async setZoom(zoomFactor: number): Promise<void> {
     await this.updateSettings({ zoomFactor });
+  }
+
+  // Minimize Tray
+  getMinimizeTray(): boolean {
+    return this.settings.minimizeTray;
+  }
+
+  async setMinimizeTray(minimizeTray: boolean): Promise<void> {
+    await this.updateSettings({ minimizeTray });
   }
 
   // Saves the current window state

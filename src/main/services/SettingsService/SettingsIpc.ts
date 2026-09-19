@@ -51,5 +51,15 @@ export class SettingsIpc {
 
       await this.settingsService.setZoom(clamped);
     });
+
+    // Returns the current app minimize tray
+    ipcMain.handle(IPC_CHANNELS.settings.getTray, () => {
+      return this.settingsService.getMinimizeTray();
+    });
+
+    // Sets the app minimize tray
+    ipcMain.handle(IPC_CHANNELS.settings.setTray, async (_, minimizeTray: boolean) => {
+      await this.settingsService.setMinimizeTray(minimizeTray);
+    });
   }
 }

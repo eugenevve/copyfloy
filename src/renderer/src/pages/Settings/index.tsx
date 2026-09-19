@@ -2,6 +2,7 @@ import { PageWrapper } from "@app/components/PageWrapper";
 import { FC } from "react";
 
 import { AutoStart } from "./components/AutoStart";
+import { MinimizeTray } from "./components/MinimizeTray";
 import { RunAdmin } from "./components/RunAdmin";
 import { UpdateChecker } from "./components/UpdateChecker";
 import { ZoomController } from "./components/ZoomController";
@@ -14,6 +15,7 @@ export const Settings: FC = () => {
         <AutoStart />
         <RunAdmin />
         <ZoomController />
+        <MinimizeTray />
         <UpdateChecker />
       </div>
     </PageWrapper>

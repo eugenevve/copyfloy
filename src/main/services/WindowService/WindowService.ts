@@ -4,7 +4,7 @@ import { is } from "@electron-toolkit/utils";
 import { appState, isWindows } from "@main/utils/environment";
 import iconPath from "@resources/icon.png?asset";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
-import { IWindowState, SettingsAction } from "@shared/types/window";
+import { IWindowState } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
 
 import { WindowEvents } from "./WindowEvents";
@@ -114,7 +114,7 @@ export class WindowService {
   private handleWindowClose(event: Electron.Event): void {
     const settings = this.settingsService.getSettings();
 
-    if (settings.closeAction === SettingsAction.MINIMIZE && !appState.isQuitting) {
+    if (settings.minimizeTray && !appState.isQuitting) {
       event.preventDefault();
       this.mainWindow?.hide();
     }
