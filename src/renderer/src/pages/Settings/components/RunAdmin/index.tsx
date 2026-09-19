@@ -24,7 +24,7 @@ export const RunAdmin: FC = () => {
       <Checkbox label="Run as administrator" checked={runAdmin} onChange={handleChange} disabled={!isPackaged} />
       <div className={styles.hint}>
         {isPackaged
-          ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled."
+          ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled"
           : "The setting is not available in development mode"}
       </div>
     </div>
