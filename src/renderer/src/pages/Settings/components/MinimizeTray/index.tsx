@@ -1,4 +1,4 @@
-import { Checkbox } from "@app/ui/Checkbox";
+import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
 import styles from "./MinimizeTray.module.css";
@@ -19,7 +19,7 @@ export const MinimizeTray: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>Closing the app</div>
-      <Checkbox label="Minimize to tray on close" checked={minimizeTray} onChange={handleChange} />
+      <Switch label="Minimize to tray on close" checked={minimizeTray} onChange={handleChange} />
       <div className={styles.hint}>
         Keep the app running in the system tray instead of exiting completely when you close the window
       </div>

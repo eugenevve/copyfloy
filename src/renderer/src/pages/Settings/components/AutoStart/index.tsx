@@ -1,4 +1,4 @@
-import { Checkbox } from "@app/ui/Checkbox";
+import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
 import styles from "./AutoStart.module.css";
@@ -21,7 +21,7 @@ export const AutoStart: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>Auto Start</div>
-      <Checkbox label="Auto-start" checked={autoStart} onChange={handleChange} disabled={!isPackaged} />
+      <Switch label="Auto-start" checked={autoStart} onChange={handleChange} disabled={!isPackaged} />
       <div className={styles.hint}>
         {isPackaged
           ? "Launch the application when the computer starts up"

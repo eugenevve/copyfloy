@@ -1,4 +1,4 @@
-import { Checkbox } from "@app/ui/Checkbox";
+import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
 import styles from "./RunAdmin.module.css";
@@ -21,7 +21,7 @@ export const RunAdmin: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>Run Admin</div>
-      <Checkbox label="Run as administrator" checked={runAdmin} onChange={handleChange} disabled={!isPackaged} />
+      <Switch label="Run as administrator" checked={runAdmin} onChange={handleChange} disabled={!isPackaged} />
       <div className={styles.hint}>
         {isPackaged
           ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled"
