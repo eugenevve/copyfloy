@@ -22,6 +22,9 @@
   /* blackout-color */
   --blackout: rgb(0 0 0 / 70%);
 
+  /* opacity */
+  --opacity-disabled: 0.6;
+
   /* spacing */
   --spacing-xxs: 1px;
   --spacing-xs: 3px;
