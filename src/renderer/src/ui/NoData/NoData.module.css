@@ -1,5 +1,24 @@
 .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-s);
   padding: var(--spacing-s);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--content-primary);
+}
+
+.title {
   font-weight: var(--heading);
   text-align: center;
 }

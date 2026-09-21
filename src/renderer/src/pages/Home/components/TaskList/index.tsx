@@ -1,3 +1,4 @@
+import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { FC } from "react";
 
@@ -7,7 +8,7 @@ import { ITaskList } from "./TaskList.types";
 
 export const TaskList: FC<ITaskList> = ({ items, onRun, onSchedule, onEdit, onDelete }) => {
   if (items.length === 0) {
-    return <NoData title="No tasks" />;
+    return <NoData title="No tasks" icon={<CloneIcon />} />;
   }
 
   return (

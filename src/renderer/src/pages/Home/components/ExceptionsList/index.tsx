@@ -1,3 +1,4 @@
+import { FolderIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import { FC } from "react";
 
@@ -7,7 +8,7 @@ import { IExceptionsList } from "./ExceptionsList.types";
 
 export const ExceptionsList: FC<IExceptionsList> = ({ items, sourcePath, onRemove }) => {
   if (items.length === 0) {
-    return <NoData title="Select the source folder" />;
+    return <NoData title="Select the source folder" icon={<FolderIcon />} />;
   }
 
   return (
