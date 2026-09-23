@@ -5,6 +5,7 @@ import { MAX_ZOOM, MIN_ZOOM, STANDART_ZOOM, ZOOM_STEP } from "@shared/constants/
 import { useEffect, useSyncExternalStore, FC } from "react";
 
 import styles from "./ZoomController.module.css";
+import { WidgetContainer } from "../WidgetContainer";
 
 export const ZoomController: FC = () => {
   const zoomFactor = useSyncExternalStore(subscribeZoom, getZoom);
@@ -14,8 +15,7 @@ export const ZoomController: FC = () => {
   }, []);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Page Zoom</div>
+    <WidgetContainer title="Page Zoom">
       <div className={styles.section}>
         <Button onClick={() => setZoom(zoomFactor - ZOOM_STEP)} disabled={zoomFactor <= MIN_ZOOM} icon>
           <MinusIcon />
@@ -28,6 +28,6 @@ export const ZoomController: FC = () => {
       <Button onClick={() => setZoom(STANDART_ZOOM)} disabled={zoomFactor === STANDART_ZOOM}>
         Reset
       </Button>
-    </div>
+    </WidgetContainer>
   );
 };

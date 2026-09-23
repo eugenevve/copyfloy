@@ -2,8 +2,8 @@ import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { FC, useEffect, useState } from "react";
 
-import styles from "./UpdateChecker.module.css";
 import { UpdateStatus } from "./UpdateChecker.types";
+import { WidgetContainer } from "../WidgetContainer";
 
 export const UpdateChecker: FC = () => {
   const { showAlert } = useModal();
@@ -82,12 +82,10 @@ export const UpdateChecker: FC = () => {
         : `Application version: ${appVersion}`;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Update</div>
+    <WidgetContainer title="Update" hint={hint}>
       <Button onClick={handleAction} disabled={isLoading}>
         {buttonText}
       </Button>
-      <div className={styles.hint}>{hint}</div>
-    </div>
+    </WidgetContainer>
   );
 };

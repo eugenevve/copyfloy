@@ -1,7 +1,7 @@
 import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
-import styles from "./AutoStart.module.css";
+import { WidgetContainer } from "../WidgetContainer";
 
 export const AutoStart: FC = () => {
   const [autoStart, setAutoStart] = useState(false);
@@ -18,15 +18,13 @@ export const AutoStart: FC = () => {
     void window.api.settings.autoStart.set(enabled);
   };
 
+  const hint = isPackaged
+    ? "Launch the application when the computer starts up"
+    : "The setting is not available in development mode";
+
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Auto Start</div>
+    <WidgetContainer title="Auto Start" hint={hint}>
       <Switch label="Auto-start" checked={autoStart} onChange={handleChange} disabled={!isPackaged} />
-      <div className={styles.hint}>
-        {isPackaged
-          ? "Launch the application when the computer starts up"
-          : "The setting is not available in development mode"}
-      </div>
-    </div>
+    </WidgetContainer>
   );
 };

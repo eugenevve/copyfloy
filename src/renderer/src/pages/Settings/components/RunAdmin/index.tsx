@@ -1,7 +1,7 @@
 import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
-import styles from "./RunAdmin.module.css";
+import { WidgetContainer } from "../WidgetContainer";
 
 export const RunAdmin: FC = () => {
   const [runAdmin, setRunAdmin] = useState(false);
@@ -18,15 +18,13 @@ export const RunAdmin: FC = () => {
     void window.api.settings.runAdmin.set(enabled);
   };
 
+  const hint = isPackaged
+    ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled"
+    : "The setting is not available in development mode";
+
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Run Admin</div>
+    <WidgetContainer title="Run Admin" hint={hint}>
       <Switch label="Run as administrator" checked={runAdmin} onChange={handleChange} disabled={!isPackaged} />
-      <div className={styles.hint}>
-        {isPackaged
-          ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled"
-          : "The setting is not available in development mode"}
-      </div>
-    </div>
+    </WidgetContainer>
   );
 };

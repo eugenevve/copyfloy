@@ -1,7 +1,7 @@
 import { Switch } from "@app/ui/Switch";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 
-import styles from "./MinimizeTray.module.css";
+import { WidgetContainer } from "../WidgetContainer";
 
 export const MinimizeTray: FC = () => {
   const [minimizeTray, setMinimizeTray] = useState(true);
@@ -16,13 +16,11 @@ export const MinimizeTray: FC = () => {
     void window.api.settings.minimizeTray.set(enabled);
   };
 
+  const hint = "Keep the app running in the system tray instead of exiting completely when you close the window";
+
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>Closing the app</div>
+    <WidgetContainer title="Closing the app" hint={hint}>
       <Switch label="Minimize to tray on close" checked={minimizeTray} onChange={handleChange} />
-      <div className={styles.hint}>
-        Keep the app running in the system tray instead of exiting completely when you close the window
-      </div>
-    </div>
+    </WidgetContainer>
   );
 };
