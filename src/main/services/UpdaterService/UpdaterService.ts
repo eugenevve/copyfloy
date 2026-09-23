@@ -85,7 +85,7 @@ export class UpdaterService {
       resizable: false,
       alwaysOnTop: true,
       center: true,
-      backgroundColor: "#1e1e1e",
+      backgroundColor: "#0a0a0a",
       show: false,
       webPreferences: {
         sandbox: false,

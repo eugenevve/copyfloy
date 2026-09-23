@@ -33,6 +33,7 @@ export const getUpdateWindowHtml = (): string => `
       }
       .subtext {
         font-size: 14px;
+        text-align: center;
         color: var(--subtitle);
         margin-top: 4px;
       }
@@ -58,6 +59,7 @@ export const getUpdateWindowHtml = (): string => `
   <body>
     <div class="title">Copyfloy</div>
     <div class="subtext">Update system...</div>
+    <div class="subtext">The application will restart automatically. This may take a few minutes</div>
     <div class="spinner"></div>
   </body>
 </html>
