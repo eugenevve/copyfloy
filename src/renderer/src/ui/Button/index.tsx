@@ -4,11 +4,19 @@ import type { FC } from "react";
 import styles from "./Button.module.css";
 import { ButtonKind, type IButton } from "./Button.types";
 
-export const Button: FC<IButton> = ({ kind = ButtonKind.PRIMARY, className, children, icon, disabled, ...props }) => {
+export const Button: FC<IButton> = ({
+  kind = ButtonKind.PRIMARY,
+  className,
+  children,
+  icon,
+  disabled,
+  position,
+  ...props
+}) => {
   const style = classNames(icon ? styles.icon : styles.container, styles[kind], className || "");
 
   return (
-    <button {...props} disabled={disabled} className={style}>
+    <button {...props} disabled={disabled} className={style} style={icon ? {} : { justifyContent: position }}>
       {children}
     </button>
   );
