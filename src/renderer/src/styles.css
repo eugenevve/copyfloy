@@ -34,6 +34,7 @@
 
   /* size-elements */
   --control-size: 28px;
+  --line-height: 1.5;
 
   /* border */
   --border-primary: var(--spacing-xxs) solid var(--content-gray-dark);
