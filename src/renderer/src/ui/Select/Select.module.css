@@ -13,12 +13,12 @@
   justify-content: space-between;
   width: 100%;
   color: var(--content-gray-light);
-  transition: none;
 }
 
 .select.active {
   outline: var(--border-secondary);
   color: var(--content-primary);
+  transition: none;
 }
 
 .select:active {
