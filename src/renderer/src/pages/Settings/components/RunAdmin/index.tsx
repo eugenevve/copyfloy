@@ -19,7 +19,7 @@ export const RunAdmin: FC = () => {
   };
 
   const hint = isPackaged
-    ? "Run the application as an administrator. The current setting may affect the autostart time, if enabled"
+    ? "Run the application as an administrator. After changing this setting, restart the program for the changes to take effect. The current setting may affect the autostart time, if enabled"
     : "The setting is not available in development mode";
 
   return (
