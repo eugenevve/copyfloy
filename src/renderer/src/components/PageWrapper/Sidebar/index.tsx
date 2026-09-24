@@ -48,8 +48,8 @@ export const Sidebar: FC = () => {
   return (
     <div className={classNames(styles.container, isSidebarOpen ? styles.open : "")}>
       <Button kind={ButtonKind.SECONDARY} icon={!isSidebarOpen} className={styles.button} onClick={handleSidebar}>
-        {isSidebarOpen && "Hide"}
         <ArrowLineIcon className={isSidebarOpen && styles.icon} />
+        {isSidebarOpen && "Hide"}
       </Button>
       <Line />
       <div className={styles.list}>
@@ -59,11 +59,12 @@ export const Sidebar: FC = () => {
               key={path}
               kind={getKind(path)}
               icon={!isSidebarOpen}
+              position="left"
               className={styles.button}
               onClick={() => void navigate(path)}
             >
-              {isSidebarOpen && label}
               {icon}
+              {isSidebarOpen && label}
             </Button>
           ))}
         </div>
