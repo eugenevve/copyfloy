@@ -101,11 +101,16 @@ export class TaskIpc {
     });
 
     // Save imported tasks
-    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: ITask[]) => {
-      this.taskStorage.save(tasks);
-      this.scheduler.rescheduleAll(tasks);
+    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: Omit<ITask, "id">[]) => {
+      const tasksWithIds: ITask[] = tasks.map((task) => ({
+        id: Date.now() + Math.random(),
+        ...task,
+      }));
 
-      return tasks;
+      this.taskStorage.save(tasksWithIds);
+      this.scheduler.rescheduleAll(tasksWithIds);
+
+      return tasksWithIds;
     });
 
     // Select a file or folder
