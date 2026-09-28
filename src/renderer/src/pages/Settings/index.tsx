@@ -4,6 +4,7 @@ import { FC } from "react";
 import { AutoStart } from "./components/AutoStart";
 import { MinimizeTray } from "./components/MinimizeTray";
 import { RunAdmin } from "./components/RunAdmin";
+import { TaskTransfer } from "./components/TaskTransfer";
 import { UpdateChecker } from "./components/UpdateChecker";
 import { ZoomController } from "./components/ZoomController";
 import styles from "./Settings.module.css";
@@ -16,6 +17,7 @@ export const Settings: FC = () => {
         <RunAdmin />
         <ZoomController />
         <MinimizeTray />
+        <TaskTransfer />
         <UpdateChecker />
       </div>
     </PageWrapper>
