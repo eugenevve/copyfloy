@@ -51,7 +51,7 @@ export const api = {
     run: (task: ITask): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.run, task),
     export: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.export),
     import: (): Promise<ITask[] | null> => invoke<ITask[] | null>(IPC_CHANNELS.tasks.import),
-    saveBulk: (tasks: Omit<ITask, "id">[]): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.saveBulk, tasks),
+    saveBulk: (tasks: ITask[]): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.saveBulk, tasks),
     openDialog: (type: TaskType): Promise<string | null> => invoke<string | null>(IPC_CHANNELS.tasks.openDialog, type),
     openExceptionDialog: (sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE): Promise<string[] | null> =>
       invoke<string[] | null>(IPC_CHANNELS.tasks.openExceptionDialog, sourcePath, mode),

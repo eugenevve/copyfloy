@@ -101,10 +101,10 @@ export class TaskIpc {
     });
 
     // Save imported tasks
-    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: Omit<ITask, "id">[]) => {
-      const tasksWithIds: ITask[] = tasks.map((task) => ({
-        id: Date.now() + Math.random(),
+    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: ITask[]) => {
+      const tasksWithIds: ITask[] = tasks.map((task, index) => ({
         ...task,
+        id: Date.now() + index,
       }));
 
       this.taskStorage.save(tasksWithIds);
