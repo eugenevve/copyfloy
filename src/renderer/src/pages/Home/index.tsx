@@ -25,7 +25,7 @@ export const Home: FC = () => {
   const { tasks, fetchTasks, runTask, deleteTask } = useTasks();
   const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
-  const handleRun = (task: ITask) => {
+  const handleRunTask = (task: ITask) => {
     try {
       void runTask(task);
     } catch (error) {
@@ -34,17 +34,17 @@ export const Home: FC = () => {
   };
 
   // Modal Schedule
-  const handleSchedule = (task: ITask) => {
+  const handleScheduleTask = (task: ITask) => {
     setInitScheduling(task);
   };
 
-  const handleCloseSchedule = () => {
+  const handleCloseScheduleTask = () => {
     setInitScheduling(null);
   };
 
-  const handleSaveSchedule = async () => {
+  const handleSaveScheduleTask = async () => {
     await fetchTasks();
-    handleCloseSchedule();
+    handleCloseScheduleTask();
   };
 
   // Modal Task
@@ -74,7 +74,7 @@ export const Home: FC = () => {
     handleCloseTask();
   };
 
-  const handleDelete = (id: number) => {
+  const handleDeleteTask = (id: number) => {
     const taskToDelete = tasks.find((t) => t.id === id);
     const taskName = taskToDelete ? `"${taskToDelete.name}"` : "task";
 
@@ -105,10 +105,10 @@ export const Home: FC = () => {
           />
           <TaskList
             items={filteredTasks}
-            onRun={handleRun}
-            onSchedule={handleSchedule}
+            onRun={handleRunTask}
+            onSchedule={handleScheduleTask}
             onEdit={handleEditTask}
-            onDelete={(task) => handleDelete(task.id)}
+            onDelete={(task) => handleDeleteTask(task.id)}
           />
         </div>
       </PageWrapper>
@@ -118,8 +118,8 @@ export const Home: FC = () => {
       {isInitScheduling && (
         <EditSchedulerFormModal
           initialData={isInitScheduling}
-          onClose={handleCloseSchedule}
-          onSaved={handleSaveSchedule}
+          onClose={handleCloseScheduleTask}
+          onSaved={handleSaveScheduleTask}
         />
       )}
     </>

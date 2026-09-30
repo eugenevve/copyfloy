@@ -35,7 +35,7 @@ export class TaskIpc {
     });
 
     // Get all tasks
-    ipcMain.handle(IPC_CHANNELS.tasks.getAll, () => {
+    ipcMain.handle(IPC_CHANNELS.tasks.get, () => {
       return this.taskStorage.load();
     });
 

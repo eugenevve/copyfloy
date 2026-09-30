@@ -23,11 +23,11 @@ export const IPC_CHANNELS = {
     setTray: "settings:set-tray",
   },
   tasks: {
+    get: "tasks:get",
     save: "tasks:save",
-    getAll: "tasks:get-all",
     update: "tasks:update",
-    run: "tasks:run",
     delete: "tasks:delete",
+    run: "tasks:run",
     export: "tasks:export",
     import: "tasks:import",
     saveBulk: "tasks:save-bulk",

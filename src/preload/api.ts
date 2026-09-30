@@ -44,7 +44,7 @@ export const api = {
     },
   },
   tasks: {
-    get: (): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.getAll),
+    get: (): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.get),
     save: (task: Omit<ITask, "id">): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.save, task),
     update: (task: ITask): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.update, task),
     delete: (id: number): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.delete, id),
