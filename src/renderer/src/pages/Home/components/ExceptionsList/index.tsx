@@ -8,7 +8,11 @@ import { IExceptionsList } from "./ExceptionsList.types";
 
 export const ExceptionsList: FC<IExceptionsList> = ({ items, sourcePath, onRemove }) => {
   if (items.length === 0) {
-    return <NoData title="Select the source folder" icon={<FolderIcon />} />;
+    return (
+      <div className={styles.container}>
+        <NoData title="Select the source folder" icon={<FolderIcon />} />
+      </div>
+    );
   }
 
   return (
