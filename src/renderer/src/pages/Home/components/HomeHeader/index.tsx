@@ -19,7 +19,7 @@ export const HomeHeader: FC<IHomeHeader> = ({
   return (
     <div className={styles.container}>
       <div className={styles.section}>
-        <InfoApp count={count} />
+        <InfoApp name="Tasks" count={count} />
         <Button onClick={onAddTask}>Add task</Button>
       </div>
       <div className={styles.section}>

@@ -2,6 +2,6 @@ import { FC } from "react";
 
 import { IInfoApp } from "./InfoApp.types";
 
-export const InfoApp: FC<IInfoApp> = ({ count }) => {
-  return <div>Tasks: {count}</div>;
+export const InfoApp: FC<IInfoApp> = ({ name, count }) => {
+  return <div>{name}: {count}</div>;
 };
