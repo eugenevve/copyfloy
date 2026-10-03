@@ -1,0 +1,9 @@
+.container {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--spacing-s);
+  color: var(--text-primary);
+  font-size: 14px;
+}
