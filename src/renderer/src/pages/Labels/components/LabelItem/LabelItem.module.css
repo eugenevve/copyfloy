@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--spacing-l);
+  background: var(--content-gray-dark);
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
