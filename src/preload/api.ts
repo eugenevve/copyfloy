@@ -1,5 +1,6 @@
 import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
+import { ILabel } from "@shared/types/labels";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { ipcRenderer } from "electron";
 
@@ -55,6 +56,12 @@ export const api = {
     openDialog: (type: TaskType): Promise<string | null> => invoke<string | null>(IPC_CHANNELS.tasks.openDialog, type),
     openExceptionDialog: (sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE): Promise<string[] | null> =>
       invoke<string[] | null>(IPC_CHANNELS.tasks.openExceptionDialog, sourcePath, mode),
+  },
+  labels: {
+    get: (): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.get),
+    save: (label: Omit<ILabel, "id">): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.save, label),
+    update: (label: ILabel): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.update, label),
+    delete: (id: number): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.delete, id),
   },
   updater: {
     check: (): Promise<void> => invoke<void>(IPC_CHANNELS.updater.check),
