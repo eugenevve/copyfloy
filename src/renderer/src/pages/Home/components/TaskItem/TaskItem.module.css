@@ -7,6 +7,12 @@
   background: var(--content-gray-dark);
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
 .info {
   display: flex;
   flex-direction: column;
@@ -33,4 +39,10 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-all;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
 }

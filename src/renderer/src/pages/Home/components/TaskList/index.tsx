@@ -6,7 +6,7 @@ import { TaskItem } from "../TaskItem";
 import styles from "./TaskList.module.css";
 import { ITaskList } from "./TaskList.types";
 
-export const TaskList: FC<ITaskList> = ({ items, onRun, onSchedule, onEdit, onDelete }) => {
+export const TaskList: FC<ITaskList> = ({ items, labels, onRun, onSchedule, onEdit, onDelete }) => {
   if (items.length === 0) {
     return <NoData title="No tasks" icon={<CloneIcon />} />;
   }
@@ -17,6 +17,7 @@ export const TaskList: FC<ITaskList> = ({ items, onRun, onSchedule, onEdit, onDe
         <TaskItem
           key={item.id}
           task={item}
+          labels={labels.filter((label) => item.labelsIds?.includes(label.id))}
           onRun={() => onRun(item)}
           onSchedule={() => onSchedule(item)}
           onEdit={() => onEdit(item)}

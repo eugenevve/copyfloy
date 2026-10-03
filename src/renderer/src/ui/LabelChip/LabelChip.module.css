@@ -3,7 +3,12 @@
   align-items: center;
   width: fit-content;
   padding: var(--spacing-xs) var(--spacing-s);
-  border-radius: var(--spacing-s);
-  color: var(--text-primary);
+  border-radius: var(--spacing-m);
+  color: var(--white-primary);
   font-size: 14px;
+  user-select: none;
+}
+
+.selected {
+  border: var(--spacing-xxs) solid var(--content-primary);
 }
