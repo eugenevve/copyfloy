@@ -17,6 +17,11 @@ export class TaskIpc {
   ) {}
 
   init(): void {
+    // Get tasks
+    ipcMain.handle(IPC_CHANNELS.tasks.get, () => {
+      return this.taskStorage.load();
+    });
+
     // Create a new task
     ipcMain.handle(IPC_CHANNELS.tasks.save, (_, newTask: Omit<ITask, "id">) => {
       const tasks = this.taskStorage.load();
@@ -32,11 +37,6 @@ export class TaskIpc {
       this.scheduler.rescheduleAll(tasks);
 
       return tasks;
-    });
-
-    // Get all tasks
-    ipcMain.handle(IPC_CHANNELS.tasks.get, () => {
-      return this.taskStorage.load();
     });
 
     // Update a task
