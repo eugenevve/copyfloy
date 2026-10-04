@@ -1,6 +1,7 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ClockIcon, FileIcon, FolderIcon, PenIcon, PlayIcon, TrashIcon } from "@app/ui/Icons";
+import { LabelChip } from "@app/ui/LabelChip";
 import { ITaskItem, TaskType } from "@shared/types/tasks";
 import type { FC } from "react";
 
@@ -11,7 +12,7 @@ const TYPE_ICONS = {
   [TaskType.FILE]: FileIcon,
 };
 
-export const TaskItem: FC<ITaskItem> = ({ task, onRun, onEdit, onSchedule, onDelete }) => {
+export const TaskItem: FC<ITaskItem> = ({ task, labels, onRun, onEdit, onSchedule, onDelete }) => {
   const TypeIcon = TYPE_ICONS[task.type];
 
   const items = [
@@ -23,12 +24,21 @@ export const TaskItem: FC<ITaskItem> = ({ task, onRun, onEdit, onSchedule, onDel
 
   return (
     <div className={styles.container}>
-      <div className={styles.info}>
-        <div className={styles.section}>
-          <TypeIcon className={styles.icon} />
-          <div className={styles.title}>{task.name}</div>
+      <div className={styles.content}>
+        <div className={styles.info}>
+          <div className={styles.section}>
+            <TypeIcon className={styles.icon} />
+            <div>{task.name}</div>
+          </div>
+          <div className={styles.source}>{task.source}</div>
         </div>
-        <div className={styles.source}>{task.source}</div>
+        {labels.length > 0 && (
+          <div className={styles.labels}>
+            {labels.map((label) => (
+              <LabelChip key={label.id} name={label.name} color={label.color} />
+            ))}
+          </div>
+        )}
       </div>
       <div className={styles.section}>
         {items.map(({ Icon, ...props }) => (

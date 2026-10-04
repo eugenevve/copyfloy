@@ -1,4 +1,5 @@
 import { PageWrapper } from "@app/components/PageWrapper";
+import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { useTaskFilter } from "@app/hooks/useTaskFilter";
 import { useTasks } from "@app/hooks/useTasks";
@@ -23,6 +24,7 @@ export const Home: FC = () => {
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
   const { tasks, fetchTasks, runTask, deleteTask } = useTasks();
+  const { labels } = useLabels();
   const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
   const handleRunTask = (task: ITask) => {
@@ -105,6 +107,7 @@ export const Home: FC = () => {
           />
           <TaskList
             items={filteredTasks}
+            labels={labels}
             onRun={handleRunTask}
             onSchedule={handleScheduleTask}
             onEdit={handleEditTask}

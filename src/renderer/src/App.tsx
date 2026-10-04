@@ -6,6 +6,7 @@ import { ModalProvider } from "./components/ModalProvider";
 import { useZoomShortcuts } from "./hooks/useZoomShortcuts";
 import { About } from "./pages/About";
 import { Home } from "./pages/Home";
+import { Labels } from "./pages/Labels";
 import { Settings } from "./pages/Settings";
 import { AppPath } from "./utils/router";
 
@@ -18,6 +19,7 @@ export const App: FC = () => {
         <HashRouter>
           <Routes>
             <Route path={AppPath.MAIN} element={<Home />} />
+            <Route path={AppPath.LABELS} element={<Labels />} />
             <Route path={AppPath.SETTINGS} element={<Settings />} />
             <Route path={AppPath.ABOUT} element={<About />} />
           </Routes>

@@ -1,7 +1,9 @@
+import { ILabel } from "./labels";
 import { IScheduleConfig } from "./schedule";
 
 export interface ITaskItem {
   task: ITask;
+  labels: ILabel[];
   onRun: () => void;
   onSchedule: () => void;
   onEdit: () => void;
@@ -16,6 +18,7 @@ export interface ITask {
   target: string;
   schedule?: IScheduleConfig;
   exceptions?: string[];
+  labelsIds?: number[];
 }
 
 export enum TaskType {

@@ -1,7 +1,9 @@
+import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { Input } from "@app/ui/Input";
+import { LabelChip } from "@app/ui/LabelChip";
 import { Modal } from "@app/ui/Modal";
 import { RadioGroup } from "@app/ui/RadioGroup";
 import { TYPE_OPTIONS_EDIT } from "@app/utils/options";
@@ -16,10 +18,12 @@ import { ExceptionsList } from "../ExceptionsList";
 
 export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose, onSaved }) => {
   const { showConfirm } = useModal();
+  const { labels } = useLabels();
   const [isChoiceOpen, setChoiceOpen] = useState(false);
 
   const initialValues = {
     name: initialData?.name || "",
+    labelsIds: initialData?.labelsIds || [],
     type: initialData?.type || TaskType.FOLDER,
     source: initialData?.source || "",
     target: initialData?.target || "",
@@ -31,6 +35,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   const [source, setSource] = useState(initialValues.source);
   const [target, setTarget] = useState(initialValues.target);
   const [exceptions, setExceptions] = useState(initialValues.exceptions);
+  const [labelsIds, setLabelsIds] = useState(initialValues.labelsIds);
 
   const isEditMode = !!initialData?.id;
 
@@ -39,10 +44,15 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     type !== initialValues.type ||
     source !== initialValues.source ||
     target !== initialValues.target ||
-    JSON.stringify(exceptions) !== JSON.stringify(initialValues.exceptions);
+    labelsIds.length !== initialValues.labelsIds.length ||
+    exceptions.length !== initialValues.exceptions.length;
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
+  };
+
+  const handleLabelChange = (id: number) => {
+    setLabelsIds((prev) => (prev.includes(id) ? prev.filter((labelId) => labelId !== id) : [...prev, id]));
   };
 
   const handleTypeChange = (val: TaskType) => {
@@ -81,7 +91,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
 
   const handleSubmit = async () => {
     const schedule = initialData?.schedule || { notify: false, type: ScheduleType.DISABLED };
-    const taskData = { name, type, source, target, exceptions, schedule };
+    const taskData = { name, type, source, target, exceptions, labelsIds, schedule };
 
     if (initialData?.id) {
       await window.api.tasks.update({ ...taskData, id: initialData.id });
@@ -105,6 +115,24 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
       <Modal title={isEditMode ? "Edit task" : "New task"} onClose={handleClose}>
         <div className={styles.container}>
           <Input label="Task name" value={name} onChange={handleNameChange} placeholder="Example: Photo backup" />
+          <div className={styles.section}>
+            <div>Labels</div>
+            {labels.length > 0 ? (
+              <div className={styles.labels}>
+                {labels.map((label) => (
+                  <LabelChip
+                    key={label.id}
+                    selected={labelsIds.includes(label.id)}
+                    name={label.name}
+                    color={label.color}
+                    onClick={() => handleLabelChange(label.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={styles.hint}>No labels created</div>
+            )}
+          </div>
           <RadioGroup
             options={TYPE_OPTIONS_EDIT}
             value={type}

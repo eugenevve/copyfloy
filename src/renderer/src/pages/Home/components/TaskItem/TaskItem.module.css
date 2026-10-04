@@ -2,9 +2,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-xs) var(--spacing-s);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s);
   border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
 }
 
 .info {
@@ -33,4 +40,10 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-all;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
 }

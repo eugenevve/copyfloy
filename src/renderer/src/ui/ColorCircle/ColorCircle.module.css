@@ -1,0 +1,11 @@
+.container {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.selected {
+  border: var(--border-secondary);
+}

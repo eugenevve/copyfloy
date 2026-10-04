@@ -1,0 +1,15 @@
+.container {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border: var(--spacing-xxs) solid transparent;
+  border-radius: var(--spacing-l);
+  color: var(--white-primary);
+  font-size: 14px;
+  user-select: none;
+}
+
+.selected {
+  border: var(--spacing-xxs) solid var(--content-primary);
+}

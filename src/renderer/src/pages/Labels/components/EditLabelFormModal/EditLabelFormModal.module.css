@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.section {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.button {
+  margin-left: auto;
+}

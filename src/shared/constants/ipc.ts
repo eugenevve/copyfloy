@@ -34,6 +34,12 @@ export const IPC_CHANNELS = {
     openDialog: "dialog:open",
     openExceptionDialog: "dialog:open-exception",
   },
+  labels: {
+    get: "labels:get",
+    save: "labels:save",
+    update: "labels:update",
+    delete: "labels:delete",
+  },
   updater: {
     check: "updater:check",
     download: "updater:download",
