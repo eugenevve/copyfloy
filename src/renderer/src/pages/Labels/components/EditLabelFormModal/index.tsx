@@ -63,6 +63,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Example: work"
+          maxLength={40}
         />
         <div className={styles.section}>
           {LABEL_COLORS.map((labelColor) => (
