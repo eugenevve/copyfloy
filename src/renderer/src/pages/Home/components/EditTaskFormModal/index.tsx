@@ -45,7 +45,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     source !== initialValues.source ||
     target !== initialValues.target ||
     labelsIds.length !== initialValues.labelsIds.length ||
-    JSON.stringify(exceptions) !== JSON.stringify(initialValues.exceptions);
+    exceptions.length !== initialValues.exceptions.length;
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
