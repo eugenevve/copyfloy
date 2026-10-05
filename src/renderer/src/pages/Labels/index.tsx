@@ -1,3 +1,4 @@
+import { HeaderTools } from "@app/components/HeaderTools";
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useLabelFilter } from "@app/hooks/useLabelFilter";
 import { useLabels } from "@app/hooks/useLabels";
@@ -6,7 +7,6 @@ import { ILabel } from "@shared/types/labels";
 import { FC, useState } from "react";
 
 import { EditLabelFormModal } from "./components/EditLabelFormModal";
-import { LabelsHeader } from "./components/LabelsHeader";
 import { LabelsList } from "./components/LabelsList";
 import styles from "./Labels.module.css";
 
@@ -71,9 +71,11 @@ export const Labels: FC = () => {
     <>
       <PageWrapper>
         <div className={styles.container}>
-          <LabelsHeader
+          <HeaderTools
+            title="Labels"
             count={filteredLabels.length}
-            onAddLabel={handleAddLabel}
+            addText="Add label"
+            onAdd={handleAddLabel}
             search={search}
             onSearchChange={setSearch}
           />
