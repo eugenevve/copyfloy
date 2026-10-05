@@ -1,14 +1,15 @@
+import { HeaderTools } from "@app/components/HeaderTools";
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { useTaskFilter } from "@app/hooks/useTaskFilter";
 import { useTasks } from "@app/hooks/useTasks";
+import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
 import { ITask } from "@shared/types/tasks";
 import { FC, useState } from "react";
 
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
-import { HomeHeader } from "./components/HomeHeader";
 import { TaskList } from "./components/TaskList";
 import styles from "./Home.module.css";
 
@@ -97,13 +98,18 @@ export const Home: FC = () => {
     <>
       <PageWrapper>
         <div className={styles.container}>
-          <HomeHeader
+          <HeaderTools
+            title="Tasks"
             count={filteredTasks.length}
-            onAddTask={handleAddTask}
+            addText="Add task"
+            onAdd={handleAddTask}
             search={search}
             onSearchChange={setSearch}
-            typeFilter={typeFilter}
-            onTypeFilterChange={setTypeFilter}
+            filter={{
+              options: TYPE_OPTIONS_FILTER,
+              value: typeFilter,
+              onChange: (value) => setTypeFilter(value as typeof typeFilter),
+            }}
           />
           <TaskList
             items={filteredTasks}
