@@ -127,8 +127,14 @@ The goal is not simply to generate code with AI, but to use AI as a development 
 - Delete tasks
 - Run tasks manually
 - Store tasks persistently
-- Import tasks from JSON
-- Export tasks to JSON
+- Import and export tasks and labels as JSON
+
+### 🏷 Labels Management
+
+- Create, edit, and delete labels
+- Set a name and color for each label
+- Assign multiple labels to a task for visual organization
+- Keep labels when exporting and importing tasks
 
 ### 🔔 Notifications
 

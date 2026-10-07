@@ -143,6 +143,24 @@ Tasks can also be exported manually to another JSON file and imported later.
 
 This makes it possible to back up or transfer task configurations between installations.
 
+Task export files include both tasks and labels. During import, labels that already exist with the same name and color are reused; otherwise, imported labels are added with unique IDs. Task label references are updated to use the resulting IDs.
+
+---
+
+<br />
+
+## 🏷 Labels
+
+Labels help organize tasks visually. Each label has a numeric ID, a name, and a color, and a task can reference multiple labels through `labelsIds`.
+
+Labels are stored separately from tasks as JSON in the Electron `userData` directory:
+
+```text
+labels.json
+```
+
+The label service handles label retrieval, creation, updates, and deletion through IPC. When a label is deleted, its ID is also removed from every task that references it.
+
 ---
 
 <br />
@@ -190,6 +208,10 @@ Responsible for:
 ### `NotificationService`
 
 Provides success and error notifications for task execution.
+
+### `LabelService`
+
+Manages label storage and IPC operations. When labels are deleted, it also removes their references from stored tasks.
 
 ### `SchedulerService`
 
