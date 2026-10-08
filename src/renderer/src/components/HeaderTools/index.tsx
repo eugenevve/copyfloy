@@ -18,7 +18,7 @@ export const HeaderTools: FC<IHeaderTools> = ({ title, count, addText, onAdd, se
         <Input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search name..."
+          placeholder="Search"
           className={styles.input}
         />
         {filter && (
