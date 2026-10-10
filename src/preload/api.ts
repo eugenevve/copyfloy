@@ -2,6 +2,7 @@ import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ILabel } from "@shared/types/labels";
 import { ITask, TaskType } from "@shared/types/tasks";
+import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { ipcRenderer } from "electron";
 
 import { invoke, receive, receiveNoData } from "./ipc";
@@ -51,8 +52,9 @@ export const api = {
     delete: (id: number): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.delete, id),
     run: (task: ITask): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.run, task),
     export: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.export),
-    import: (): Promise<ITask[] | null> => invoke<ITask[] | null>(IPC_CHANNELS.tasks.import),
-    saveBulk: (tasks: ITask[]): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.saveBulk, tasks),
+    import: (): Promise<ITaskTransfer | null> => invoke<ITaskTransfer | null>(IPC_CHANNELS.tasks.import),
+    saveBulk: (transfer: ITaskTransfer, mode: ImportMode): Promise<ITask[]> =>
+      invoke<ITask[]>(IPC_CHANNELS.tasks.saveBulk, transfer, mode),
     openDialog: (type: TaskType): Promise<string | null> => invoke<string | null>(IPC_CHANNELS.tasks.openDialog, type),
     openExceptionDialog: (sourcePath: string, mode: TaskType.FOLDER | TaskType.FILE): Promise<string[] | null> =>
       invoke<string[] | null>(IPC_CHANNELS.tasks.openExceptionDialog, sourcePath, mode),

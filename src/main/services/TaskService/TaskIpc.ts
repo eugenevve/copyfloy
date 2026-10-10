@@ -2,18 +2,31 @@ import path from "node:path";
 
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ITask, TaskType } from "@shared/types/tasks";
+import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 
 import { TaskStorage } from "./TaskStorage";
 import { CopyService } from "../CopyService/CopyService";
+import { LabelStorage } from "../LabelService/LabelStorage";
 import { SchedulerService } from "../SchedulerService/SchedulerService";
+
+const createUniqueId = (usedIds: Set<number>): number => {
+  let id = Date.now();
+  while (usedIds.has(id)) {
+    id += 1;
+  }
+
+  usedIds.add(id);
+  return id;
+};
 
 // Initializes IPC handlers
 export class TaskIpc {
   constructor(
     private readonly taskStorage: TaskStorage,
     private readonly copyService: CopyService,
-    private readonly scheduler: SchedulerService
+    private readonly scheduler: SchedulerService,
+    private readonly labelStorage: LabelStorage
   ) {}
 
   init(): void {
@@ -66,12 +79,10 @@ export class TaskIpc {
       return tasks;
     });
 
-    // Export tasks
+    // Export tasks and labels
     ipcMain.handle(IPC_CHANNELS.tasks.export, async () => {
-      const tasks = this.taskStorage.load();
-
       const { filePath, canceled } = await dialog.showSaveDialog({
-        title: "Export task",
+        title: "Export tasks and labels",
         defaultPath: path.join(app.getPath("documents"), "tasks.json"),
         filters: [{ name: "JSON", extensions: ["json"] }],
       });
@@ -80,15 +91,20 @@ export class TaskIpc {
         return false;
       }
 
-      this.taskStorage.saveToFile(tasks, filePath);
+      const transfer: ITaskTransfer = {
+        tasks: this.taskStorage.load(),
+        labels: this.labelStorage.load(),
+      };
+
+      this.taskStorage.saveTransferToFile(transfer, filePath);
 
       return true;
     });
 
-    // Import tasks
+    // Import tasks and labels
     ipcMain.handle(IPC_CHANNELS.tasks.import, async () => {
       const { filePaths, canceled } = await dialog.showOpenDialog({
-        title: "Importing tasks",
+        title: "Import tasks and labels",
         filters: [{ name: "JSON", extensions: ["json"] }],
         properties: ["openFile"],
       });
@@ -97,16 +113,46 @@ export class TaskIpc {
         return null;
       }
 
-      return this.taskStorage.loadFromFile(filePaths[0]);
+      return this.taskStorage.loadTransferFromFile(filePaths[0]);
     });
 
-    // Save imported tasks
-    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, tasks: ITask[]) => {
-      const tasksWithIds: ITask[] = tasks.map((task, index) => ({
-        ...task,
-        id: Date.now() + index,
-      }));
+    // Save imported tasks and merge imported labels
+    ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, transfer: ITaskTransfer, mode: ImportMode) => {
+      const currentTasks = mode === ImportMode.ADD || transfer.tasks.length === 0 ? this.taskStorage.load() : [];
+      const currentLabels = this.labelStorage.load();
+      const importedLabelIds = new Map<number, number>();
+      const usedLabelIds = new Set(currentLabels.map((label) => label.id));
 
+      transfer.labels.forEach((importedLabel) => {
+        const sameId = currentLabels.find((label) => label.id === importedLabel.id);
+        const sameLabel = currentLabels.find(
+          (label) => label.name === importedLabel.name && label.color === importedLabel.color
+        );
+
+        if (sameId && sameId.name === importedLabel.name && sameId.color === importedLabel.color) {
+          importedLabelIds.set(importedLabel.id, sameId.id);
+          return;
+        }
+
+        if (sameLabel) {
+          importedLabelIds.set(importedLabel.id, sameLabel.id);
+          return;
+        }
+
+        const newId = createUniqueId(usedLabelIds);
+        importedLabelIds.set(importedLabel.id, newId);
+        currentLabels.push({ ...importedLabel, id: newId });
+      });
+
+      const usedTaskIds = new Set(currentTasks.map((task) => task.id));
+      const importedTasks = transfer.tasks.map((task) => ({
+        ...task,
+        id: createUniqueId(usedTaskIds),
+        labelsIds: task.labelsIds?.map((labelId) => importedLabelIds.get(labelId) ?? labelId),
+      }));
+      const tasksWithIds: ITask[] = [...currentTasks, ...importedTasks];
+
+      this.labelStorage.save(currentLabels);
       this.taskStorage.save(tasksWithIds);
       this.scheduler.rescheduleAll(tasksWithIds);
 

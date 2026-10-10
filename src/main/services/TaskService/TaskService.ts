@@ -1,6 +1,7 @@
 import { TaskIpc } from "./TaskIpc";
 import { TaskStorage } from "./TaskStorage";
 import { CopyService } from "../CopyService/CopyService";
+import { LabelStorage } from "../LabelService/LabelStorage";
 import { SchedulerService } from "../SchedulerService/SchedulerService";
 
 // Service responsible for coordinating task-related services
@@ -18,7 +19,7 @@ export class TaskService {
       void this.copyService.run(task);
     });
 
-    this.taskIpc = new TaskIpc(this.taskStorage, this.copyService, this.scheduler);
+    this.taskIpc = new TaskIpc(this.taskStorage, this.copyService, this.scheduler, new LabelStorage());
   }
 
   // Initializes the task system
