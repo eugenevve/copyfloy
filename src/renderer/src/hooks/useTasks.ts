@@ -18,6 +18,11 @@ export const useTasks = () => {
     setTasks(updatedTasks);
   };
 
+  const updateTask = async (task: ITask) => {
+    const updatedTasks = await window.api.tasks.update(task);
+    setTasks(updatedTasks);
+  };
+
   useEffect(() => {
     void window.api.tasks.get().then(setTasks);
   }, []);
@@ -27,5 +32,6 @@ export const useTasks = () => {
     fetchTasks,
     runTask,
     deleteTask,
+    updateTask,
   };
 };

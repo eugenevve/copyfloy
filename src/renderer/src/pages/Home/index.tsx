@@ -24,7 +24,7 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
-  const { tasks, fetchTasks, runTask, deleteTask } = useTasks();
+  const { tasks, fetchTasks, runTask, deleteTask, updateTask } = useTasks();
   const { labels } = useLabels();
   const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
@@ -118,6 +118,7 @@ export const Home: FC = () => {
             onSchedule={handleScheduleTask}
             onEdit={handleEditTask}
             onDelete={(task) => handleDeleteTask(task.id)}
+            onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
           />
         </div>
       </PageWrapper>

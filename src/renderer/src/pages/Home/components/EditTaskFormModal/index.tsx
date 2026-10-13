@@ -91,7 +91,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
 
   const handleSubmit = async () => {
     const schedule = initialData?.schedule || { notify: false, type: ScheduleType.DISABLED };
-    const taskData = { name, type, source, target, exceptions, labelsIds, schedule };
+    const taskData = { name, type, source, target, exceptions, labelsIds, schedule, isPinned: initialData?.isPinned };
 
     if (initialData?.id) {
       await window.api.tasks.update({ ...taskData, id: initialData.id });
