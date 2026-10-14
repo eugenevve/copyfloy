@@ -15,7 +15,7 @@ export const TaskList: FC<ITaskList> = ({ items, labels, onRun, onSchedule, onEd
     <div className={styles.container}>
       {items
         .toReversed()
-        .sort((first, second) => Number(second.isPinned) - Number(first.isPinned))
+        .sort((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)))
         .map((item) => (
           <TaskItem
             key={item.id}
