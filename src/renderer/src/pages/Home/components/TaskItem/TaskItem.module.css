@@ -25,10 +25,28 @@
   gap: var(--spacing-xs);
 }
 
-.icon {
-  fill: var(--content-primary);
+.icon,
+.iconPin {
   width: 14px;
   height: 14px;
+}
+
+.icon {
+  fill: var(--content-primary);
+}
+
+.iconPin {
+  fill: var(--content-gray-light) !important;
+}
+
+.pinButton {
+  width: 20px;
+  min-width: 20px !important;
+  height: 20px;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  padding: 0;
+  background: transparent;
 }
 
 .source {
