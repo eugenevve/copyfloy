@@ -8,6 +8,7 @@ export interface ITaskItem {
   onSchedule: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onPin: () => void;
 }
 
 export interface ITask {
@@ -19,6 +20,7 @@ export interface ITask {
   schedule?: IScheduleConfig;
   exceptions?: string[];
   labelsIds?: number[];
+  isPinned?: boolean;
 }
 
 export enum TaskType {

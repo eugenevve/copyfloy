@@ -8,4 +8,5 @@ export interface ITaskList {
   onSchedule: (task: ITask) => void;
   onEdit: (task: ITask) => void;
   onDelete: (task: ITask) => void;
+  onPin: (task: ITask) => void;
 }
