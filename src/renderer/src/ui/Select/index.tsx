@@ -1,5 +1,5 @@
 import { classNames } from "@app/utils/classNames";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useId, useRef, useState } from "react";
 
 import styles from "./Select.module.css";
 import { Button } from "../Button";
@@ -8,6 +8,7 @@ import { ButtonKind } from "../Button/Button.types";
 import { CheckIcon, ChevronIcon } from "../Icons";
 
 export const Select: FC<ISelect> = ({ label, value, onChange, options, placeholder, disabled, className }) => {
+  const fieldId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((option) => option.value === value);
 
@@ -25,8 +26,13 @@ export const Select: FC<ISelect> = ({ label, value, onChange, options, placehold
 
   return (
     <div ref={containerRef} className={classNames(styles.container, className || "", isOpen ? styles.isOpen : "")}>
-      {label && <div className={styles.label}>{label}</div>}
+      {label && (
+        <label htmlFor={fieldId} className={styles.label}>
+          {label}
+        </label>
+      )}
       <Button
+        id={fieldId}
         kind={ButtonKind.SECONDARY}
         className={classNames(styles.select, isOpen ? styles.active : "")}
         onClick={() => setIsOpen((prev) => !prev)}
