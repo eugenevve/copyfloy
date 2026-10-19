@@ -1,4 +1,4 @@
-export interface IScheduleConfig {
+export interface ISchedule {
   type: ScheduleType;
   notify: boolean;
   hours?: number;

@@ -1,8 +1,8 @@
-import { IScheduleConfig, ScheduleType } from "@shared/types/schedule";
+import { ISchedule, ScheduleType } from "@shared/types/schedule";
 
 // Converts an application schedule configuration to a cron expression
 // Returns null if the schedule is disabled or cannot be converted to a valid cron expression
-export function convertToCron(config: IScheduleConfig): string | null {
+export function convertToCron(config: ISchedule): string | null {
   const { type, hours = 0, minutes = 0, interval = 5, days = [] } = config;
 
   switch (type) {

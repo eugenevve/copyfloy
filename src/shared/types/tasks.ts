@@ -1,5 +1,5 @@
 import { ILabel } from "./labels";
-import { IScheduleConfig } from "./schedule";
+import { ISchedule } from "./schedule";
 
 export interface ITaskItem {
   task: ITask;
@@ -17,7 +17,7 @@ export interface ITask {
   type: TaskType;
   source: string;
   target: string;
-  schedule?: IScheduleConfig;
+  schedule?: ISchedule;
   exceptions?: string[];
   labelsIds?: number[];
   isPinned?: boolean;
