@@ -73,20 +73,6 @@ The project focuses on:
 
 Instead of manually copying the same folders on a regular basis, users can configure a task once and let application execute it automatically.
 
-### 🤖 AI-Assisted Development
-
-An important part of this project is the development process itself.
-
-Application is being developed with the help of several free AI tools, with each model being used for a different role in the development workflow:
-
-- **ChatGPT** - general-purpose development assistance, architecture discussions, implementation, documentation, and everyday development tasks.
-- **Claude** - solving complex and fundamental technical problems, exploring architectural approaches, and working through more challenging engineering decisions.
-- **Gemini** - refining concepts, improving existing solutions, exploring alternative approaches, and helping iterate on the project's overall direction.
-
-Rather than relying on a single AI model, the project uses a **multi-model development approach**, where different AI systems are used according to their strengths.
-
-The goal is not simply to generate code with AI, but to use AI as a development tool for **exploration, problem solving, iteration, and continuous improvement**, while keeping the overall architecture and technical decisions under human direction.
-
 ---
 
 <br />
