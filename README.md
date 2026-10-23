@@ -16,12 +16,8 @@
 
 <img src="./resources/readme.png" />
 
----
-
 > [!WARNING]
-> **Experimental - not ready for public use.**
-> This application is under active development and may contain bugs or incomplete features.
-> It may change without notice and is not recommended for production use.
+> **Experimental - not ready for public use.** The application is under active development and may contain bugs or incomplete features. It may change without notice and is not recommended for production use.
 
 ---
 
@@ -29,49 +25,19 @@
 
 ## ✨ About
 
-A lightweight Windows desktop application for scheduling and automating local file and folder copy operations.
+Windows desktop application that automates recurring copying of local files and folders.
 
-Application allows you to create copy tasks with a source and destination, configure an execution schedule, exclude specific files or directories, and run tasks automatically in the background.
+Instead of copying the same folders by hand, you create a task once - a source, a destination and, optionally, a schedule - and application runs it for you. Tasks can be started manually or on a schedule, and the app can keep working in the system tray with its window closed. Typical uses are periodic backups to another drive or a USB stick.
 
-Is designed to simplify recurring local file copy operations between drives, folders, removable storage devices, and other accessible locations.
-
-A task consists of a single source and destination:
+A task has a single source (a **file or a folder**) and a destination **folder**. The source name is appended to the destination path:
 
 ```text
-[Source]
-D:\Documents
-    ↓
-[Destination]
-E:\Backup
-    ↓
-[Result]
-E:\Backup\Documents
+Source        D:\Documents
+Destination   E:\Backup
+Result        E:\Backup\Documents
 ```
 
-The source can be either a **file or a directory**, while the destination is a directory.
-
-Tasks can be executed manually or automatically according to a configured schedule.
-
-The application can remain running in the **Windows system tray**, allowing scheduled tasks to operate without keeping the main window open.
-
----
-
-<br />
-
-## 💡 Why this project exists
-
-Application was created as a lightweight solution for automating repetitive local file copy operations.
-
-The project focuses on:
-
-- Simple task-based configuration
-- Local file and folder operations
-- Flexible scheduling
-- Background execution
-- Windows system integration
-- Maintainable Electron architecture
-
-Instead of manually copying the same folders on a regular basis, users can configure a task once and let application execute it automatically.
+Copying is one-way: existing files in the destination are overwritten, and nothing is ever deleted there.
 
 ---
 
@@ -79,274 +45,152 @@ Instead of manually copying the same folders on a regular basis, users can confi
 
 ## 🚀 Features
 
-### 📁 File & Folder Copying
+**Tasks**
 
-- Copy individual files
-- Copy entire directories recursively
-- Preserve the source directory as part of the destination path
-- Copy between local drives and folders
-- Copy to removable storage such as USB drives
-- Automatically overwrite existing files
+- Create, edit, delete and manually run tasks
+- Copy a single file or an entire folder (recursively)
+- Pin important tasks to the top of the list
+- Search tasks and filter them by type (file / folder)
+- Confirmation before deleting a task or closing a form with unsaved changes
 
-### ⏰ Task Scheduling
+**Exclusions**
 
-- Run tasks manually
-- Schedule tasks to run automatically
-- Every N minutes
-- Hourly
-- Daily
-- Weekly
-- Enable or disable task scheduling
-- Optional notifications after task execution
+- Exclude specific files and folders from a copy; multiple paths can be selected at once
+- An excluded folder is skipped together with all of its contents
 
-### 🚫 Copy Exceptions
+**Scheduling**
 
-- Exclude specific files from a task
-- Exclude specific directories
-- Select multiple files or directories as exclusions
-- Excluded directories and their contents are skipped during copying
+- Every N minutes, hourly, daily or on selected days of the week
+- Scheduling can be switched off per task
+- Optional success notification per task; failures are always reported
+- Scheduled tasks run only while the app is running - the tray keeps it alive after the window is closed
 
-### 📋 Task Management
+**Labels**
 
-- Create copy tasks
-- Edit existing tasks
-- Delete tasks
-- Run tasks manually
-- Store tasks persistently
-- Import and export tasks and labels as JSON
+- Colored labels with a name, managed on a separate page
+- Several labels per task; deleting a label removes it from every task
 
-### 🏷 Labels Management
+**Import and export**
 
-- Create, edit, and delete labels
-- Set a name and color for each label
-- Assign multiple labels to a task for visual organization
-- Keep labels when exporting and importing tasks
+- Export all tasks and labels to a JSON file and import them on another machine
+- Import either adds to the existing tasks or replaces them
+- Imported labels with the same name and color are reused; other tasks and labels get new unique IDs
 
-### 🔔 Notifications
+**Windows integration**
 
-- Success notifications for completed tasks
-- Error notifications when a task fails
+- System tray icon (click to open, right-click for the _Open_ / _Close_ menu)
+- Optional minimize-to-tray when the window is closed (enabled by default)
+- Optional auto-start with Windows and optional run as administrator. When both are on, the app is launched at logon through a Windows scheduled task, so the elevated start is not blocked. Both options take effect only in the packaged build.
+- Single instance: launching the app a second time restores the existing window
+- Window state, sidebar state and page zoom (also via keyboard shortcuts) are remembered between launches
+- Discord Rich Presence status in the user's Discord profile
 
-### 🖥 Windows Integration
+**Updates**
 
-- System tray support
-- Run application in the background
-- Configure application window behavior
-- Optional behavior for closing the main window
-- Optional application auto-start
-- Application settings stored locally
+- Built-in updater (`electron-updater`) with releases published on GitHub
+- Updates are checked, downloaded and installed manually from the Settings page
 
-### 🔄 Application Updates
-
-- Built-in update infrastructure using `electron-updater`
-- Application update support is part of the project architecture
+All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`).
 
 ---
 
 <br />
 
-## 🛠 Tech Stack
+## 🛠 Getting Started
 
-### Production
-
-- **Electron** - desktop application runtime
-- **React** - frontend UI
-- **TypeScript** - application development
-- **React Router** - frontend routing
-- **fs-extra** - file and directory operations
-- **node-cron** - task scheduling
-- **electron-updater** - application updates
-- **Electron Toolkit** - Electron preload and utility helpers
-
-### Development
-
-- **Vite / electron-vite** - development and build tooling
-- **ESLint** - JavaScript/TypeScript linting
-- **Stylelint** - CSS/SCSS linting
-- **TypeScript ESLint** - TypeScript-aware linting
-- **Prettier ESLint configuration** - formatting compatibility
-
----
-
-<br />
-
-## 🏗 Architecture
-
-Follows the standard Electron architecture with a clear separation between the **main process**, **preload layer**, and **renderer application**.
-
-For a detailed overview of the application architecture, services, data flow, and task lifecycle, see: [Architecture Documentation](./docs/ARCHITECTURE.md)
-
-```text
-src/
-├── main/
-│   └── services/
-│       ├── AppService/
-│       ├── CopyService/
-│       ├── DiscordService/
-│       ├── NotificationService/
-│       ├── SchedulerService/
-│       ├── SettingsService/
-│       ├── TaskService/
-│       ├── TrayService/
-│       ├── UpdaterService/
-│       └── WindowService/
-│
-├── preload/
-│   └── ...
-│
-└── renderer/
-    └── ...
-```
-
-### Main Process
-
-The main process contains the application's core functionality and system-level services.
-
-### Preload
-
-The preload layer provides a controlled API between the renderer process and Electron's main process.
-
-### Renderer
-
-The renderer communicates with the backend through IPC handlers rather than accessing Node.js APIs directly.
-
----
-
-<br />
-
-## 📦 Installation
-
-Clone the repository:
+**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.12 or newer and npm.
 
 ```bash
 git clone https://github.com/eugenevve/copyfloy.git
 cd copyfloy
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
----
-
-<br />
-
-## 🚀 Development
-
-Start the application in development mode:
-
-```bash
 npm run dev
 ```
 
-The development environment is powered by `electron-vite`.
+### Scripts
+
+| Command                | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| `npm run dev`          | Start the app in development mode (`electron-vite`)          |
+| `npm run build`        | Lint CSS and JS/TS, then create the production build         |
+| `npm run preview`      | Preview the generated production build                       |
+| `npm run build:win`    | Production build + Windows installer (`electron-builder`)    |
+| `npm run lint`         | Lint JavaScript/TypeScript with ESLint (no warnings allowed) |
+| `npm run lint:fix`     | Lint JavaScript/TypeScript and apply automatic fixes         |
+| `npm run lint:css`     | Lint CSS with Stylelint                                      |
+| `npm run lint:css:fix` | Lint CSS and apply automatic fixes                           |
 
 ---
 
 <br />
 
-## 🔍 Code Quality
-
-Run JavaScript and TypeScript linting:
-
-```bash
-npm run lint
-```
-
-Run CSS/SCSS linting:
-
-```bash
-npm run lint:css
-```
-
-The production build runs both linting steps before building the application.
-
----
-
-<br />
-
-## 🏗 Production Build
-
-Build the application:
-
-```bash
-npm run build
-```
-
-Preview the generated Electron build:
-
-```bash
-npm run preview
-```
-
-The project includes an `electron-builder.yml` configuration for application packaging.
-
----
-
-<br />
-
-## 📦 Windows Installer
-
-Create a Windows installer:
+## 📦 Building the Windows Installer
 
 ```bash
 npm run build:win
 ```
 
-This command first creates the production build and then packages the application using `electron-builder`.
-
-The generated files are placed in the `dist` directory.
-
-The Windows installer uses the NSIS target and provides:
-
-- a selectable installation directory;
-- desktop shortcut creation;
-- application and installer icons;
-- uninstaller support;
-- MIT license information during installation.
-
-The packaging configuration is defined in `package.json`.
-
-### Build output
-
-After a successful build, the Windows installer will be available in:
+The command runs the linters, builds the app and packages it with `electron-builder`. The installer is written to the `dist` directory:
 
 ```text
-dist/Copyfloy-setup-0.0.0.exe
+dist/Copyfloy-setup-<version>.exe
 ```
 
----
+The packaging settings live in the `build` section of `package.json`. The installer uses the NSIS target and provides a selectable installation directory (per-user install), a desktop shortcut, application icons, an uninstaller and the MIT license text.
 
-<br />
-
-## ⚠️ Windows Security Notice
-
-Application is currently distributed without a code-signing certificate.
-
-Because the Windows executable is not digitally signed, Windows Defender SmartScreen or other Windows security components may display a warning when launching the application.
-
-This does not necessarily indicate that the application is malicious. The warning is related to the executable not having a trusted digital signature.
-
-Code signing and distribution configuration may be added in a future release.
+> [!NOTE]
+> **Windows security warning.** The executable is not code-signed yet, so Windows Defender SmartScreen may show a warning on launch. This only means the app has no trusted digital signature. Code signing may be added in a future release.
 
 ---
 
 <br />
 
-## 🤝 Contribution
+## 🏗 Project Structure
 
-The project is currently under active development.
+```text
+src/
+├── main/            # Electron main process
+│   ├── services/    # AppService, CopyService, DiscordService, LabelService,
+│   │                # NotificationService, SchedulerService, SettingsService,
+│   │                # TaskService, TrayService, UpdaterService, WindowService
+│   └── utils/
+├── preload/         # Secure bridge between main and renderer
+├── renderer/        # React UI: Home (tasks), Labels, Settings, About
+└── shared/          # Code used by both sides: IPC channel names, types, constants
+```
 
-Suggestions, improvements, bug reports, and pull requests are welcome as the project evolves.
+- **Main process** - the core logic: copying, scheduling, storage, tray, updates, system integration. Most services follow one pattern: a service with its logic, an `Ipc` class that exposes it, and a `Storage` class for its JSON file.
+- **Preload** - exposes a restricted `window.api` to the UI.
+- **Renderer** - the React interface. It has no direct access to Node.js and talks to the main process only through IPC. All channels are listed in `src/shared/constants/ipc.ts`.
 
-If you encounter an issue or have an idea for a new feature, feel free to open an issue or submit a pull request.
+For the task lifecycle, scheduling, storage format and the responsibilities of each service, see [Architecture Documentation](./docs/ARCHITECTURE.md).
 
 ---
 
 <br />
+
+## 🧰 Tech Stack
+
+| Area            | Technologies                                                             |
+| --------------- | ------------------------------------------------------------------------ |
+| Desktop runtime | Electron                                                                 |
+| UI              | React, React Router (`HashRouter`), CSS Modules                          |
+| Language        | TypeScript                                                               |
+| File system     | fs-extra                                                                 |
+| Scheduling      | node-cron                                                                |
+| Updates         | electron-updater (GitHub releases)                                       |
+| Integrations    | @xhayper/discord-rpc, Electron Toolkit (`preload`, `utils`)              |
+| Build           | electron-vite, electron-builder (NSIS)                                   |
+| Code quality    | ESLint (+ TypeScript, React, import plugins), Stylelint, Prettier config |
+
+---
+
+<br />
+
+## 🤝 Contributing
+
+The project is under active development. Bug reports, suggestions and pull requests are welcome - feel free to open an issue or submit a PR.
 
 ## 📄 License
 
-This project is available under the **[MIT License](./LICENSE)**.
+Released under the **[MIT License](./LICENSE)**.
