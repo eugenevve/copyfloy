@@ -12,10 +12,15 @@
   gap: var(--spacing-s);
 }
 
+.section:last-child {
+  flex: 1;
+}
+
 .input input {
-  width: 170px;
+  flex: 1;
+  width: 100%;
 }
 
 .select {
-  width: 180px;
+  width: 260px;
 }
