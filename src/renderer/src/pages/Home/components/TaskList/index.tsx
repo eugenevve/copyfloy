@@ -2,7 +2,7 @@ import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import type { FC } from "react";
 
@@ -50,7 +50,7 @@ export const TaskList: FC<ITaskList> = ({
   };
 
   return (
-    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis, restrictToParentElement]} onDragEnd={handleDragEnd}>
       <div className={styles.container}>
         {[pinnedIds, regularIds].map((ids, index) => (
           <SortableContext key={index} items={ids}>

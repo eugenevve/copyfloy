@@ -2,7 +2,7 @@ import { LabelsIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import type { FC } from "react";
 
@@ -26,7 +26,7 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
   };
 
   return (
-    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis, restrictToParentElement]} onDragEnd={handleDragEnd}>
       <SortableContext items={displayIds}>
         <div className={styles.container}>
           {displayItems.map((item) => (
