@@ -1,3 +1,4 @@
+import { reorderByDisplayIds } from "@main/utils/reorderByDisplayIds";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ILabel } from "@shared/types/labels";
 import { ipcMain } from "electron";
@@ -56,6 +57,20 @@ export class LabelIpc {
       this.taskStorage.save(tasks);
 
       return labels;
+    });
+
+    // Label order
+    ipcMain.handle(IPC_CHANNELS.labels.reorder, (_, orderedIds: number[]) => {
+      const labels = this.labelStorage.load();
+      const reorderedLabels = reorderByDisplayIds(labels, orderedIds);
+
+      if (!reorderedLabels) {
+        return labels;
+      }
+
+      this.labelStorage.save(reorderedLabels);
+
+      return reorderedLabels;
     });
   }
 }
