@@ -1,6 +1,6 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
-import { DrugButton } from "@app/ui/DrugButton";
+import { DragButton } from "@app/ui/DragButton";
 import { PenIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
 import { classNames } from "@app/utils/classNames";
@@ -30,7 +30,7 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
   return (
     <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
       <div className={styles.section}>
-        {reorder && <DrugButton {...attributes} {...listeners} />}
+        {reorder && <DragButton {...attributes} {...listeners} />}
         <LabelChip name={label.name} color={label.color} />
       </div>
       <div className={styles.section}>
