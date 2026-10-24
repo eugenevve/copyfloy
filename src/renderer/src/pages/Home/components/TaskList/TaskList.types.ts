@@ -5,7 +5,9 @@ export interface ITaskList {
   items: ITask[];
   labels: ILabel[];
   reorder: boolean;
+  progress: Record<number, number>;
   onRun: (task: ITask) => void;
+  onStop: (task: ITask) => void;
   onSchedule: (task: ITask) => void;
   onEdit: (task: ITask) => void;
   onDelete: (task: ITask) => void;
