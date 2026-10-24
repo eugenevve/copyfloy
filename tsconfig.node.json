@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "composite": true,
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "types": ["electron-vite/node"],
     "paths": {
       "@main/*": ["./src/main/*"],
