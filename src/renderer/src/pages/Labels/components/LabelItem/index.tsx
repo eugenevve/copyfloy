@@ -1,6 +1,7 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
-import { DotsVerticalIcon, PenIcon, TrashIcon } from "@app/ui/Icons";
+import { DrugButton } from "@app/ui/DrugButton";
+import { PenIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -28,11 +29,7 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder }) 
   return (
     <div ref={setNodeRef} className={styles.container} style={sortableStyle}>
       <div className={styles.section}>
-        {reorder && (
-          <Button className={styles.dragButton} {...attributes} {...listeners}>
-            <DotsVerticalIcon className={styles.icon} />
-          </Button>
-        )}
+        {reorder && <DrugButton {...attributes} {...listeners} />}
         <LabelChip name={label.name} color={label.color} />
       </div>
       <div className={styles.section}>
