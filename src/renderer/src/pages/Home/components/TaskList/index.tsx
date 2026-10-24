@@ -1,9 +1,9 @@
 import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { FC, useState } from "react";
 
 import { TaskItem } from "../TaskItem";
@@ -22,7 +22,10 @@ export const TaskList: FC<ITaskList> = ({
   onReorder,
 }) => {
   const [activeId, setActiveId] = useState<number | null>(null);
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   if (items.length === 0) {
     return <NoData title="No tasks" icon={<CloneIcon />} />;

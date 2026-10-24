@@ -90,7 +90,6 @@ export class TaskIpc {
       }
 
       this.taskStorage.save(reorderedTasks);
-      this.scheduler.rescheduleAll(reorderedTasks);
 
       return reorderedTasks;
     });
