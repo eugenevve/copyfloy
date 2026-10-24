@@ -70,6 +70,16 @@ export class TaskIpc {
       await this.copyService.run(task);
     });
 
+    // Stop a running task
+    ipcMain.handle(IPC_CHANNELS.tasks.stop, (_, id: number) => {
+      this.copyService.stop(id);
+    });
+
+    // Progress of running tasks
+    ipcMain.handle(IPC_CHANNELS.tasks.getRunning, () => {
+      return this.copyService.getRunning();
+    });
+
     // Delete a task
     ipcMain.handle(IPC_CHANNELS.tasks.delete, (_, id: number) => {
       const tasks = this.taskStorage.load().filter((task) => task.id !== id);

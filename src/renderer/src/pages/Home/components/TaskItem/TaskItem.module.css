@@ -70,3 +70,9 @@
   flex-wrap: wrap;
   gap: var(--spacing-xs);
 }
+
+.progress {
+  width: 45px;
+  text-align: right;
+  user-select: none;
+}

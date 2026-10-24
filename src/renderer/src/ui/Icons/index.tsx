@@ -86,6 +86,14 @@ export const PlayIcon = ({ ...props }) => {
   );
 };
 
+export const StopIcon = ({ ...props }) => {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" {...props}>
+      <path d="M2.85714 0H17.1429C18.7188 0 20 1.28125 20 2.85714V17.1429C20 18.7188 18.7188 20 17.1429 20H2.85714C1.28125 20 0 18.7188 0 17.1429V2.85714C0 1.28125 1.28125 0 2.85714 0Z" />
+    </svg>
+  );
+};
+
 export const ClockIcon = ({ ...props }) => {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" {...props}>

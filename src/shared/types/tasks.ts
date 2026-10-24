@@ -6,11 +6,18 @@ export interface ITaskItem {
   labels: ILabel[];
   reorder: boolean;
   dimmed?: boolean;
+  progress?: number;
   onRun: () => void;
+  onStop: () => void;
   onSchedule: () => void;
   onEdit: () => void;
   onDelete: () => void;
   onPin: () => void;
+}
+
+export interface ITaskProgress {
+  taskId: number;
+  percent: number | null;
 }
 
 export interface ITask {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<ITask[]>([]);
+  const [progress, setProgress] = useState<Record<number, number>>({});
 
   const fetchTasks = async () => {
     const data = await window.api.tasks.get();
@@ -11,6 +12,10 @@ export const useTasks = () => {
 
   const runTask = async (task: ITask) => {
     await window.api.tasks.run(task);
+  };
+
+  const stopTask = async (id: number) => {
+    await window.api.tasks.stop(id);
   };
 
   const deleteTask = async (id: number) => {
@@ -30,12 +35,29 @@ export const useTasks = () => {
 
   useEffect(() => {
     void window.api.tasks.get().then(setTasks);
+    void window.api.tasks.getRunning().then(setProgress);
+
+    return window.api.tasks.onProgress(({ taskId, percent }) => {
+      setProgress((prev) => {
+        const next = { ...prev };
+
+        if (percent === null) {
+          delete next[taskId];
+        } else {
+          next[taskId] = percent;
+        }
+
+        return next;
+      });
+    });
   }, []);
 
   return {
     tasks,
+    progress,
     fetchTasks,
     runTask,
+    stopTask,
     deleteTask,
     updateTask,
     reorderTasks,

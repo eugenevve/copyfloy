@@ -14,7 +14,9 @@ export const TaskList: FC<ITaskList> = ({
   items,
   labels,
   reorder,
+  progress,
   onRun,
+  onStop,
   onSchedule,
   onEdit,
   onDelete,
@@ -76,7 +78,9 @@ export const TaskList: FC<ITaskList> = ({
                   labels={labels.filter((label) => item.labelsIds?.includes(label.id))}
                   reorder={reorder}
                   dimmed={activeId !== null && activeId !== item.id}
+                  progress={progress[item.id]}
                   onRun={() => onRun(item)}
+                  onStop={() => onStop(item)}
                   onSchedule={() => onSchedule(item)}
                   onEdit={() => onEdit(item)}
                   onDelete={() => onDelete(item)}

@@ -1,7 +1,7 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { DragButton } from "@app/ui/DragButton";
-import { ClockIcon, FileIcon, FolderIcon, PenIcon, PinIcon, PlayIcon, TrashIcon } from "@app/ui/Icons";
+import { ClockIcon, FileIcon, FolderIcon, PenIcon, PinIcon, PlayIcon, StopIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
 import { classNames } from "@app/utils/classNames";
 import { useSortable } from "@dnd-kit/sortable";
@@ -21,7 +21,9 @@ export const TaskItem: FC<ITaskItem> = ({
   labels,
   reorder,
   dimmed,
+  progress,
   onRun,
+  onStop,
   onEdit,
   onSchedule,
   onDelete,
@@ -38,9 +40,10 @@ export const TaskItem: FC<ITaskItem> = ({
   };
 
   const TypeIcon = TYPE_ICONS[task.type];
+  const isRunning = progress !== undefined;
 
   const items = [
-    { Icon: PlayIcon, onClick: onRun },
+    isRunning ? { Icon: StopIcon, onClick: onStop } : { Icon: PlayIcon, onClick: onRun },
     { Icon: ClockIcon, onClick: onSchedule },
     { Icon: PenIcon, onClick: onEdit },
     { Icon: TrashIcon, onClick: onDelete },
@@ -63,7 +66,7 @@ export const TaskItem: FC<ITaskItem> = ({
           </div>
           {labels.length > 0 && (
             <div className={styles.labels}>
-              {labels.map((label) => (
+              {labels.toReversed().map((label) => (
                 <LabelChip key={label.id} name={label.name} color={label.color} />
               ))}
             </div>
@@ -71,6 +74,7 @@ export const TaskItem: FC<ITaskItem> = ({
         </div>
       </div>
       <div className={styles.section}>
+        <div className={styles.progress}>{isRunning ? `${progress}%` : "\u00A0"}</div>
         {items.map(({ Icon, ...props }) => (
           <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon {...props}>
             <Icon />
