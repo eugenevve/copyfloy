@@ -13,3 +13,33 @@
   align-items: center;
   gap: var(--spacing-xs);
 }
+
+.dragButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+}
+
+.dragButton:active {
+  cursor: grabbing;
+}
+
+.dragButton:disabled {
+  cursor: not-allowed;
+}
+
+.dragButton[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--content-gray-light) !important;
+}
