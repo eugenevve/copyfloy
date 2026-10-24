@@ -27,6 +27,7 @@ export const IPC_CHANNELS = {
     save: "tasks:save",
     update: "tasks:update",
     delete: "tasks:delete",
+    reorder: "tasks:reorder",
     run: "tasks:run",
     export: "tasks:export",
     import: "tasks:import",
@@ -39,6 +40,7 @@ export const IPC_CHANNELS = {
     save: "labels:save",
     update: "labels:update",
     delete: "labels:delete",
+    reorder: "labels:reorder",
   },
   updater: {
     check: "updater:check",

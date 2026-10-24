@@ -20,7 +20,7 @@ export const Labels: FC = () => {
     open: false,
     label: null,
   });
-  const { labels, fetchLabels, deleteLabel } = useLabels();
+  const { labels, fetchLabels, deleteLabel, reorderLabels } = useLabels();
   const { search, setSearch, filteredLabels } = useLabelFilter(labels);
 
   // Modal Label
@@ -81,8 +81,10 @@ export const Labels: FC = () => {
           />
           <LabelsList
             items={filteredLabels}
+            reorder={!search.trim()}
             onEdit={handleEditLabel}
             onDelete={(label) => handleDeleteLabel(label.id)}
+            onReorder={(orderedIds) => void reorderLabels(orderedIds)}
           />
         </div>
       </PageWrapper>

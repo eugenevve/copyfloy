@@ -1,24 +1,41 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
+import { DragButton } from "@app/ui/DragButton";
 import { PenIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
-import { FC } from "react";
+import { classNames } from "@app/utils/classNames";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { CSSProperties, FC } from "react";
 
 import styles from "./LabelItem.module.css";
 import { ILabelItem } from "./LabelItem.types";
 
-export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete }) => {
+export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, dimmed }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: label.id,
+    disabled: !reorder,
+  });
+  const sortableStyle: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : "auto",
+  };
+
   const items = [
     { Icon: PenIcon, onClick: onEdit },
     { Icon: TrashIcon, onClick: onDelete },
   ];
 
   return (
-    <div className={styles.container}>
-      <LabelChip name={label.name} color={label.color} />
+    <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
+      <div className={styles.section}>
+        {reorder && <DragButton {...attributes} {...listeners} />}
+        <LabelChip name={label.name} color={label.color} />
+      </div>
       <div className={styles.section}>
         {items.map(({ Icon, ...props }) => (
-          <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon {...props}>
+          <Button key={String(props.onClick)} kind={ButtonKind.PRIMARY} icon {...props}>
             <Icon />
           </Button>
         ))}

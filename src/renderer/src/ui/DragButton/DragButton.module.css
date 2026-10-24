@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+}
+
+.container:active {
+  cursor: grabbing;
+}
+
+.container:disabled {
+  cursor: not-allowed;
+}
+
+.container[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--content-gray-light) !important;
+}

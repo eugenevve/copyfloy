@@ -50,6 +50,7 @@ export const api = {
     save: (task: Omit<ITask, "id">): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.save, task),
     update: (task: ITask): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.update, task),
     delete: (id: number): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.delete, id),
+    reorder: (orderedIds: number[]): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.reorder, orderedIds),
     run: (task: ITask): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.run, task),
     export: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.export),
     import: (): Promise<ITaskTransfer | null> => invoke<ITaskTransfer | null>(IPC_CHANNELS.tasks.import),
@@ -64,6 +65,7 @@ export const api = {
     save: (label: Omit<ILabel, "id">): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.save, label),
     update: (label: ILabel): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.update, label),
     delete: (id: number): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.delete, id),
+    reorder: (orderedIds: number[]): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.reorder, orderedIds),
   },
   updater: {
     check: (): Promise<void> => invoke<void>(IPC_CHANNELS.updater.check),

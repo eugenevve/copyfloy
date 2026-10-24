@@ -119,7 +119,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
             <div>Labels</div>
             {labels.length > 0 ? (
               <div className={styles.labels}>
-                {labels.map((label) => (
+                {labels.toReversed().map((label) => (
                   <LabelChip
                     key={label.id}
                     selected={labelsIds.includes(label.id)}

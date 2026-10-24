@@ -10,8 +10,13 @@ export const useLabels = () => {
   };
 
   const deleteLabel = async (id: number) => {
-    const updatedTasks = await window.api.labels.delete(id);
-    setLabels(updatedTasks);
+    const updatedLabels = await window.api.labels.delete(id);
+    setLabels(updatedLabels);
+  };
+
+  const reorderLabels = async (ids: number[]) => {
+    setLabels((prev) => prev.toSorted((a, b) => ids.indexOf(b.id) - ids.indexOf(a.id)));
+    await window.api.labels.reorder(ids);
   };
 
   useEffect(() => {
@@ -22,5 +27,6 @@ export const useLabels = () => {
     labels,
     fetchLabels,
     deleteLabel,
+    reorderLabels,
   };
 };

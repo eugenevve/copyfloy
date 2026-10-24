@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
@@ -77,6 +78,20 @@ export class TaskIpc {
       this.scheduler.rescheduleAll(tasks);
 
       return tasks;
+    });
+
+    // Task order
+    ipcMain.handle(IPC_CHANNELS.tasks.reorder, (_, orderedIds: number[]) => {
+      const tasks = this.taskStorage.load();
+      const reorderedTasks = reorderDisplayIds(tasks, orderedIds);
+
+      if (!reorderedTasks) {
+        return tasks;
+      }
+
+      this.taskStorage.save(reorderedTasks);
+
+      return reorderedTasks;
     });
 
     // Export tasks and labels

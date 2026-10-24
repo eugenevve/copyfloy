@@ -4,4 +4,6 @@ export interface ILabelItem {
   label: ILabel;
   onEdit: () => void;
   onDelete: () => void;
+  reorder: boolean;
+  dimmed?: boolean;
 }
