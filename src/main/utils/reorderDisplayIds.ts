@@ -1,4 +1,4 @@
-export const reorderByDisplayIds = <T extends { id: number }>(items: T[], orderedIds: number[]): T[] | null => {
+export const reorderDisplayIds = <T extends { id: number }>(items: T[], orderedIds: number[]): T[] | null => {
   const itemsById = new Map(items.map((item) => [item.id, item]));
 
   if (
