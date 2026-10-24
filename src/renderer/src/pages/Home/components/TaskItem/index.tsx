@@ -34,7 +34,7 @@ export const TaskItem: FC<ITaskItem> = ({
   const sortableStyle: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 1 : "",
+    zIndex: isDragging ? 1 : "auto",
   };
 
   const TypeIcon = TYPE_ICONS[task.type];

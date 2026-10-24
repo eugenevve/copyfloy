@@ -19,7 +19,7 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
   const sortableStyle: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 1 : "",
+    zIndex: isDragging ? 1 : "auto",
   };
 
   const items = [
