@@ -17,7 +17,7 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
     disabled: !reorder,
   });
   const sortableStyle: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     zIndex: isDragging ? 1 : "auto",
   };
