@@ -4,7 +4,7 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
-import type { FC } from "react";
+import { FC, useState } from "react";
 
 import { TaskItem } from "../TaskItem";
 import styles from "./TaskList.module.css";
@@ -21,6 +21,7 @@ export const TaskList: FC<ITaskList> = ({
   onPin,
   onReorder,
 }) => {
+  const [activeId, setActiveId] = useState<number | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   if (items.length === 0) {
@@ -36,6 +37,7 @@ export const TaskList: FC<ITaskList> = ({
 
   const handleDragEnd = ({ active, over }: DragEndEvent): void => {
     if (!over || active.id === over.id) {
+      setActiveId(null);
       return;
     }
 
@@ -43,14 +45,22 @@ export const TaskList: FC<ITaskList> = ({
     const activeId = Number(active.id);
     const overId = Number(over.id);
     if (pinnedIds.includes(activeId) !== pinnedIds.includes(overId)) {
+      setActiveId(null);
       return;
     }
 
     onReorder(arrayMove(displayIds, displayIds.indexOf(activeId), displayIds.indexOf(overId)));
+    setActiveId(null);
   };
 
   return (
-    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis, restrictToParentElement]} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      onDragStart={({ active }) => setActiveId(Number(active.id))}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+    >
       <div className={styles.container}>
         {[pinnedIds, regularIds].map((ids, index) => (
           <SortableContext key={index} items={ids}>
@@ -62,6 +72,7 @@ export const TaskList: FC<ITaskList> = ({
                   task={item}
                   labels={labels.filter((label) => item.labelsIds?.includes(label.id))}
                   reorder={reorder}
+                  dimmed={activeId !== null && activeId !== item.id}
                   onRun={() => onRun(item)}
                   onSchedule={() => onSchedule(item)}
                   onEdit={() => onEdit(item)}

@@ -6,6 +6,11 @@
   padding: var(--spacing-s);
   border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
+  transition: opacity var(--transition);
+}
+
+.dimmed {
+  opacity: var(--opacity-disabled);
 }
 
 .content {

@@ -5,4 +5,5 @@ export interface ILabelItem {
   onEdit: () => void;
   onDelete: () => void;
   reorder: boolean;
+  dimmed?: boolean;
 }

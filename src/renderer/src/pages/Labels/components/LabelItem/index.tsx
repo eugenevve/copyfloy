@@ -3,6 +3,7 @@ import { ButtonKind } from "@app/ui/Button/Button.types";
 import { DrugButton } from "@app/ui/DrugButton";
 import { PenIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
+import { classNames } from "@app/utils/classNames";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CSSProperties, FC } from "react";
@@ -10,7 +11,7 @@ import { CSSProperties, FC } from "react";
 import styles from "./LabelItem.module.css";
 import { ILabelItem } from "./LabelItem.types";
 
-export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder }) => {
+export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, dimmed }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: label.id,
     disabled: !reorder,
@@ -27,7 +28,7 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder }) 
   ];
 
   return (
-    <div ref={setNodeRef} className={styles.container} style={sortableStyle}>
+    <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
       <div className={styles.section}>
         {reorder && <DrugButton {...attributes} {...listeners} />}
         <LabelChip name={label.name} color={label.color} />

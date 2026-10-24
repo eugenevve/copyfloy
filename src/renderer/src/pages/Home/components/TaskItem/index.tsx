@@ -3,6 +3,7 @@ import { ButtonKind } from "@app/ui/Button/Button.types";
 import { DrugButton } from "@app/ui/DrugButton";
 import { ClockIcon, FileIcon, FolderIcon, PenIcon, PinIcon, PlayIcon, TrashIcon } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
+import { classNames } from "@app/utils/classNames";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ITaskItem, TaskType } from "@shared/types/tasks";
@@ -15,7 +16,17 @@ const TYPE_ICONS = {
   [TaskType.FILE]: FileIcon,
 };
 
-export const TaskItem: FC<ITaskItem> = ({ task, labels, reorder, onRun, onEdit, onSchedule, onDelete, onPin }) => {
+export const TaskItem: FC<ITaskItem> = ({
+  task,
+  labels,
+  reorder,
+  dimmed,
+  onRun,
+  onEdit,
+  onSchedule,
+  onDelete,
+  onPin,
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     disabled: !reorder,
@@ -36,7 +47,7 @@ export const TaskItem: FC<ITaskItem> = ({ task, labels, reorder, onRun, onEdit, 
   ];
 
   return (
-    <div ref={setNodeRef} className={styles.container} style={sortableStyle}>
+    <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
       <div className={styles.section}>
         {reorder && <DrugButton {...attributes} {...listeners} />}
         <div className={styles.content}>
