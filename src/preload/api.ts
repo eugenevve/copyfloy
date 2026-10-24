@@ -1,7 +1,7 @@
 import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ILabel } from "@shared/types/labels";
-import { ITask, TaskType } from "@shared/types/tasks";
+import { ITask, ITaskProgress, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { ipcRenderer } from "electron";
 
@@ -52,6 +52,10 @@ export const api = {
     delete: (id: number): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.delete, id),
     reorder: (orderedIds: number[]): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.reorder, orderedIds),
     run: (task: ITask): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.run, task),
+    stop: (id: number): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.stop, id),
+    getRunning: (): Promise<Record<number, number>> => invoke<Record<number, number>>(IPC_CHANNELS.tasks.getRunning),
+    onProgress: (callback: (progress: ITaskProgress) => void): (() => void) =>
+      receive<ITaskProgress>(IPC_CHANNELS.tasks.progress, callback),
     export: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.export),
     import: (): Promise<ITaskTransfer | null> => invoke<ITaskTransfer | null>(IPC_CHANNELS.tasks.import),
     saveBulk: (transfer: ITaskTransfer, mode: ImportMode): Promise<ITask[]> =>
