@@ -4,6 +4,7 @@ import { ISchedule } from "./schedule";
 export interface ITaskItem {
   task: ITask;
   labels: ILabel[];
+  reorder: boolean;
   onRun: () => void;
   onSchedule: () => void;
   onEdit: () => void;

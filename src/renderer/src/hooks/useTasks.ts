@@ -23,6 +23,11 @@ export const useTasks = () => {
     setTasks(updatedTasks);
   };
 
+  const reorderTasks = async (ids: number[]) => {
+    setTasks((prev) => prev.toSorted((a, b) => ids.indexOf(b.id) - ids.indexOf(a.id)));
+    await window.api.tasks.reorder(ids);
+  };
+
   useEffect(() => {
     void window.api.tasks.get().then(setTasks);
   }, []);
@@ -33,5 +38,6 @@ export const useTasks = () => {
     runTask,
     deleteTask,
     updateTask,
+    reorderTasks,
   };
 };

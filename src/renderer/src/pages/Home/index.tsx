@@ -24,7 +24,7 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
-  const { tasks, fetchTasks, runTask, deleteTask, updateTask } = useTasks();
+  const { tasks, fetchTasks, runTask, deleteTask, updateTask, reorderTasks } = useTasks();
   const { labels } = useLabels();
   const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
@@ -114,11 +114,13 @@ export const Home: FC = () => {
           <TaskList
             items={filteredTasks}
             labels={labels}
+            reorder={!search.trim() && typeFilter === "all"}
             onRun={handleRunTask}
             onSchedule={handleScheduleTask}
             onEdit={handleEditTask}
             onDelete={(task) => handleDeleteTask(task.id)}
             onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
+            onReorder={(orderedIds) => void reorderTasks(orderedIds)}
           />
         </div>
       </PageWrapper>
