@@ -103,12 +103,20 @@ function runGit(
   return new Promise((resolve, reject) => {
     const git = spawn("git", args, {
       env,
-      signal,
       windowsHide: true,
       stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";
     let errorOutput = "";
+
+    // Kill git on abort; the "close" handler rejects after git has exited
+    const onAbort = (): void => {
+      git.kill();
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+    if (signal?.aborted) {
+      onAbort();
+    }
 
     git.stdout?.setEncoding("utf8");
     git.stdout?.on("data", (chunk: string) => {

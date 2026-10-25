@@ -166,12 +166,18 @@ export class TaskStorage {
       return task;
     }
 
-    if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error("Secure token storage is unavailable");
-    }
+    try {
+      if (!safeStorage.isEncryptionAvailable()) {
+        throw new Error("Secure token storage is unavailable");
+      }
 
-    const encryptedToken = Buffer.from(task.accessToken.slice("encrypted:".length), "base64");
-    return { ...task, accessToken: safeStorage.decryptString(encryptedToken) };
+      const encryptedToken = Buffer.from(task.accessToken.slice("encrypted:".length), "base64");
+      return { ...task, accessToken: safeStorage.decryptString(encryptedToken) };
+    } catch (error) {
+      Logger.error("TaskStorage", `Failed to decrypt access token for task "${task.id}"`, error);
+
+      return { ...task, accessToken: undefined };
+    }
   }
 
   private isValidLabel(value: unknown): value is ILabel {

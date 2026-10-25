@@ -86,7 +86,13 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
       const url = new URL(source);
       const expectedHost = repositoryProvider === RepositoryProvider.GITHUB ? "github.com" : "gitlab.com";
       const repositoryParts = url.pathname.split("/").filter(Boolean);
-      return url.protocol === "https:" && url.hostname.toLowerCase() === expectedHost && repositoryParts.length >= 2;
+      return (
+        url.protocol === "https:" &&
+        url.hostname.toLowerCase() === expectedHost &&
+        !url.username &&
+        !url.password &&
+        repositoryParts.length >= 2
+      );
     } catch {
       return false;
     }
