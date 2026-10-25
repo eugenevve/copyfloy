@@ -167,11 +167,11 @@ export class TaskStorage {
       return preserved ? { ...task, accessToken: preserved } : task;
     }
 
-    if (!task.accessToken || task.accessToken.startsWith("encrypted:")) {
+    this.undecryptableTokens.delete(task.id);
+
+    if (!task.accessToken) {
       return task;
     }
-
-    this.undecryptableTokens.delete(task.id);
 
     if (!safeStorage.isEncryptionAvailable()) {
       throw new Error("Secure token storage is unavailable");
