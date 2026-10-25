@@ -12,6 +12,9 @@ import { app, safeStorage } from "electron";
 export class TaskStorage {
   readonly dataPath = path.join(app.getPath("userData"), "tasks.json");
 
+  // Ciphertexts that could not be decrypted, kept so save() does not erase them
+  private readonly undecryptableTokens = new Map<number, string>();
+
   // Reads all tasks from the default tasks.json
   load(): ITask[] {
     if (!fs.existsSync(this.dataPath)) {
@@ -72,6 +75,14 @@ export class TaskStorage {
   }
 
   save(tasks: ITask[]): void {
+    const ids = new Set(tasks.map((task) => task.id));
+
+    for (const id of this.undecryptableTokens.keys()) {
+      if (!ids.has(id)) {
+        this.undecryptableTokens.delete(id);
+      }
+    }
+
     this.saveToFile(
       tasks.map((task) => this.encryptTaskToken(task)),
       this.dataPath
@@ -150,9 +161,17 @@ export class TaskStorage {
   }
 
   private encryptTaskToken(task: ITask): ITask {
+    if (task.accessToken === undefined) {
+      const preserved = this.undecryptableTokens.get(task.id);
+
+      return preserved ? { ...task, accessToken: preserved } : task;
+    }
+
     if (!task.accessToken || task.accessToken.startsWith("encrypted:")) {
       return task;
     }
+
+    this.undecryptableTokens.delete(task.id);
 
     if (!safeStorage.isEncryptionAvailable()) {
       throw new Error("Secure token storage is unavailable");
@@ -175,6 +194,8 @@ export class TaskStorage {
       return { ...task, accessToken: safeStorage.decryptString(encryptedToken) };
     } catch (error) {
       Logger.error("TaskStorage", `Failed to decrypt access token for task "${task.id}"`, error);
+
+      this.undecryptableTokens.set(task.id, task.accessToken);
 
       return { ...task, accessToken: undefined };
     }

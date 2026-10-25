@@ -58,7 +58,7 @@ export const TaskItem: FC<ITaskItem> = ({
       ? ["To access the Repository functionality, install Git and ensure it is available in your PATH."]
       : []),
     ...(task.type === TaskType.REPOSITORY && task.isPrivate && !task.accessToken
-      ? ["Access token is missing. Edit this task and add a token for the private repository."]
+      ? ["Access token is missing or could not be decrypted. Edit this task and re-enter the token for the private repository."]
       : []),
   ];
   const unavailableReason = unavailableReasons.join(" ");
