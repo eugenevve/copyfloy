@@ -70,11 +70,13 @@ export async function cloneRepository(
     return;
   }
 
+  const destinationExisted = await fs.pathExists(destination);
+
   try {
     await runGit(["clone", "--progress", "--", repositoryUrl.toString(), destination], env, onProgress, signal);
   } catch (error) {
-    // Remove the partial clone so the next run starts clean
-    if (signal?.aborted) {
+    // Remove only a partial clone created by this run, never a pre-existing folder
+    if (signal?.aborted && !destinationExisted) {
       await fs.remove(destination).catch(() => undefined);
     }
 
