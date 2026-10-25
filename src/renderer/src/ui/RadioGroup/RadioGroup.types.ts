@@ -9,4 +9,5 @@ export interface IRadioGroup<T> {
 export interface IRadioOption<T> {
   value: T;
   label: string;
+  disabled?: boolean;
 }

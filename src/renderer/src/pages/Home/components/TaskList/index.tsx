@@ -15,6 +15,7 @@ export const TaskList: FC<ITaskList> = ({
   labels,
   reorder,
   progress,
+  gitAvailable,
   onRun,
   onStop,
   onSchedule,
@@ -77,6 +78,7 @@ export const TaskList: FC<ITaskList> = ({
                   task={item}
                   labels={labels.filter((label) => item.labelsIds?.includes(label.id))}
                   reorder={reorder}
+                  gitAvailable={gitAvailable}
                   dimmed={activeId !== null && activeId !== item.id}
                   progress={progress[item.id]}
                   onRun={() => onRun(item)}

@@ -1,7 +1,17 @@
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { DragButton } from "@app/ui/DragButton";
-import { ClockIcon, FileIcon, FolderIcon, PenIcon, PinIcon, PlayIcon, StopIcon, TrashIcon } from "@app/ui/Icons";
+import {
+  BranchIcon,
+  ClockIcon,
+  FileIcon,
+  FolderIcon,
+  PenIcon,
+  PinIcon,
+  PlayIcon,
+  StopIcon,
+  TrashIcon,
+} from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
 import { classNames } from "@app/utils/classNames";
 import { useSortable } from "@dnd-kit/sortable";
@@ -14,6 +24,7 @@ import styles from "./TaskItem.module.css";
 const TYPE_ICONS = {
   [TaskType.FOLDER]: FolderIcon,
   [TaskType.FILE]: FileIcon,
+  [TaskType.REPOSITORY]: BranchIcon,
 };
 
 export const TaskItem: FC<ITaskItem> = ({
@@ -22,6 +33,7 @@ export const TaskItem: FC<ITaskItem> = ({
   reorder,
   dimmed,
   progress,
+  gitAvailable,
   onRun,
   onStop,
   onEdit,
@@ -41,9 +53,20 @@ export const TaskItem: FC<ITaskItem> = ({
 
   const TypeIcon = TYPE_ICONS[task.type];
   const isRunning = progress !== undefined;
+  const unavailableReasons = [
+    ...(task.type === TaskType.REPOSITORY && gitAvailable === false
+      ? ["To access the Repository functionality, install Git and ensure it is available in your PATH."]
+      : []),
+    ...(task.type === TaskType.REPOSITORY && task.isPrivate && !task.accessToken
+      ? ["Access token is missing or could not be decrypted. Edit this task and re-enter the token for the private repository."]
+      : []),
+  ];
+  const unavailableReason = unavailableReasons.join(" ");
 
   const items = [
-    isRunning ? { Icon: StopIcon, onClick: onStop } : { Icon: PlayIcon, onClick: onRun },
+    isRunning
+      ? { Icon: StopIcon, onClick: onStop }
+      : { Icon: PlayIcon, onClick: onRun, disabled: Boolean(unavailableReason), title: unavailableReason },
     { Icon: ClockIcon, onClick: onSchedule },
     { Icon: PenIcon, onClick: onEdit },
     { Icon: TrashIcon, onClick: onDelete },
@@ -63,6 +86,7 @@ export const TaskItem: FC<ITaskItem> = ({
               </Button>
             </div>
             <div className={styles.source}>{task.source}</div>
+            {unavailableReason && <div className={styles.warning}>{unavailableReason}</div>}
           </div>
           {labels.length > 0 && (
             <div className={styles.labels}>

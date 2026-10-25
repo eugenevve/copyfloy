@@ -6,6 +6,7 @@ export interface ITaskList {
   labels: ILabel[];
   reorder: boolean;
   progress: Record<number, number>;
+  gitAvailable: boolean | null;
   onRun: (task: ITask) => void;
   onStop: (task: ITask) => void;
   onSchedule: (task: ITask) => void;

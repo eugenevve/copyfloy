@@ -14,7 +14,7 @@ export const RadioGroup = <T extends string>({ options, value, onChange, classNa
           onChange={(event) => onChange(event.target.value as T)}
           checked={value === option.value}
           label={option.label}
-          disabled={disabled}
+          disabled={disabled || option.disabled}
         />
       ))}
     </div>

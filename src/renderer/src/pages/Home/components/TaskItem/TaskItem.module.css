@@ -76,3 +76,8 @@
   text-align: right;
   user-select: none;
 }
+
+.warning {
+  color: var(--red);
+  font-size: 14px;
+}

@@ -7,6 +7,7 @@ export interface ITaskItem {
   reorder: boolean;
   dimmed?: boolean;
   progress?: number;
+  gitAvailable: boolean | null;
   onRun: () => void;
   onStop: () => void;
   onSchedule: () => void;
@@ -30,9 +31,23 @@ export interface ITask {
   exceptions?: string[];
   labelsIds?: number[];
   isPinned?: boolean;
+  repositoryProvider?: RepositoryProvider;
+  isPrivate?: boolean;
+  accessToken?: string;
 }
 
 export enum TaskType {
   FOLDER = "folder",
   FILE = "file",
+  REPOSITORY = "repository",
+}
+
+export enum RepositoryProvider {
+  GITHUB = "github",
+  GITLAB = "gitlab",
+}
+
+export enum RepositoryVisibility {
+  PUBLIC = "public",
+  PRIVATE = "private",
 }

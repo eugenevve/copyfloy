@@ -56,6 +56,7 @@ export const api = {
     getRunning: (): Promise<Record<number, number>> => invoke<Record<number, number>>(IPC_CHANNELS.tasks.getRunning),
     onProgress: (callback: (progress: ITaskProgress) => void): (() => void) =>
       receive<ITaskProgress>(IPC_CHANNELS.tasks.progress, callback),
+    isGitAvailable: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.gitAvailable),
     export: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.export),
     import: (): Promise<ITaskTransfer | null> => invoke<ITaskTransfer | null>(IPC_CHANNELS.tasks.import),
     saveBulk: (transfer: ITaskTransfer, mode: ImportMode): Promise<ITask[]> =>
