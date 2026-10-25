@@ -3,9 +3,9 @@ import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
 import { ILabel } from "@shared/types/labels";
-import { ITask, TaskType } from "@shared/types/tasks";
+import { ITask, RepositoryProvider, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer } from "@shared/types/transfer";
-import { app } from "electron";
+import { app, safeStorage } from "electron";
 
 // Storage for Task entities
 // Responsible only for reading and writing tasks.json
@@ -46,8 +46,8 @@ export class TaskStorage {
     const data: unknown = JSON.parse(content);
 
     const isLegacyTasksFile = Array.isArray(data);
-    const transfer = isLegacyTasksFile
-      ? { tasks: data, labels: [] }
+    const transfer: ITaskTransfer = isLegacyTasksFile
+      ? { tasks: data as ITask[], labels: [] }
       : this.parseTransfer(data);
 
     if (isLegacyTasksFile && transfer.tasks.length === 0) {
@@ -66,11 +66,16 @@ export class TaskStorage {
       throw new Error("Duplicate label IDs");
     }
 
+    transfer.tasks = transfer.tasks.map((task) => this.decryptTaskToken(task));
+
     return transfer;
   }
 
   save(tasks: ITask[]): void {
-    this.saveToFile(tasks, this.dataPath);
+    this.saveToFile(
+      tasks.map((task) => this.encryptTaskToken(task)),
+      this.dataPath
+    );
   }
 
   // Saves tasks to a specific JSON file
@@ -128,7 +133,13 @@ export class TaskStorage {
       typeof task.name === "string" &&
       typeof task.source === "string" &&
       typeof task.target === "string" &&
-      (task.type === TaskType.FILE || task.type === TaskType.FOLDER) &&
+      (task.type === TaskType.FILE ||
+        task.type === TaskType.FOLDER ||
+        (task.type === TaskType.REPOSITORY &&
+          (task.repositoryProvider === RepositoryProvider.GITHUB ||
+            task.repositoryProvider === RepositoryProvider.GITLAB) &&
+          typeof task.isPrivate === "boolean")) &&
+      (task.accessToken === undefined || typeof task.accessToken === "string") &&
       (task.schedule === undefined || typeof task.schedule === "object") &&
       (task.labelsIds === undefined ||
         (Array.isArray(task.labelsIds) && task.labelsIds.every((labelId) => typeof labelId === "number"))) &&
@@ -136,6 +147,31 @@ export class TaskStorage {
         (Array.isArray(task.exceptions) && task.exceptions.every((exception) => typeof exception === "string"))) &&
       (task.isPinned === undefined || typeof task.isPinned === "boolean")
     );
+  }
+
+  private encryptTaskToken(task: ITask): ITask {
+    if (!task.accessToken || task.accessToken.startsWith("encrypted:")) {
+      return task;
+    }
+
+    if (!safeStorage.isEncryptionAvailable()) {
+      throw new Error("Secure token storage is unavailable");
+    }
+
+    return { ...task, accessToken: `encrypted:${safeStorage.encryptString(task.accessToken).toString("base64")}` };
+  }
+
+  private decryptTaskToken(task: ITask): ITask {
+    if (!task.accessToken?.startsWith("encrypted:")) {
+      return task;
+    }
+
+    if (!safeStorage.isEncryptionAvailable()) {
+      throw new Error("Secure token storage is unavailable");
+    }
+
+    const encryptedToken = Buffer.from(task.accessToken.slice("encrypted:".length), "base64");
+    return { ...task, accessToken: safeStorage.decryptString(encryptedToken) };
   }
 
   private isValidLabel(value: unknown): value is ILabel {

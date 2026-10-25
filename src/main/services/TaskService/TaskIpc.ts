@@ -70,6 +70,9 @@ export class TaskIpc {
       await this.copyService.run(task);
     });
 
+    // Check if Git is available
+    ipcMain.handle(IPC_CHANNELS.tasks.gitAvailable, () => this.copyService.isGitAvailable());
+
     // Stop a running task
     ipcMain.handle(IPC_CHANNELS.tasks.stop, (_, id: number) => {
       this.copyService.stop(id);
@@ -117,7 +120,11 @@ export class TaskIpc {
       }
 
       const transfer: ITaskTransfer = {
-        tasks: this.taskStorage.load(),
+        tasks: this.taskStorage.load().map((task) => {
+          const exportedTask = { ...task };
+          delete exportedTask.accessToken;
+          return exportedTask;
+        }),
         labels: this.labelStorage.load(),
       };
 

@@ -4,11 +4,12 @@ import { pipeline } from "node:stream/promises";
 
 import { Logger } from "@main/utils/logger";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
-import { ITask } from "@shared/types/tasks";
+import { ITask, TaskType } from "@shared/types/tasks";
 import { BrowserWindow } from "electron";
 import fs from "fs-extra";
 
 import { ICopyEntry, IRunningTask } from "./CopyService.types";
+import { cloneRepository, isGitAvailable } from "./GitRepositoryService";
 import { NotificationService } from "../NotificationService/NotificationService";
 
 // Service responsible for executing file and folder copy operations
@@ -31,6 +32,10 @@ export class CopyService {
     this.running.get(taskId)?.controller.abort();
   }
 
+  async isGitAvailable(): Promise<boolean> {
+    return isGitAvailable();
+  }
+
   // Copies a source file or directory to a target directory and honors the task's excluded paths
   async run(task: ITask): Promise<void> {
     if (this.running.has(task.id)) {
@@ -42,6 +47,26 @@ export class CopyService {
     this.broadcast(task.id, 0);
 
     try {
+      if (task.type === TaskType.REPOSITORY) {
+        await cloneRepository(
+          task,
+          (percent) => {
+            if (percent > state.percent) {
+              state.percent = percent;
+              this.broadcast(task.id, percent);
+            }
+          },
+          state.controller.signal
+        );
+        Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
+
+        if (task.schedule?.notify) {
+          NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
+        }
+
+        return;
+      }
+
       const destination = path.join(task.target, path.basename(task.source));
 
       Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);

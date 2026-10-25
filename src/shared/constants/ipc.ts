@@ -32,6 +32,7 @@ export const IPC_CHANNELS = {
     stop: "tasks:stop",
     getRunning: "tasks:get-running",
     progress: "tasks:progress",
+    gitAvailable: "tasks:git-available",
     export: "tasks:export",
     import: "tasks:import",
     saveBulk: "tasks:save-bulk",
