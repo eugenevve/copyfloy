@@ -6,10 +6,11 @@ import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
 import { Modal } from "@app/ui/Modal";
 import { RadioGroup } from "@app/ui/RadioGroup";
-import { TYPE_OPTIONS_EDIT } from "@app/utils/options";
+import { Select } from "@app/ui/Select";
+import { REPOSITORY_PROVIDER_OPTIONS, TYPE_OPTIONS_EDIT, VISIBILITY_OPTIONS } from "@app/utils/options";
 import { ScheduleType } from "@shared/types/schedule";
-import { TaskType } from "@shared/types/tasks";
-import { useState, type ChangeEvent, type FC } from "react";
+import { RepositoryProvider, RepositoryVisibility, TaskType } from "@shared/types/tasks";
+import { useEffect, useState, type ChangeEvent, type FC } from "react";
 
 import styles from "./EditTaskFormModal.module.css";
 import { FormField, IEditTaskFormModal } from "./EditTaskFormModal.types";
@@ -20,6 +21,14 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   const { showConfirm } = useModal();
   const { labels } = useLabels();
   const [isChoiceOpen, setChoiceOpen] = useState(false);
+  const [gitAvailable, setGitAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    void window.api.tasks
+      .isGitAvailable()
+      .then(setGitAvailable)
+      .catch(() => setGitAvailable(false));
+  }, []);
 
   const initialValues = {
     name: initialData?.name || "",
@@ -28,6 +37,9 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     source: initialData?.source || "",
     target: initialData?.target || "",
     exceptions: initialData?.exceptions || [],
+    repositoryProvider: initialData?.repositoryProvider || RepositoryProvider.GITHUB,
+    isPrivate: initialData?.isPrivate || false,
+    accessToken: initialData?.accessToken || "",
   };
 
   const [name, setName] = useState(initialValues.name);
@@ -36,6 +48,9 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   const [target, setTarget] = useState(initialValues.target);
   const [exceptions, setExceptions] = useState(initialValues.exceptions);
   const [labelsIds, setLabelsIds] = useState(initialValues.labelsIds);
+  const [repositoryProvider, setRepositoryProvider] = useState(initialValues.repositoryProvider);
+  const [isPrivate, setIsPrivate] = useState(initialValues.isPrivate);
+  const [accessToken, setAccessToken] = useState(initialValues.accessToken);
 
   const isEditMode = !!initialData?.id;
 
@@ -44,6 +59,9 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     type !== initialValues.type ||
     source !== initialValues.source ||
     target !== initialValues.target ||
+    repositoryProvider !== initialValues.repositoryProvider ||
+    isPrivate !== initialValues.isPrivate ||
+    accessToken !== initialValues.accessToken ||
     labelsIds.length !== initialValues.labelsIds.length ||
     exceptions.length !== initialValues.exceptions.length;
 
@@ -59,6 +77,19 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     setType(val);
     setSource("");
     setExceptions([]);
+  };
+
+  const isValidRepositoryUrl = () => {
+    if (type !== TaskType.REPOSITORY) return true;
+
+    try {
+      const url = new URL(source);
+      const expectedHost = repositoryProvider === RepositoryProvider.GITHUB ? "github.com" : "gitlab.com";
+      const repositoryParts = url.pathname.split("/").filter(Boolean);
+      return url.protocol === "https:" && url.hostname.toLowerCase() === expectedHost && repositoryParts.length >= 2;
+    } catch {
+      return false;
+    }
   };
 
   const handleSelectPath = async (targetField: FormField) => {
@@ -91,7 +122,19 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
 
   const handleSubmit = async () => {
     const schedule = initialData?.schedule || { notify: false, type: ScheduleType.DISABLED };
-    const taskData = { name, type, source, target, exceptions, labelsIds, schedule, isPinned: initialData?.isPinned };
+    const taskData = {
+      name,
+      type,
+      source,
+      target,
+      exceptions,
+      labelsIds,
+      schedule,
+      isPinned: initialData?.isPinned,
+      ...(type === TaskType.REPOSITORY
+        ? { repositoryProvider, isPrivate, accessToken: isPrivate ? accessToken : "" }
+        : {}),
+    };
 
     if (initialData?.id) {
       await window.api.tasks.update({ ...taskData, id: initialData.id });
@@ -134,23 +177,63 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
             )}
           </div>
           <RadioGroup
-            options={TYPE_OPTIONS_EDIT}
+            options={TYPE_OPTIONS_EDIT.map((option) => ({
+              ...option,
+              disabled: option.value === TaskType.REPOSITORY && gitAvailable === false,
+            }))}
             value={type}
             disabled={isEditMode}
             onChange={handleTypeChange}
             className={styles.radioGroup}
           />
-          <div className={styles.group}>
-            <Input
-              label="Original path"
-              value={source}
-              placeholder={type === TaskType.FOLDER ? "Folder path" : "File path"}
-              readOnly
-            />
-            <Button kind={ButtonKind.PRIMARY} onClick={() => void handleSelectPath(FormField.SOURCE)}>
-              Review
-            </Button>
-          </div>
+          {gitAvailable === false && (
+            <div className={styles.hint}>
+              To access the Repository functionality, install Git and ensure it is available in your PATH.
+            </div>
+          )}
+          {type === TaskType.REPOSITORY ? (
+            <>
+              <Select
+                label="Service"
+                value={repositoryProvider}
+                options={REPOSITORY_PROVIDER_OPTIONS}
+                onChange={(value) => setRepositoryProvider(value as RepositoryProvider)}
+              />
+              <RadioGroup
+                options={VISIBILITY_OPTIONS}
+                value={isPrivate ? RepositoryVisibility.PRIVATE : RepositoryVisibility.PUBLIC}
+                onChange={(value) => setIsPrivate(value === RepositoryVisibility.PRIVATE)}
+                className={styles.radioGroup}
+              />
+              <Input
+                label="Repository HTTPS URL"
+                value={source}
+                onChange={(event) => setSource(event.target.value)}
+                placeholder="https://github.com/owner/repository.git"
+              />
+              {isPrivate && (
+                <Input
+                  type="password"
+                  label="Access token"
+                  value={accessToken}
+                  onChange={(event) => setAccessToken(event.target.value)}
+                  placeholder="Personal access token"
+                />
+              )}
+            </>
+          ) : (
+            <div className={styles.group}>
+              <Input
+                label="Original path"
+                value={source}
+                placeholder={type === TaskType.FOLDER ? "Folder path" : "File path"}
+                readOnly
+              />
+              <Button kind={ButtonKind.PRIMARY} onClick={() => void handleSelectPath(FormField.SOURCE)}>
+                Review
+              </Button>
+            </div>
+          )}
           <div className={styles.group}>
             <Input label="Destination Path" value={target} readOnly placeholder="Folder path" />
             <Button kind={ButtonKind.PRIMARY} onClick={() => void handleSelectPath(FormField.TARGET)}>
@@ -176,7 +259,17 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
         </div>
         <div className={styles.section}>
           {!isEditMode && <div className={styles.hint}>The schedule can be configured after saving the task</div>}
-          <Button onClick={() => void handleSubmit()} disabled={!name || !source || !target} className={styles.button}>
+          <Button
+            onClick={() => void handleSubmit()}
+            disabled={
+              !name ||
+              !source ||
+              !target ||
+              !isValidRepositoryUrl() ||
+              (type === TaskType.REPOSITORY && isPrivate && !accessToken)
+            }
+            className={styles.button}
+          >
             Save
           </Button>
         </div>

@@ -24,7 +24,8 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
-  const { tasks, progress, fetchTasks, runTask, stopTask, deleteTask, updateTask, reorderTasks } = useTasks();
+  const { tasks, progress, gitAvailable, fetchTasks, runTask, stopTask, deleteTask, updateTask, reorderTasks } =
+    useTasks();
   const { labels } = useLabels();
   const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
 
@@ -116,6 +117,7 @@ export const Home: FC = () => {
             labels={labels}
             reorder={!search.trim() && typeFilter === "all"}
             progress={progress}
+            gitAvailable={gitAvailable}
             onRun={handleRunTask}
             onStop={(task) => void stopTask(task.id)}
             onSchedule={handleScheduleTask}
