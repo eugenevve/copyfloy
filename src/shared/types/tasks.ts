@@ -34,6 +34,7 @@ export interface ITask {
   repositoryProvider?: RepositoryProvider;
   isPrivate?: boolean;
   accessToken?: string;
+  isArchive?: boolean;
 }
 
 export enum TaskType {
