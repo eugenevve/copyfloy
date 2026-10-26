@@ -2,6 +2,7 @@ import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
+import { Checkbox } from "@app/ui/Checkbox";
 import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
 import { Modal } from "@app/ui/Modal";
@@ -40,6 +41,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     repositoryProvider: initialData?.repositoryProvider || RepositoryProvider.GITHUB,
     isPrivate: initialData?.isPrivate || false,
     accessToken: initialData?.accessToken || "",
+    isArchive: initialData?.isArchive || false,
   };
 
   const [name, setName] = useState(initialValues.name);
@@ -51,6 +53,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   const [repositoryProvider, setRepositoryProvider] = useState(initialValues.repositoryProvider);
   const [isPrivate, setIsPrivate] = useState(initialValues.isPrivate);
   const [accessToken, setAccessToken] = useState(initialValues.accessToken);
+  const [isArchive, setIsArchive] = useState(initialValues.isArchive);
 
   const isEditMode = !!initialData?.id;
 
@@ -62,6 +65,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     repositoryProvider !== initialValues.repositoryProvider ||
     isPrivate !== initialValues.isPrivate ||
     accessToken !== initialValues.accessToken ||
+    isArchive !== initialValues.isArchive ||
     labelsIds.length !== initialValues.labelsIds.length ||
     exceptions.length !== initialValues.exceptions.length;
 
@@ -137,6 +141,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
       labelsIds,
       schedule,
       isPinned: initialData?.isPinned,
+      isArchive,
       ...(type === TaskType.REPOSITORY
         ? { repositoryProvider, isPrivate, accessToken: isPrivate ? accessToken : "" }
         : {}),
@@ -263,6 +268,11 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
             </div>
           )}
         </div>
+        <Checkbox
+          label="Create ZIP archive instead of copying"
+          checked={isArchive}
+          onChange={(event) => setIsArchive(event.target.checked)}
+        />
         <div className={styles.section}>
           {!isEditMode && <div className={styles.hint}>The schedule can be configured after saving the task</div>}
           <Button
