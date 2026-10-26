@@ -5,9 +5,10 @@ import { pipeline } from "node:stream/promises";
 import { Logger } from "@main/utils/logger";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ITask, TaskType } from "@shared/types/tasks";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, app } from "electron";
 import fs from "fs-extra";
 
+import { createZip } from "./ArchiveService";
 import { ICopyEntry, IRunningTask } from "./CopyService.types";
 import { cloneRepository, isGitAvailable } from "./GitRepositoryService";
 import { NotificationService } from "../NotificationService/NotificationService";
@@ -48,16 +49,19 @@ export class CopyService {
 
     try {
       if (task.type === TaskType.REPOSITORY) {
-        await cloneRepository(
-          task,
-          (percent) => {
-            if (percent > state.percent) {
-              state.percent = percent;
-              this.broadcast(task.id, percent);
-            }
-          },
-          state.controller.signal
-        );
+        const report = (percent: number): void => {
+          if (percent > state.percent) {
+            state.percent = percent;
+            this.broadcast(task.id, percent);
+          }
+        };
+
+        if (task.isArchive) {
+          await this.archiveRepository(task, state.controller.signal, report);
+        } else {
+          await cloneRepository(task, report, state.controller.signal);
+        }
+
         Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
         if (task.schedule?.notify) {
@@ -68,6 +72,31 @@ export class CopyService {
       }
 
       const destination = path.join(task.target, path.basename(task.source));
+
+      if (task.isArchive) {
+        const archivePath = path.join(task.target, `${path.basename(task.source)}.zip`);
+        const onProgress = (percent: number): void => {
+          if (percent > state.percent) {
+            state.percent = percent;
+            this.broadcast(task.id, percent);
+          }
+        };
+
+        Logger.info("CopyService", `Starting backup "${task.name}": "${task.source}" → "${archivePath}"`);
+        await fs.ensureDir(task.target);
+
+        const entries: ICopyEntry[] = [];
+        await this.collect(task.source, path.basename(task.source), task.exceptions, entries);
+        await createZip(entries, archivePath, state.controller.signal, onProgress);
+
+        Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
+
+        if (task.schedule?.notify) {
+          NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
+        }
+
+        return;
+      }
 
       Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);
 
@@ -121,6 +150,31 @@ export class CopyService {
     } finally {
       this.running.delete(task.id);
       this.broadcast(task.id, null);
+    }
+  }
+
+  // Clones into a temp folder, then zips the whole clone (including .git) into the target
+  private async archiveRepository(
+    task: ITask,
+    signal: AbortSignal,
+    onProgress: (percent: number) => void
+  ): Promise<void> {
+    const tempDir = await fs.mkdtemp(path.join(app.getPath("temp"), "copyfloy-"));
+
+    try {
+      // Clone takes 0-70%, packing takes 70-100%
+      await cloneRepository({ ...task, target: tempDir }, (percent) => onProgress(Math.floor(percent * 0.7)), signal);
+
+      const [repositoryName] = await fs.readdir(tempDir);
+      const entries: ICopyEntry[] = [];
+      await this.collect(path.join(tempDir, repositoryName), repositoryName, undefined, entries);
+
+      await fs.ensureDir(task.target);
+      await createZip(entries, path.join(task.target, `${repositoryName}.zip`), signal, (percent) =>
+        onProgress(70 + Math.floor(percent * 0.3))
+      );
+    } finally {
+      await fs.remove(tempDir).catch(() => undefined);
     }
   }
 

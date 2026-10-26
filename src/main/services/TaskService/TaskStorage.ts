@@ -156,7 +156,8 @@ export class TaskStorage {
         (Array.isArray(task.labelsIds) && task.labelsIds.every((labelId) => typeof labelId === "number"))) &&
       (task.exceptions === undefined ||
         (Array.isArray(task.exceptions) && task.exceptions.every((exception) => typeof exception === "string"))) &&
-      (task.isPinned === undefined || typeof task.isPinned === "boolean")
+      (task.isPinned === undefined || typeof task.isPinned === "boolean") &&
+      (task.isArchive === undefined || typeof task.isArchive === "boolean")
     );
   }
 
