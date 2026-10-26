@@ -3,7 +3,12 @@ import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { FC, useState } from "react";
 
 import { TaskItem } from "../TaskItem";
@@ -27,7 +32,7 @@ export const TaskList: FC<ITaskList> = ({
   const [activeId, setActiveId] = useState<number | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   if (items.length === 0) {
@@ -69,7 +74,7 @@ export const TaskList: FC<ITaskList> = ({
     >
       <div className={styles.container}>
         {[pinnedIds, regularIds].map((ids, index) => (
-          <SortableContext key={index} items={ids}>
+          <SortableContext key={index} items={ids} strategy={verticalListSortingStrategy}>
             {displayItems
               .filter((task) => ids.includes(task.id))
               .map((item) => (
