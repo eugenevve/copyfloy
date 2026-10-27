@@ -26,6 +26,6 @@
   background: var(--content-gray-dark);
 }
 
-.error td:first-child {
+.error td:nth-child(2) {
   color: var(--red);
 }

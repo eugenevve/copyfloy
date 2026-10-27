@@ -9,6 +9,7 @@ export const ReportTable: FC<IReportTableProps> = ({ records }) => (
   <table className={styles.table}>
     <thead>
       <tr>
+        <th>#</th>
         <th>Task</th>
         <th>Started</th>
         <th>Copied files</th>
@@ -18,8 +19,9 @@ export const ReportTable: FC<IReportTableProps> = ({ records }) => (
       </tr>
     </thead>
     <tbody>
-      {records.map((record) => (
+      {records.map((record, index) => (
         <tr key={record.id} className={record.status === ReportStatus.ERROR ? styles.error : undefined}>
+          <td>{index + 1}</td>
           <td title={record.error}>{record.taskName}</td>
           <td>{new Date(record.startedAt).toLocaleString()}</td>
           <td>{record.filesCopied ?? "-"}</td>
