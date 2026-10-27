@@ -1,5 +1,11 @@
 .container {
   display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.content {
+  display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
@@ -14,6 +20,34 @@
 
 .section:last-child {
   flex: 1;
+}
+
+.labelsContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  width: 100%;
+  min-width: 0;
+}
+
+.labels {
+  display: flex;
+  gap: var(--spacing-s);
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.labels > * {
+  flex-shrink: 0;
+}
+
+.arrowLeft {
+  transform: rotate(90deg);
+}
+
+.arrowRight {
+  transform: rotate(-90deg);
 }
 
 .input input {
