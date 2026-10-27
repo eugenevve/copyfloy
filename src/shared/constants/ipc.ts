@@ -48,6 +48,7 @@ export const IPC_CHANNELS = {
   },
   report: {
     get: "report:get",
+    clear: "report:clear",
   },
   updater: {
     check: "updater:check",

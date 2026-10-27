@@ -75,6 +75,7 @@ export const api = {
   },
   report: {
     get: (): Promise<IReport> => invoke<IReport>(IPC_CHANNELS.report.get),
+    clear: (): Promise<void> => invoke<void>(IPC_CHANNELS.report.clear),
   },
   updater: {
     check: (): Promise<void> => invoke<void>(IPC_CHANNELS.updater.check),
