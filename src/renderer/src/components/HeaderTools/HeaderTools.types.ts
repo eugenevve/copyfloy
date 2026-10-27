@@ -1,4 +1,5 @@
 import { ISelectOption } from "@app/ui/Select/Select.types";
+import { ILabel } from "@shared/types/labels";
 
 export interface IHeaderTools {
   title: string;
@@ -8,6 +9,13 @@ export interface IHeaderTools {
   search: string;
   onSearchChange: (value: string) => void;
   filter?: IHeaderToolsFilter;
+  labelsFilter?: IHeaderToolsLabelsFilter;
+}
+
+interface IHeaderToolsLabelsFilter {
+  labels: ILabel[];
+  selectedIds: number[];
+  onToggle: (id: number) => void;
 }
 
 interface IHeaderToolsFilter {

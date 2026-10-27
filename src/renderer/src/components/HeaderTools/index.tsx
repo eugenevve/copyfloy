@@ -1,30 +1,76 @@
 import { InfoApp } from "@app/pages/Home/components/InfoApp";
 import { Button } from "@app/ui/Button";
+import { ButtonKind } from "@app/ui/Button/Button.types";
+import { ChevronIcon } from "@app/ui/Icons";
 import { Input } from "@app/ui/Input";
+import { LabelChip } from "@app/ui/LabelChip";
 import { Select } from "@app/ui/Select";
-import { FC } from "react";
+import { FC, useRef } from "react";
 
 import styles from "./HeaderTools.module.css";
 import { IHeaderTools } from "./HeaderTools.types";
 
-export const HeaderTools: FC<IHeaderTools> = ({ title, count, addText, onAdd, search, onSearchChange, filter }) => {
+export const HeaderTools: FC<IHeaderTools> = ({
+  title,
+  count,
+  addText,
+  onAdd,
+  search,
+  onSearchChange,
+  filter,
+  labelsFilter,
+}) => {
+  const labelsRef = useRef<HTMLDivElement>(null);
+
+  const scrollLabels = (direction: -1 | 1) => {
+    labelsRef.current?.scrollBy({ left: direction * 200, behavior: "smooth" });
+  };
+
   return (
     <div className={styles.container}>
-      <div className={styles.section}>
-        <InfoApp name={title} count={count} />
-        <Button onClick={onAdd}>{addText}</Button>
+      <div className={styles.content}>
+        <div className={styles.section}>
+          <InfoApp name={title} count={count} />
+          <Button onClick={onAdd}>{addText}</Button>
+        </div>
+        <div className={styles.section}>
+          <Input
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search"
+            className={styles.input}
+          />
+          {filter && (
+            <Select
+              options={filter.options}
+              value={filter.value}
+              onChange={filter.onChange}
+              className={styles.select}
+            />
+          )}
+        </div>
       </div>
-      <div className={styles.section}>
-        <Input
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search"
-          className={styles.input}
-        />
-        {filter && (
-          <Select options={filter.options} value={filter.value} onChange={filter.onChange} className={styles.select} />
-        )}
-      </div>
+      {labelsFilter && labelsFilter.labels.length > 0 && (
+        <div className={styles.labelsContainer}>
+          <Button kind={ButtonKind.SECONDARY} icon onClick={() => scrollLabels(-1)}>
+            <ChevronIcon className={styles.arrowLeft} />
+          </Button>
+          <div ref={labelsRef} className={styles.labels}>
+            {labelsFilter.labels.map((label) => (
+              <LabelChip
+                key={label.id}
+                name={label.name}
+                color={label.color}
+                selected={labelsFilter.selectedIds.includes(label.id)}
+                onClick={() => labelsFilter.onToggle(label.id)}
+              />
+            ))}
+          </div>
+          <Button icon kind={ButtonKind.SECONDARY} onClick={() => scrollLabels(1)}>
+            <ChevronIcon className={styles.arrowRight} />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -27,7 +27,8 @@ export const Home: FC = () => {
   const { tasks, progress, gitAvailable, fetchTasks, runTask, stopTask, deleteTask, updateTask, reorderTasks } =
     useTasks();
   const { labels } = useLabels();
-  const { search, setSearch, typeFilter, setTypeFilter, filteredTasks } = useTaskFilter(tasks);
+  const { search, setSearch, typeFilter, setTypeFilter, selectedLabelIds, toggleLabel, filteredTasks } =
+    useTaskFilter(tasks);
 
   const handleRunTask = (task: ITask) => {
     try {
@@ -111,11 +112,12 @@ export const Home: FC = () => {
               value: typeFilter,
               onChange: (value) => setTypeFilter(value as typeof typeFilter),
             }}
+            labelsFilter={{ labels, selectedIds: selectedLabelIds, onToggle: toggleLabel }}
           />
           <TaskList
             items={filteredTasks}
             labels={labels}
-            reorder={!search.trim() && typeFilter === "all"}
+            reorder={!search.trim() && typeFilter === "all" && selectedLabelIds.length === 0}
             progress={progress}
             gitAvailable={gitAvailable}
             onRun={handleRunTask}
