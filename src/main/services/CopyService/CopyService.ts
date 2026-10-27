@@ -65,9 +65,12 @@ export class CopyService {
         };
 
         if (task.isArchive) {
-          await this.archiveRepository(task, state.controller.signal, report);
+          await this.archiveRepository(task, state.controller.signal, report, stats);
         } else {
-          await cloneRepository(task, report, state.controller.signal);
+          const clonedPath = await cloneRepository(task, report, state.controller.signal);
+          const entries: ICopyEntry[] = [];
+          await this.collect(clonedPath, clonedPath, undefined, entries);
+          this.applyEntryStats(entries, stats);
         }
 
         outcome = ReportStatus.SUCCESS;
@@ -98,8 +101,7 @@ export class CopyService {
         await this.collect(task.source, path.basename(task.source), task.exceptions, entries, stats);
         await createZip(entries, archivePath, state.controller.signal, onProgress);
 
-        stats.filesCopied = entries.filter((entry) => !entry.isDirectory).length;
-        stats.totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
+        this.applyEntryStats(entries, stats);
         outcome = ReportStatus.SUCCESS;
         Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
@@ -192,7 +194,8 @@ export class CopyService {
   private async archiveRepository(
     task: ITask,
     signal: AbortSignal,
-    onProgress: (percent: number) => void
+    onProgress: (percent: number) => void,
+    stats: IOperationStats
   ): Promise<void> {
     const tempDir = await fs.mkdtemp(path.join(app.getPath("temp"), "copyfloy-"));
 
@@ -203,6 +206,7 @@ export class CopyService {
       const [repositoryName] = await fs.readdir(tempDir);
       const entries: ICopyEntry[] = [];
       await this.collect(path.join(tempDir, repositoryName), repositoryName, undefined, entries);
+      this.applyEntryStats(entries, stats);
 
       await fs.ensureDir(task.target);
       await createZip(entries, path.join(task.target, `${repositoryName}.zip`), signal, (percent) =>
@@ -211,6 +215,11 @@ export class CopyService {
     } finally {
       await fs.remove(tempDir).catch(() => undefined);
     }
+  }
+
+  private applyEntryStats(entries: ICopyEntry[], stats: IOperationStats): void {
+    stats.filesCopied = entries.filter((entry) => !entry.isDirectory).length;
+    stats.totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
   }
 
   // Copies one file, removing the partial result if the copy is interrupted

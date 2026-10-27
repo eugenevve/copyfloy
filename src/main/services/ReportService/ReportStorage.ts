@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
-import { IReportRecord } from "@shared/types/report";
+import { IReportRecord, ReportStatus } from "@shared/types/report";
 import { app } from "electron";
 
 const MAX_RECORDS = 1000;
@@ -46,7 +46,16 @@ export class ReportStorage {
   }
 
   append(record: IReportRecord): void {
-    this.save([...this.load(), record].slice(-MAX_RECORDS));
+    const records = this.load();
+    const usedIds = new Set(records.map((item) => item.id));
+    let id = record.id;
+
+    // Report ids double as React keys, so bump on collision (same-millisecond runs)
+    while (usedIds.has(id)) {
+      id += 1;
+    }
+
+    this.save([...records, { ...record, id }].slice(-MAX_RECORDS));
   }
 
   private isValidRecord(value: unknown): value is IReportRecord {
@@ -56,13 +65,21 @@ export class ReportStorage {
 
     const record = value as Record<string, unknown>;
 
+    const isNumber = (field: unknown): field is number => typeof field === "number" && Number.isFinite(field);
+    const isOptional = (field: unknown, check: (item: unknown) => boolean): boolean =>
+      field === undefined || check(field);
+
     return (
-      typeof record.id === "number" &&
-      typeof record.taskId === "number" &&
+      isNumber(record.id) &&
+      isNumber(record.taskId) &&
       typeof record.taskName === "string" &&
-      typeof record.startedAt === "number" &&
-      typeof record.durationMs === "number" &&
-      typeof record.status === "string"
+      isNumber(record.startedAt) &&
+      isNumber(record.durationMs) &&
+      Object.values(ReportStatus).includes(record.status as ReportStatus) &&
+      isNumber(record.filesSkipped) &&
+      isOptional(record.filesCopied, isNumber) &&
+      isOptional(record.totalBytes, isNumber) &&
+      isOptional(record.error, (field) => typeof field === "string")
     );
   }
 }
