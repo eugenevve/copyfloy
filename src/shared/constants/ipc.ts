@@ -46,6 +46,10 @@ export const IPC_CHANNELS = {
     delete: "labels:delete",
     reorder: "labels:reorder",
   },
+  report: {
+    get: "report:get",
+    clear: "report:clear",
+  },
   updater: {
     check: "updater:check",
     download: "updater:download",

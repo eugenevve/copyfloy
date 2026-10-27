@@ -18,7 +18,7 @@ export async function cloneRepository(
   task: ITask,
   onProgress?: (percent: number) => void,
   signal?: AbortSignal
-): Promise<void> {
+): Promise<string> {
   if (!(await isGitAvailable())) {
     throw new Error("Git is not installed or is not available in PATH");
   }
@@ -67,7 +67,7 @@ export async function cloneRepository(
     }
 
     await runGit(["-C", destination, "pull", "--ff-only", "--progress"], env, onProgress, signal);
-    return;
+    return destination;
   }
 
   const destinationExisted = await fs.pathExists(destination);
@@ -82,6 +82,8 @@ export async function cloneRepository(
 
     throw error;
   }
+
+  return destination;
 }
 
 // Extracts overall percent (0-100) from git's stderr progress lines

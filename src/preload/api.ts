@@ -1,6 +1,7 @@
 import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ILabel } from "@shared/types/labels";
+import { IReport } from "@shared/types/report";
 import { ITask, ITaskProgress, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { ipcRenderer } from "electron";
@@ -71,6 +72,10 @@ export const api = {
     update: (label: ILabel): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.update, label),
     delete: (id: number): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.delete, id),
     reorder: (orderedIds: number[]): Promise<ILabel[]> => invoke<ILabel[]>(IPC_CHANNELS.labels.reorder, orderedIds),
+  },
+  report: {
+    get: (): Promise<IReport> => invoke<IReport>(IPC_CHANNELS.report.get),
+    clear: (): Promise<void> => invoke<void>(IPC_CHANNELS.report.clear),
   },
   updater: {
     check: (): Promise<void> => invoke<void>(IPC_CHANNELS.updater.check),

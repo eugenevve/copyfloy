@@ -5,6 +5,7 @@ import { AppIpc } from "./services/AppService/AppIpc";
 import { AppService } from "./services/AppService/AppService";
 import { DiscordService } from "./services/DiscordService/DiscordService";
 import { LabelService } from "./services/LabelService/LabelService";
+import { ReportService } from "./services/ReportService/ReportService";
 import { SettingsIpc } from "./services/SettingsService/SettingsIpc";
 import { SettingsService } from "./services/SettingsService/SettingsService";
 import { TaskService } from "./services/TaskService/TaskService";
@@ -25,6 +26,7 @@ const windowService = new WindowService(settingsService, windowStateService);
 const windowIpc = new WindowIpc(windowService);
 const taskService = new TaskService();
 const labelService = new LabelService();
+const reportService = new ReportService();
 const updater = new UpdaterService();
 const updaterIpc = new UpdaterIpc(updater);
 const discordService = new DiscordService();
@@ -59,6 +61,7 @@ function initializeApplication(): void {
 function initializeServices(): void {
   taskService.init();
   labelService.init();
+  reportService.init();
   updater.init();
 
   discordService.init();

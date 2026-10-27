@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: 100%;
+  padding: var(--spacing-s);
+  border-radius: var(--spacing-l);
+  background: var(--content-gray-dark);
+}
+
+.value {
+  font-size: 18px;
+}
+
+.label {
+  color: var(--content-gray-light);
+  font-size: 14px;
+}

@@ -1,0 +1,31 @@
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--spacing-l);
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-s);
+  text-align: left;
+}
+
+.table th {
+  background: var(--content-gray-dark);
+  font-weight: var(--heading);
+}
+
+.table tbody tr:nth-child(odd) {
+  background: var(--background-secondary);
+}
+
+.table tbody tr:nth-child(even) {
+  background: var(--content-gray-dark);
+}
+
+.error td:nth-child(2) {
+  color: var(--red);
+}
