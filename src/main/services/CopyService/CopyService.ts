@@ -4,18 +4,21 @@ import { pipeline } from "node:stream/promises";
 
 import { Logger } from "@main/utils/logger";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
+import { ReportStatus } from "@shared/types/report";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { BrowserWindow, app } from "electron";
 import fs from "fs-extra";
 
 import { createZip } from "./ArchiveService";
-import { ICopyEntry, IRunningTask } from "./CopyService.types";
+import { ICopyEntry, IOperationStats, IRunningTask } from "./CopyService.types";
 import { cloneRepository, isGitAvailable } from "./GitRepositoryService";
 import { NotificationService } from "../NotificationService/NotificationService";
+import { ReportStorage } from "../ReportService/ReportStorage";
 
 // Service responsible for executing file and folder copy operations
 export class CopyService {
   private readonly running = new Map<number, IRunningTask>();
+  private readonly reportStorage = new ReportStorage();
 
   // Returns progress (0-100) of every task that is currently running
   getRunning(): Record<number, number> {
@@ -47,6 +50,11 @@ export class CopyService {
     this.running.set(task.id, state);
     this.broadcast(task.id, 0);
 
+    const startedAt = Date.now();
+    const stats: IOperationStats = { skipped: 0 };
+    let outcome: ReportStatus | null = null;
+    let errorMessage: string | undefined;
+
     try {
       if (task.type === TaskType.REPOSITORY) {
         const report = (percent: number): void => {
@@ -62,6 +70,7 @@ export class CopyService {
           await cloneRepository(task, report, state.controller.signal);
         }
 
+        outcome = ReportStatus.SUCCESS;
         Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
         if (task.schedule?.notify) {
@@ -86,9 +95,12 @@ export class CopyService {
         await fs.ensureDir(task.target);
 
         const entries: ICopyEntry[] = [];
-        await this.collect(task.source, path.basename(task.source), task.exceptions, entries);
+        await this.collect(task.source, path.basename(task.source), task.exceptions, entries, stats);
         await createZip(entries, archivePath, state.controller.signal, onProgress);
 
+        stats.filesCopied = entries.filter((entry) => !entry.isDirectory).length;
+        stats.totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
+        outcome = ReportStatus.SUCCESS;
         Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
         if (task.schedule?.notify) {
@@ -101,7 +113,7 @@ export class CopyService {
       Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);
 
       const entries: ICopyEntry[] = [];
-      await this.collect(task.source, destination, task.exceptions, entries);
+      await this.collect(task.source, destination, task.exceptions, entries, stats);
 
       const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
       let copiedSize = 0;
@@ -114,6 +126,8 @@ export class CopyService {
           this.broadcast(task.id, percent);
         }
       };
+
+      stats.filesCopied = 0;
 
       for (const entry of entries) {
         if (state.controller.signal.aborted) {
@@ -130,8 +144,11 @@ export class CopyService {
           copiedSize += bytes;
           report();
         });
+        stats.filesCopied += 1;
       }
 
+      stats.totalBytes = copiedSize;
+      outcome = ReportStatus.SUCCESS;
       Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
       // Show a notification when the task requests it
@@ -146,8 +163,26 @@ export class CopyService {
 
       Logger.error("CopyService", `Failed to copy task "${task.name}"`, error);
 
+      outcome = ReportStatus.ERROR;
+      errorMessage = error instanceof Error ? error.message : String(error);
+
       NotificationService.error(`Failed to complete the task: "${task.name}"`);
     } finally {
+      if (outcome) {
+        this.reportStorage.append({
+          id: startedAt,
+          taskId: task.id,
+          taskName: task.name,
+          startedAt,
+          durationMs: Date.now() - startedAt,
+          status: outcome,
+          filesCopied: stats.filesCopied,
+          filesSkipped: stats.skipped,
+          totalBytes: stats.totalBytes,
+          error: errorMessage,
+        });
+      }
+
       this.running.delete(task.id);
       this.broadcast(task.id, null);
     }
@@ -196,25 +231,36 @@ export class CopyService {
     source: string,
     destination: string,
     exceptions: string[] | undefined,
-    entries: ICopyEntry[]
+    entries: ICopyEntry[],
+    operationStats?: IOperationStats
   ): Promise<void> {
     if (this.isExcluded(source, exceptions)) {
-      return;
-    }
-
-    const stats = await fs.stat(source);
-
-    if (stats.isDirectory()) {
-      entries.push({ source, destination, isDirectory: true, size: 0 });
-
-      for (const name of await fs.readdir(source)) {
-        await this.collect(path.join(source, name), path.join(destination, name), exceptions, entries);
+      if (operationStats) {
+        operationStats.skipped += 1;
       }
 
       return;
     }
 
-    entries.push({ source, destination, isDirectory: false, size: stats.size });
+    const fileStats = await fs.stat(source);
+
+    if (fileStats.isDirectory()) {
+      entries.push({ source, destination, isDirectory: true, size: 0 });
+
+      for (const name of await fs.readdir(source)) {
+        await this.collect(
+          path.join(source, name),
+          path.join(destination, name),
+          exceptions,
+          entries,
+          operationStats
+        );
+      }
+
+      return;
+    }
+
+    entries.push({ source, destination, isDirectory: false, size: fileStats.size });
   }
 
   private broadcast(taskId: number, percent: number | null): void {

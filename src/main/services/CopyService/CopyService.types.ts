@@ -9,3 +9,9 @@ export interface IRunningTask {
   controller: AbortController;
   percent: number;
 }
+
+export interface IOperationStats {
+  skipped: number;
+  filesCopied?: number;
+  totalBytes?: number;
+}
