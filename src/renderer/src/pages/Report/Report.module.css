@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-s);
+}
