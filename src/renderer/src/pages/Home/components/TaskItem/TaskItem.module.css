@@ -54,7 +54,23 @@
   background: transparent;
 }
 
-.source {
+.pathContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.pathIcon {
+  margin-top: var(--spacing-xs);
+  fill: var(--content-gray-light);
+}
+
+.pathDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.path {
   display: -webkit-box;
   color: var(--content-gray-light);
   font-size: 14px;
