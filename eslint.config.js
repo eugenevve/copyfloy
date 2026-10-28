@@ -11,7 +11,7 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
   // 1. Basic settings
   {
-    ignores: ["dist", "out", "eslint.config.js", "stylelint.config.mjs"],
+    ignores: ["dist", "out", "scripts", "eslint.config.js", "stylelint.config.mjs"],
   },
   js.configs.recommended,
 
