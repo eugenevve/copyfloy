@@ -1,3 +1,5 @@
+import path from "path";
+
 import { optimizer } from "@electron-toolkit/utils";
 import { app, BrowserWindow } from "electron";
 
@@ -16,6 +18,11 @@ import { WindowIpc } from "./services/WindowService/WindowIpc";
 import { WindowService } from "./services/WindowService/WindowService";
 import { WindowStateService } from "./services/WindowService/WindowStateService";
 import { appState } from "./utils/environment";
+
+// Must run before services are created: storages resolve userData at construction
+if (!app.isPackaged) {
+  app.setPath("userData", path.join(app.getPath("appData"), `${app.getName()}-dev`));
+}
 
 const appService = new AppService();
 const appIpc = new AppIpc(appService);
