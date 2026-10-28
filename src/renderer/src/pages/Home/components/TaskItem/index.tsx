@@ -2,6 +2,7 @@ import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { DragButton } from "@app/ui/DragButton";
 import {
+  ArrowTurnIcon,
   BranchIcon,
   ClockIcon,
   FileIcon,
@@ -85,7 +86,13 @@ export const TaskItem: FC<ITaskItem> = ({
                 <PinIcon className={task.isPinned ? "" : styles.iconPin} />
               </Button>
             </div>
-            <div className={styles.source}>{task.source}</div>
+            <div className={styles.pathContainer}>
+              <ArrowTurnIcon className={styles.pathIcon} />
+              <div className={styles.pathDetails}>
+                <div className={styles.path}>{task.source}</div>
+                <div className={styles.path}>{task.target}</div>
+              </div>
+            </div>
             {unavailableReason && <div className={styles.warning}>{unavailableReason}</div>}
           </div>
           {labels.length > 0 && (
