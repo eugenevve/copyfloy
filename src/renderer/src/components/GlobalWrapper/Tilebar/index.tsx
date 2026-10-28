@@ -8,6 +8,7 @@ import styles from "./Tilebar.module.css";
 export const Tilebar: FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { isPackaged } = window.api.app;
 
   const handleClose = () => window.api.window.close();
   const handleMinimize = () => window.api.window.minimize();
@@ -22,7 +23,9 @@ export const Tilebar: FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>Copyfloy {isAdmin && "(administrator)"}</div>
+      <div className={styles.title}>
+        Copyfloy {isPackaged ? "" : "(dev)"} {isAdmin && "(administrator)"}
+      </div>
       <div className={styles.controls}>
         <TilebarButton onClick={handleMinimize}>
           <LineIcon />

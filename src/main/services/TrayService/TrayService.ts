@@ -13,7 +13,7 @@ export class TrayService {
   init(): void {
     this.tray = new Tray(this.createTrayIcon());
 
-    this.tray.setToolTip(packageJson.name);
+    this.tray.setToolTip(`${packageJson.name} ${app.isPackaged ? "" : "(dev)"}`);
 
     this.tray.on("click", () => {
       this.showWindow();
