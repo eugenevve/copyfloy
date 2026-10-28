@@ -56,7 +56,9 @@
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
-    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix"
+    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix",
+    "icons": "node scripts/make-icon.mjs",
+    "icons-check": "node scripts/check-icon.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -88,8 +90,10 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
+    "png-to-ico": "^3.0.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "sharp": "^0.35.5",
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-order": "^8.1.1",
