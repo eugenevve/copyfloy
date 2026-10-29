@@ -3,6 +3,7 @@ import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ReportIcon, TrashIcon } from "@app/ui/Icons";
+import { Loader } from "@app/ui/Loader";
 import { NoData } from "@app/ui/NoData";
 import { IReport } from "@shared/types/report";
 import { FC, useEffect, useState } from "react";
@@ -13,11 +14,23 @@ import styles from "./Report.module.css";
 
 export const Report: FC = () => {
   const [report, setReport] = useState<IReport | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { showConfirm } = useModal();
 
   useEffect(() => {
-    void window.api.report.get().then(setReport);
+    void window.api.report
+      .get()
+      .then(setReport)
+      .finally(() => setIsLoading(false));
   }, []);
+
+  if (isLoading) {
+    return (
+      <PageWrapper>
+        <Loader label="Loading report..." />
+      </PageWrapper>
+    );
+  }
 
   if (!report) {
     return (

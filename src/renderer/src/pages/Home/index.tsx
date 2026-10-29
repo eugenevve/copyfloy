@@ -4,6 +4,7 @@ import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { useTaskFilter } from "@app/hooks/useTaskFilter";
 import { useTasks } from "@app/hooks/useTasks";
+import { Loader } from "@app/ui/Loader";
 import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
 import { ITask } from "@shared/types/tasks";
 import { FC, useState } from "react";
@@ -24,8 +25,18 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
-  const { tasks, progress, gitAvailable, fetchTasks, runTask, stopTask, deleteTask, updateTask, reorderTasks } =
-    useTasks();
+  const {
+    tasks,
+    isLoading,
+    progress,
+    gitAvailable,
+    fetchTasks,
+    runTask,
+    stopTask,
+    deleteTask,
+    updateTask,
+    reorderTasks,
+  } = useTasks();
   const { labels } = useLabels();
   const { search, setSearch, typeFilter, setTypeFilter, selectedLabelIds, toggleLabel, filteredTasks } =
     useTaskFilter(tasks);
@@ -114,20 +125,24 @@ export const Home: FC = () => {
             }}
             labelsFilter={{ labels, selectedIds: selectedLabelIds, onToggle: toggleLabel }}
           />
-          <TaskList
-            items={filteredTasks}
-            labels={labels}
-            reorder={!search.trim() && typeFilter === "all" && selectedLabelIds.length === 0}
-            progress={progress}
-            gitAvailable={gitAvailable}
-            onRun={handleRunTask}
-            onStop={(task) => void stopTask(task.id)}
-            onSchedule={handleScheduleTask}
-            onEdit={handleEditTask}
-            onDelete={(task) => handleDeleteTask(task.id)}
-            onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
-            onReorder={(orderedIds) => void reorderTasks(orderedIds)}
-          />
+          {isLoading ? (
+            <Loader label="Loading tasks..." />
+          ) : (
+            <TaskList
+              items={filteredTasks}
+              labels={labels}
+              reorder={!search.trim() && typeFilter === "all" && selectedLabelIds.length === 0}
+              progress={progress}
+              gitAvailable={gitAvailable}
+              onRun={handleRunTask}
+              onStop={(task) => void stopTask(task.id)}
+              onSchedule={handleScheduleTask}
+              onEdit={handleEditTask}
+              onDelete={(task) => handleDeleteTask(task.id)}
+              onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
+              onReorder={(orderedIds) => void reorderTasks(orderedIds)}
+            />
+          )}
         </div>
       </PageWrapper>
       {isTaskModal.open && (
