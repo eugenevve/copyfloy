@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export const useLabels = () => {
   const [labels, setLabels] = useState<ILabel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchLabels = async () => {
     const data = await window.api.labels.get();
@@ -20,11 +21,15 @@ export const useLabels = () => {
   };
 
   useEffect(() => {
-    void window.api.labels.get().then(setLabels);
+    void window.api.labels
+      .get()
+      .then(setLabels)
+      .finally(() => setIsLoading(false));
   }, []);
 
   return {
     labels,
+    isLoading,
     fetchLabels,
     deleteLabel,
     reorderLabels,

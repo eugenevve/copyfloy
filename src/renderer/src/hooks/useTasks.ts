@@ -5,6 +5,7 @@ export const useTasks = () => {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [progress, setProgress] = useState<Record<number, number>>({});
   const [gitAvailable, setGitAvailable] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchTasks = async () => {
     const data = await window.api.tasks.get();
@@ -35,9 +36,15 @@ export const useTasks = () => {
   };
 
   useEffect(() => {
-    void window.api.tasks.get().then(setTasks);
+    void window.api.tasks
+      .get()
+      .then(setTasks)
+      .finally(() => setIsLoading(false));
     void window.api.tasks.getRunning().then(setProgress);
-    void window.api.tasks.isGitAvailable().then(setGitAvailable).catch(() => setGitAvailable(false));
+    void window.api.tasks
+      .isGitAvailable()
+      .then(setGitAvailable)
+      .catch(() => setGitAvailable(false));
 
     return window.api.tasks.onProgress(({ taskId, percent }) => {
       setProgress((prev) => {
@@ -58,6 +65,7 @@ export const useTasks = () => {
     tasks,
     progress,
     gitAvailable,
+    isLoading,
     fetchTasks,
     runTask,
     stopTask,
