@@ -3,6 +3,7 @@ import { PageWrapper } from "@app/components/PageWrapper";
 import { useLabelFilter } from "@app/hooks/useLabelFilter";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
+import { Loader } from "@app/ui/Loader";
 import { ILabel } from "@shared/types/labels";
 import { FC, useState } from "react";
 
@@ -20,7 +21,7 @@ export const Labels: FC = () => {
     open: false,
     label: null,
   });
-  const { labels, fetchLabels, deleteLabel, reorderLabels } = useLabels();
+  const { labels, isLoading, fetchLabels, deleteLabel, reorderLabels } = useLabels();
   const { search, setSearch, filteredLabels } = useLabelFilter(labels);
 
   // Modal Label
@@ -79,13 +80,17 @@ export const Labels: FC = () => {
             search={search}
             onSearchChange={setSearch}
           />
-          <LabelsList
-            items={filteredLabels}
-            reorder={!search.trim()}
-            onEdit={handleEditLabel}
-            onDelete={(label) => handleDeleteLabel(label.id)}
-            onReorder={(orderedIds) => void reorderLabels(orderedIds)}
-          />
+          {isLoading ? (
+            <Loader label="Loading labels..." />
+          ) : (
+            <LabelsList
+              items={filteredLabels}
+              reorder={!search.trim()}
+              onEdit={handleEditLabel}
+              onDelete={(label) => handleDeleteLabel(label.id)}
+              onReorder={(orderedIds) => void reorderLabels(orderedIds)}
+            />
+          )}
         </div>
       </PageWrapper>
       {isLabelModal.open && (
