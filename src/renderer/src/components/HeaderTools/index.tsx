@@ -56,7 +56,7 @@ export const HeaderTools: FC<IHeaderTools> = ({
             <ChevronIcon className={styles.arrowLeft} />
           </Button>
           <div ref={labelsRef} className={styles.labels}>
-            {labelsFilter.labels.map((label) => (
+            {labelsFilter.labels.toReversed().map((label) => (
               <LabelChip
                 key={label.id}
                 name={label.name}
