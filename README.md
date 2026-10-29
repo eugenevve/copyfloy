@@ -48,9 +48,11 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 **Tasks**
 
 - Create, edit, delete and manually run tasks
-- Copy a single file or an entire folder (recursively)
+- Copy a single file, an entire folder (recursively) or a Git repository
+- Live progress for running tasks and a **Stop** button to cancel them
 - Pin important tasks to the top of the list
-- Search tasks and filter them by type (file / folder)
+- Reorder tasks by drag and drop (within the pinned / regular group; available when no search or filter is active)
+- Search tasks and filter them by type (file / folder / repository) and by labels
 - Confirmation before deleting a task or closing a form with unsaved changes
 
 **Exclusions**
@@ -58,11 +60,31 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 - Exclude specific files and folders from a copy; multiple paths can be selected at once
 - An excluded folder is skipped together with all of its contents
 
+**Git repositories**
+
+- Back up repositories from **GitHub** and **GitLab** (HTTPS URLs on `github.com` / `gitlab.com` only)
+- First run clones the repository into `<destination>\<repository name>`; later runs update it with `git pull --ff-only`. If the destination already contains a different repository, the task fails instead of overwriting it
+- **Archive mode:** clone into a temporary folder and pack the whole repository, including `.git`, into `<destination>\<repository name>.zip`; the temporary clone is removed afterwards
+- Private repositories are supported with a personal access token. The token is encrypted with Electron `safeStorage` (OS-level encryption) before it is written to `tasks.json`
+- Requires [Git](https://git-scm.com/) to be installed and available in `PATH`; otherwise repository tasks are disabled in the UI
+
+**Stopping tasks**
+
+- A running task can be cancelled at any time; files that were already copied are kept
+- A partially written file is removed; a partial clone is removed only if it was created by that run, an existing folder is never deleted
+- Cancelled runs are not recorded in the report
+
+**Reports**
+
+- A separate **Report** page with the number of tasks, successful and failed operations
+- History table: task, start time, copied files, skipped files (excluded paths), duration, total size; failed runs are highlighted and show the error on hover
+- Records are stored in `report.json` (the last 1000 are kept) and can be cleared with one click
+
 **Scheduling**
 
 - Every N minutes, hourly, daily or on selected days of the week
 - Scheduling can be switched off per task
-- Optional success notification per task; failures are always reported
+- Optional success notification per task (also for repository tasks) failures are always reported
 - Scheduled tasks run only while the app is running - the tray keeps it alive after the window is closed
 
 **Labels**
@@ -73,6 +95,7 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 **Import and export**
 
 - Export all tasks and labels to a JSON file and import them on another machine
+- Access tokens of private repositories are **never exported**: after import, edit such a task and enter the token again
 - Import either adds to the existing tasks or replaces them
 - Imported labels with the same name and color are reused; other tasks and labels get new unique IDs
 
@@ -90,7 +113,7 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 - Built-in updater (`electron-updater`) with releases published on GitHub
 - Updates are checked, downloaded and installed manually from the Settings page
 
-All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`).
+All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`, `report.json`).
 
 ---
 
@@ -98,7 +121,7 @@ All data is stored locally as JSON files in Electron's `userData` directory (`ta
 
 ## 🛠 Getting Started
 
-**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.12 or newer and npm.
+**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.12 or newer and npm. [Git](https://git-scm.com/) is optional and needed only for repository tasks.
 
 ```bash
 git clone https://github.com/eugenevve/copyfloy.git
@@ -151,11 +174,12 @@ The packaging settings live in the `build` section of `package.json`. The instal
 src/
 ├── main/            # Electron main process
 │   ├── services/    # AppService, CopyService, DiscordService, LabelService,
-│   │                # NotificationService, SchedulerService, SettingsService,
-│   │                # TaskService, TrayService, UpdaterService, WindowService
+│   │                # NotificationService, ReportService, SchedulerService,
+│   │                # SettingsService, TaskService, TrayService,
+│   │                # UpdaterService, WindowService
 │   └── utils/
 ├── preload/         # Secure bridge between main and renderer
-├── renderer/        # React UI: Home (tasks), Labels, Settings, About
+├── renderer/        # React UI: Home (tasks), Labels, Report, Settings, About
 └── shared/          # Code used by both sides: IPC channel names, types, constants
 ```
 
@@ -182,6 +206,8 @@ For the task lifecycle, scheduling, storage format and the responsibilities of e
 | Integrations    | @xhayper/discord-rpc, Electron Toolkit (`preload`, `utils`)              |
 | Build           | electron-vite, electron-builder (NSIS)                                   |
 | Code quality    | ESLint (+ TypeScript, React, import plugins), Stylelint, Prettier config |
+| Git             | System, via child process                                                |
+| DND-kit         | Drag and drop                                                            |
 
 ---
 
