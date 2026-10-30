@@ -32,6 +32,10 @@
   --spacing-m: 11px;
   --spacing-l: 15px;
 
+  /* z-index */
+  --z-base: 1;
+  --z-tooltip: 2;
+
   /* size-elements */
   --control-size: 28px;
   --line-height: 1.5;
