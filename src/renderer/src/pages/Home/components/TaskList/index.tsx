@@ -1,3 +1,6 @@
+import { usePagination } from "@app/hooks/usePagination";
+import { Button } from "@app/ui/Button";
+import { ButtonKind } from "@app/ui/Button/Button.types";
 import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
@@ -35,13 +38,16 @@ export const TaskList: FC<ITaskList> = ({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const allItems = items
+    .toReversed()
+    .sort((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)));
+  const { visibleItems: displayItems, hasMore, showMore } = usePagination(allItems);
+
   if (items.length === 0) {
     return <NoData title="No tasks" icon={<CloneIcon />} />;
   }
 
-  const displayItems = items
-    .toReversed()
-    .sort((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)));
+  const allIds = allItems.map(({ id }) => id);
   const displayIds = displayItems.map(({ id }) => id);
   const pinnedIds = displayItems.filter((task) => task.isPinned).map(({ id }) => id);
   const regularIds = displayIds.filter((id) => !pinnedIds.includes(id));
@@ -60,7 +66,7 @@ export const TaskList: FC<ITaskList> = ({
       return;
     }
 
-    onReorder(arrayMove(displayIds, displayIds.indexOf(activeId), displayIds.indexOf(overId)));
+    onReorder(arrayMove(allIds, allIds.indexOf(activeId), allIds.indexOf(overId)));
     setActiveId(null);
   };
 
@@ -96,6 +102,11 @@ export const TaskList: FC<ITaskList> = ({
               ))}
           </SortableContext>
         ))}
+        {hasMore && (
+          <Button kind={ButtonKind.SECONDARY} onClick={showMore} className={styles.showMoreButton}>
+            Show more...
+          </Button>
+        )}
       </div>
     </DndContext>
   );
