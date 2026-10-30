@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+}
+
+.content {
+  position: fixed;
+  width: max-content;
+  max-width: 400px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--spacing-s);
+  background: var(--content-gray-light);
+  color: var(--white-primary);
+  font-size: 14px;
+  z-index: var(--z-tooltip);
+  pointer-events: none;
+  user-select: none;
+}
+
+.top {
+  transform: translate(-50%, -100%);
+}
+
+.bottom {
+  transform: translate(-50%, 0);
+}
+
+.left {
+  transform: translate(-100%, -50%);
+}
+
+.right {
+  transform: translate(0, -50%);
+}
