@@ -15,6 +15,7 @@ import {
 } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
 import { classNames } from "@app/utils/classNames";
+import { getScheduleText } from "@app/utils/shedule";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ITaskItem, TaskType } from "@shared/types/tasks";
@@ -63,6 +64,7 @@ export const TaskItem: FC<ITaskItem> = ({
       : []),
   ];
   const unavailableReason = unavailableReasons.join(" ");
+  const scheduleText = getScheduleText(task.schedule);
 
   const items = [
     isRunning
@@ -102,7 +104,7 @@ export const TaskItem: FC<ITaskItem> = ({
               <div className={styles.path}>{task.target}</div>
             </div>
           </div>
-          {/* TODO: Times */}
+          {scheduleText && <div className={styles.schedule}>{scheduleText}</div>}
         </div>
         {unavailableReason && <div className={styles.warning}>{unavailableReason}</div>}
         {labels.length > 0 && (

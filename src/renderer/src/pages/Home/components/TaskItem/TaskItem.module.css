@@ -93,6 +93,12 @@
   word-break: break-all;
 }
 
+.schedule {
+  max-width: 120px;
+  color: var(--content-gray-light);
+  font-size: 14px;
+}
+
 .warning {
   color: var(--red);
   font-size: 14px;
