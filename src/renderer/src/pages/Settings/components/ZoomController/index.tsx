@@ -17,11 +17,11 @@ export const ZoomController: FC = () => {
   return (
     <WidgetContainer title="Page Zoom">
       <div className={styles.section}>
-        <Button onClick={() => setZoom(zoomFactor - ZOOM_STEP)} disabled={zoomFactor <= MIN_ZOOM} icon>
+        <Button onClick={() => setZoom(zoomFactor - ZOOM_STEP)} disabled={zoomFactor <= MIN_ZOOM} icon tooltip="Decrease zoom">
           <MinusIcon />
         </Button>
         <div>{Math.round(zoomFactor * 100)}%</div>
-        <Button onClick={() => setZoom(zoomFactor + ZOOM_STEP)} disabled={zoomFactor >= MAX_ZOOM} icon>
+        <Button onClick={() => setZoom(zoomFactor + ZOOM_STEP)} disabled={zoomFactor >= MAX_ZOOM} icon tooltip="Increase zoom">
           <PlusIcon />
         </Button>
       </div>
