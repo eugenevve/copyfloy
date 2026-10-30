@@ -64,7 +64,12 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
         </div>
       </SortableContext>
       {hasMore && (
-        <Button kind={ButtonKind.SECONDARY} onClick={showMore} className={styles.showMoreButton}>
+        <Button
+          kind={ButtonKind.SECONDARY}
+          onClick={showMore}
+          className={styles.showMoreButton}
+          tooltip="Show more labels"
+        >
           Show more...
         </Button>
       )}

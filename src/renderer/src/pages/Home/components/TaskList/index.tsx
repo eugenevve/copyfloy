@@ -103,7 +103,12 @@ export const TaskList: FC<ITaskList> = ({
           </SortableContext>
         ))}
         {hasMore && (
-          <Button kind={ButtonKind.SECONDARY} onClick={showMore} className={styles.showMoreButton}>
+          <Button
+            kind={ButtonKind.SECONDARY}
+            onClick={showMore}
+            className={styles.showMoreButton}
+            tooltip="Show more tasks"
+          >
             Show more...
           </Button>
         )}

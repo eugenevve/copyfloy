@@ -40,7 +40,12 @@ export const ReportTable: FC<IReportTableProps> = ({ records }) => {
         </tbody>
       </table>
       {hasMore && (
-        <Button kind={ButtonKind.SECONDARY} onClick={showMore} className={styles.showMoreButton}>
+        <Button
+          kind={ButtonKind.SECONDARY}
+          onClick={showMore}
+          className={styles.showMoreButton}
+          tooltip="Show more reports"
+        >
           Show more...
         </Button>
       )}
