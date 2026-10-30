@@ -2,10 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
+import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { IReportRecord, ReportStatus } from "@shared/types/report";
 import { app } from "electron";
-
-const MAX_RECORDS = 1000;
 
 export class ReportStorage {
   readonly dataPath = path.join(app.getPath("userData"), "report.json");
@@ -55,7 +54,7 @@ export class ReportStorage {
       id += 1;
     }
 
-    this.save([...records, { ...record, id }].slice(-MAX_RECORDS));
+    this.save([...records, { ...record, id }].slice(-MAX_LIST_ITEMS));
   }
 
   private isValidRecord(value: unknown): value is IReportRecord {

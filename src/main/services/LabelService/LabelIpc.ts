@@ -1,5 +1,6 @@
 import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
+import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
 import { ipcMain } from "electron";
 
@@ -21,6 +22,10 @@ export class LabelIpc {
     // Create a new label
     ipcMain.handle(IPC_CHANNELS.labels.save, (_, newLabel: Omit<ILabel, "id">) => {
       const labels = this.labelStorage.load();
+
+      if (labels.length >= MAX_LIST_ITEMS) {
+        return labels;
+      }
 
       const label: ILabel = {
         id: Date.now(),

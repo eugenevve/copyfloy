@@ -29,3 +29,7 @@
 .error td:nth-child(2) {
   color: var(--red);
 }
+
+.showMoreButton {
+  align-self: center;
+}

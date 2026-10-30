@@ -4,6 +4,7 @@ import { useLabelFilter } from "@app/hooks/useLabelFilter";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { Loader } from "@app/ui/Loader";
+import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
 import { FC, useState } from "react";
 
@@ -77,6 +78,7 @@ export const Labels: FC = () => {
             count={filteredLabels.length}
             addText="Add label"
             onAdd={handleAddLabel}
+            addDisabled={labels.length >= MAX_LIST_ITEMS}
             search={search}
             onSearchChange={setSearch}
           />

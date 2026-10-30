@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-s);
@@ -16,12 +15,14 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-s);
+  gap: var(--spacing-xs);
+  width: 100%;
 }
 
-.info {
+.horizontalContainer {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .section {
@@ -30,10 +31,21 @@
   gap: var(--spacing-xs);
 }
 
+.taskName {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: inherit;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
+
 .icon,
 .iconPin {
-  width: 14px;
-  height: 14px;
+  min-width: 14px;
+  max-width: 14px;
+  min-height: 14px;
+  max-height: 14px;
 }
 
 .icon {
@@ -54,10 +66,10 @@
   background: transparent;
 }
 
-.pathContainer {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
+.progress {
+  width: 45px;
+  text-align: right;
+  user-select: none;
 }
 
 .pathIcon {
@@ -81,19 +93,19 @@
   word-break: break-all;
 }
 
-.labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.progress {
-  width: 45px;
-  text-align: right;
-  user-select: none;
+.schedule {
+  max-width: 120px;
+  color: var(--content-gray-light);
+  font-size: 14px;
 }
 
 .warning {
   color: var(--red);
   font-size: 14px;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
 }

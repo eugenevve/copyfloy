@@ -1,18 +1,9 @@
 import { Checkbox } from "@app/ui/Checkbox";
+import { DAYS_LIST } from "@app/utils/daysList";
 import { FC } from "react";
 
 import styles from "./DaysSelector.module.css";
 import { IDaysSelector } from "./DaysSelector.types";
-
-const DAYS = [
-  { id: 1, label: "Mon" },
-  { id: 2, label: "Tue" },
-  { id: 3, label: "Wed" },
-  { id: 4, label: "Thu" },
-  { id: 5, label: "Fri" },
-  { id: 6, label: "Sat" },
-  { id: 7, label: "Sun" },
-];
 
 export const DaysSelector: FC<IDaysSelector> = ({ selectedDays, onChange }) => {
   const toggleDay = (id: number) => {
@@ -24,7 +15,7 @@ export const DaysSelector: FC<IDaysSelector> = ({ selectedDays, onChange }) => {
     <div className={styles.container}>
       <div className={styles.label}>Days of week</div>
       <div className={styles.list}>
-        {DAYS.map((day) => (
+        {DAYS_LIST.map((day) => (
           <Checkbox
             key={day.id}
             label={day.label}

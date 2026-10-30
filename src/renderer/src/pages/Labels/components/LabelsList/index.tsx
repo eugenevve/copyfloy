@@ -1,3 +1,6 @@
+import { usePagination } from "@app/hooks/usePagination";
+import { Button } from "@app/ui/Button";
+import { ButtonKind } from "@app/ui/Button/Button.types";
 import { LabelsIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
 import type { DragEndEvent } from "@dnd-kit/core";
@@ -22,16 +25,19 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const allItems = items.toReversed();
+  const { visibleItems: displayItems, hasMore, showMore } = usePagination(allItems);
+
   if (items.length === 0) {
     return <NoData title="No labels" icon={<LabelsIcon />} />;
   }
 
-  const displayItems = items.toReversed();
   const displayIds = displayItems.map(({ id }) => id);
+  const allIds = allItems.map(({ id }) => id);
   const handleDragEnd = ({ active, over }: DragEndEvent): void => {
     setActiveId(null);
     if (over && active.id !== over.id) {
-      onReorder(arrayMove(displayIds, displayIds.indexOf(Number(active.id)), displayIds.indexOf(Number(over.id))));
+      onReorder(arrayMove(allIds, allIds.indexOf(Number(active.id)), allIds.indexOf(Number(over.id))));
     }
   };
 
@@ -57,6 +63,11 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
           ))}
         </div>
       </SortableContext>
+      {hasMore && (
+        <Button kind={ButtonKind.SECONDARY} onClick={showMore} className={styles.showMoreButton}>
+          Show more...
+        </Button>
+      )}
     </DndContext>
   );
 };
