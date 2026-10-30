@@ -3,6 +3,7 @@ import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ArrowLineIcon, GearIcon, HomeIcon, InfoIcon, LabelsIcon, ReportIcon } from "@app/ui/Icons";
 import { Line } from "@app/ui/Line";
+import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import { classNames } from "@app/utils/classNames";
 import { AppPath } from "@app/utils/router";
 import { FC, useState } from "react";
@@ -57,7 +58,14 @@ export const Sidebar: FC = () => {
 
   return (
     <div className={classNames(styles.container, isSidebarOpen ? styles.open : "")}>
-      <Button kind={ButtonKind.SECONDARY} icon={!isSidebarOpen} className={styles.button} onClick={handleSidebar}>
+      <Button
+        kind={ButtonKind.SECONDARY}
+        icon={!isSidebarOpen}
+        className={styles.button}
+        onClick={handleSidebar}
+        tooltip={isSidebarOpen ? undefined : "Show"}
+        tooltipPlacement={TooltipPlacement.RIGHT}
+      >
         <ArrowLineIcon className={isSidebarOpen && styles.icon} />
         {isSidebarOpen && "Hide"}
       </Button>
@@ -72,6 +80,8 @@ export const Sidebar: FC = () => {
               position="left"
               className={styles.button}
               onClick={() => void navigate(path)}
+              tooltip={isSidebarOpen ? undefined : label}
+              tooltipPlacement={TooltipPlacement.RIGHT}
             >
               {icon}
               {isSidebarOpen && label}
