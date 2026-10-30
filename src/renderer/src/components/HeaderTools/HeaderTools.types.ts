@@ -6,6 +6,7 @@ export interface IHeaderTools {
   count: number;
   addText: string;
   onAdd: () => void;
+  addDisabled?: boolean;
   search: string;
   onSearchChange: (value: string) => void;
   filter?: IHeaderToolsFilter;

@@ -6,6 +6,7 @@ import { useTaskFilter } from "@app/hooks/useTaskFilter";
 import { useTasks } from "@app/hooks/useTasks";
 import { Loader } from "@app/ui/Loader";
 import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
+import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ITask } from "@shared/types/tasks";
 import { FC, useState } from "react";
 
@@ -116,6 +117,7 @@ export const Home: FC = () => {
             count={filteredTasks.length}
             addText="Add task"
             onAdd={handleAddTask}
+            addDisabled={tasks.length >= MAX_LIST_ITEMS}
             search={search}
             onSearchChange={setSearch}
             filter={{

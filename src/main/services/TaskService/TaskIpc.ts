@@ -2,6 +2,7 @@ import path from "node:path";
 
 import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
+import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ITask, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
@@ -39,6 +40,10 @@ export class TaskIpc {
     // Create a new task
     ipcMain.handle(IPC_CHANNELS.tasks.save, (_, newTask: Omit<ITask, "id">) => {
       const tasks = this.taskStorage.load();
+
+      if (tasks.length >= MAX_LIST_ITEMS) {
+        return tasks;
+      }
 
       const taskWithId: ITask = {
         id: Date.now(),
@@ -183,9 +188,9 @@ export class TaskIpc {
         id: createUniqueId(usedTaskIds),
         labelsIds: task.labelsIds?.map((labelId) => importedLabelIds.get(labelId) ?? labelId),
       }));
-      const tasksWithIds: ITask[] = [...currentTasks, ...importedTasks];
+      const tasksWithIds: ITask[] = [...currentTasks, ...importedTasks].slice(0, MAX_LIST_ITEMS);
 
-      this.labelStorage.save(currentLabels);
+      this.labelStorage.save(currentLabels.slice(0, MAX_LIST_ITEMS));
       this.taskStorage.save(tasksWithIds);
       this.scheduler.rescheduleAll(tasksWithIds);
 

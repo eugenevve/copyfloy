@@ -15,6 +15,7 @@ export const HeaderTools: FC<IHeaderTools> = ({
   count,
   addText,
   onAdd,
+  addDisabled,
   search,
   onSearchChange,
   filter,
@@ -31,7 +32,7 @@ export const HeaderTools: FC<IHeaderTools> = ({
       <div className={styles.content}>
         <div className={styles.section}>
           <InfoApp name={title} count={count} />
-          <Button onClick={onAdd}>{addText}</Button>
+          <Button onClick={onAdd} disabled={addDisabled}>{addText}</Button>
         </div>
         <div className={styles.section}>
           <Input
