@@ -150,8 +150,9 @@ export class TaskIpc {
 
     // Save imported tasks and merge imported labels
     ipcMain.handle(IPC_CHANNELS.tasks.saveBulk, (_, transfer: ITaskTransfer, mode: ImportMode) => {
-      const currentTasks = mode === ImportMode.ADD || transfer.tasks.length === 0 ? this.taskStorage.load() : [];
-      const currentLabels = this.labelStorage.load();
+      const keepCurrent = mode === ImportMode.ADD || transfer.tasks.length === 0;
+      const currentTasks = keepCurrent ? this.taskStorage.load() : [];
+      const currentLabels = keepCurrent ? this.labelStorage.load() : [];
       const importedLabelIds = new Map<number, number>();
       const usedLabelIds = new Set(currentLabels.map((label) => label.id));
 
