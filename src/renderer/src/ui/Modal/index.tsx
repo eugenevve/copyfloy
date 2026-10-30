@@ -16,7 +16,7 @@ export const Modal: FC<IModal> = ({ title, width, onClose, children, showCloseBu
         <div className={styles.header}>
           <div className={styles.title}>{title}</div>
           {showCloseButton && (
-            <Button kind={ButtonKind.SECONDARY} onClick={onClose} icon>
+            <Button kind={ButtonKind.SECONDARY} onClick={onClose} icon tooltip="Close">
               <XmarkIcon />
             </Button>
           )}
