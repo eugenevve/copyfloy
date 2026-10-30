@@ -1,6 +1,5 @@
 import { usePagination } from "@app/hooks/usePagination";
-import { Button } from "@app/ui/Button";
-import { ButtonKind } from "@app/ui/Button/Button.types";
+import { ShowMoreButton } from "@app/ui/ShowMoreButton";
 import { formatDuration, formatSize } from "@app/utils/reports";
 import { ReportStatus } from "@shared/types/report";
 import { FC } from "react";
@@ -39,16 +38,7 @@ export const ReportTable: FC<IReportTableProps> = ({ records }) => {
           ))}
         </tbody>
       </table>
-      {hasMore && (
-        <Button
-          kind={ButtonKind.SECONDARY}
-          onClick={showMore}
-          className={styles.showMoreButton}
-          tooltip="Show more reports"
-        >
-          Show more...
-        </Button>
-      )}
+      {hasMore && <ShowMoreButton onClick={showMore} />}
     </>
   );
 };

@@ -1,8 +1,7 @@
 import { usePagination } from "@app/hooks/usePagination";
-import { Button } from "@app/ui/Button";
-import { ButtonKind } from "@app/ui/Button/Button.types";
 import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
+import { ShowMoreButton } from "@app/ui/ShowMoreButton";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -102,16 +101,7 @@ export const TaskList: FC<ITaskList> = ({
               ))}
           </SortableContext>
         ))}
-        {hasMore && (
-          <Button
-            kind={ButtonKind.SECONDARY}
-            onClick={showMore}
-            className={styles.showMoreButton}
-            tooltip="Show more tasks"
-          >
-            Show more...
-          </Button>
-        )}
+        {hasMore && <ShowMoreButton onClick={showMore} />}
       </div>
     </DndContext>
   );
