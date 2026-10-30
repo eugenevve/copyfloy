@@ -75,42 +75,43 @@ export const TaskItem: FC<ITaskItem> = ({
 
   return (
     <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
-      <div className={styles.section}>
-        {reorder && <DragButton {...attributes} {...listeners} />}
-        <div className={styles.content}>
-          <div className={styles.info}>
-            <div className={styles.section}>
-              <TypeIcon className={styles.icon} />
-              <div>{task.name}</div>
-              <Button kind={ButtonKind.SECONDARY} icon className={styles.pinButton} onClick={onPin}>
-                <PinIcon className={task.isPinned ? "" : styles.iconPin} />
-              </Button>
-            </div>
-            <div className={styles.pathContainer}>
-              <ArrowTurnIcon className={styles.pathIcon} />
-              <div className={styles.pathDetails}>
-                <div className={styles.path}>{task.source}</div>
-                <div className={styles.path}>{task.target}</div>
-              </div>
-            </div>
-            {unavailableReason && <div className={styles.warning}>{unavailableReason}</div>}
+      {reorder && <DragButton {...attributes} {...listeners} />}
+      <div className={styles.content}>
+        <div className={styles.horizontalContainer}>
+          <div className={styles.section}>
+            <TypeIcon className={styles.icon} />
+            <div className={styles.taskName}>{task.name}</div>
+            <Button kind={ButtonKind.SECONDARY} icon className={styles.pinButton} onClick={onPin}>
+              <PinIcon className={task.isPinned ? "" : styles.iconPin} />
+            </Button>
           </div>
-          {labels.length > 0 && (
-            <div className={styles.labels}>
-              {labels.toReversed().map((label) => (
-                <LabelChip key={label.id} name={label.name} color={label.color} />
-              ))}
-            </div>
-          )}
+          <div className={styles.section}>
+            <div className={styles.progress}>{isRunning ? `${progress}%` : "\u00A0"}</div>
+            {items.map(({ Icon, ...props }) => (
+              <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon {...props}>
+                <Icon />
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className={styles.section}>
-        <div className={styles.progress}>{isRunning ? `${progress}%` : "\u00A0"}</div>
-        {items.map(({ Icon, ...props }) => (
-          <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon {...props}>
-            <Icon />
-          </Button>
-        ))}
+        <div className={styles.horizontalContainer}>
+          <div className={styles.section} style={{ paddingBottom: "var(--spacing-s)" }}>
+            <ArrowTurnIcon className={styles.pathIcon} />
+            <div className={styles.pathDetails}>
+              <div className={styles.path}>{task.source}</div>
+              <div className={styles.path}>{task.target}</div>
+            </div>
+          </div>
+          {/* TODO: Times */}
+        </div>
+        {unavailableReason && <div className={styles.warning}>{unavailableReason}</div>}
+        {labels.length > 0 && (
+          <div className={styles.labels}>
+            {labels.toReversed().map((label) => (
+              <LabelChip key={label.id} name={label.name} color={label.color} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
