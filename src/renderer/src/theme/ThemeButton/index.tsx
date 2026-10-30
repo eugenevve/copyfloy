@@ -2,6 +2,7 @@ import { useTheme } from "@app/theme/useTheme";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { MoonIcon, SunIcon, SystemIcon } from "@app/ui/Icons";
+import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import type { FC } from "react";
 
 import styles from "./ThemeButton.module.css";
@@ -38,7 +39,14 @@ export const ThemeButton: FC<IThemeButton> = ({ label }) => {
   };
 
   return (
-    <Button kind={ButtonKind.SECONDARY} onClick={handleToggle} icon={!label} className={styles.button}>
+    <Button
+      kind={ButtonKind.SECONDARY}
+      onClick={handleToggle}
+      icon={!label}
+      className={styles.button}
+      tooltip={label ? undefined : labels[theme]}
+      tooltipPlacement={TooltipPlacement.RIGHT}
+    >
       {label && labels[theme]}
       {icon[theme]}
     </Button>
