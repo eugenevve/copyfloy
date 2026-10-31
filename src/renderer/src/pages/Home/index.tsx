@@ -4,6 +4,7 @@ import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { useTaskFilter } from "@app/hooks/useTaskFilter";
 import { useTasks } from "@app/hooks/useTasks";
+import stylesGlobal from "@app/styles/page.module.css";
 import { Loader } from "@app/ui/Loader";
 import { TYPE_OPTIONS_FILTER } from "@app/utils/options";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
@@ -13,7 +14,6 @@ import { FC, useState } from "react";
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
 import { TaskList } from "./components/TaskList";
-import styles from "./Home.module.css";
 
 export const Home: FC = () => {
   const { showConfirm } = useModal();
@@ -129,7 +129,7 @@ export const Home: FC = () => {
   return (
     <>
       <PageWrapper header={header}>
-        <div className={styles.container}>
+        <div className={stylesGlobal.container}>
           {isLoading ? (
             <Loader label="Loading tasks..." />
           ) : (

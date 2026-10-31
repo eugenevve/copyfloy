@@ -1,4 +1,5 @@
 import { PageWrapper } from "@app/components/PageWrapper";
+import stylesGlobal from "@app/styles/page.module.css";
 import { Button } from "@app/ui/Button";
 import { FC } from "react";
 
@@ -12,7 +13,7 @@ export const About: FC = () => {
 
   return (
     <PageWrapper>
-      <div className={styles.container}>
+      <div className={stylesGlobal.container} style={{ lineHeight: "var(--line-height)" }}>
         <div className={styles.title}>About the Program</div>
         <div>
           Copyfloy helps automatically copy files and folders without constant manual oversight. The application is

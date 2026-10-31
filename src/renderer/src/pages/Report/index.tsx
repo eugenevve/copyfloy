@@ -1,5 +1,6 @@
 import { PageWrapper } from "@app/components/PageWrapper";
 import { useModal } from "@app/hooks/useModal";
+import stylesGlobal from "@app/styles/page.module.css";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ReportIcon, TrashIcon } from "@app/ui/Icons";
@@ -70,7 +71,7 @@ export const Report: FC = () => {
 
   return (
     <PageWrapper header={header}>
-      <div className={styles.container}>
+      <div className={stylesGlobal.container}>
         {report.records?.length === 0 ? (
           <NoData title="No stats" icon={<ReportIcon />} />
         ) : (
