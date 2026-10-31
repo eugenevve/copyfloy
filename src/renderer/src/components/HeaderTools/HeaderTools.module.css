@@ -32,7 +32,7 @@
 
 .labels {
   display: flex;
-  gap: var(--spacing-s);
+  gap: var(--spacing-xs);
   width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
