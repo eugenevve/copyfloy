@@ -2,6 +2,7 @@ import { FC, useEffect } from "react";
 import { HashRouter, Route, Routes } from "react-router";
 
 import { GlobalWrapper } from "./components/GlobalWrapper";
+import { MissedTasksPrompt } from "./components/MissedTasksPrompt";
 import { ModalProvider } from "./components/ModalProvider";
 import { useZoomShortcuts } from "./hooks/useZoomShortcuts";
 import { About } from "./pages/About";
@@ -31,6 +32,7 @@ export const App: FC = () => {
             <Route path={AppPath.ABOUT} element={<About />} />
           </Routes>
         </HashRouter>
+        <MissedTasksPrompt />
       </ModalProvider>
     </GlobalWrapper>
   );
