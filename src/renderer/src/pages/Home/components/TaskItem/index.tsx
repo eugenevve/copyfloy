@@ -14,6 +14,7 @@ import {
   TrashIcon,
 } from "@app/ui/Icons";
 import { LabelChip } from "@app/ui/LabelChip";
+import { Tooltip } from "@app/ui/Tooltip";
 import { classNames } from "@app/utils/classNames";
 import { getScheduleText } from "@app/utils/shedule";
 import { useSortable } from "@dnd-kit/sortable";
@@ -60,7 +61,9 @@ export const TaskItem: FC<ITaskItem> = ({
       ? ["To access the Repository functionality, install Git and ensure it is available in your PATH."]
       : []),
     ...(task.type === TaskType.REPOSITORY && task.isPrivate && !task.accessToken
-      ? ["Access token is missing or could not be decrypted. Edit this task and re-enter the token for the private repository."]
+      ? [
+          "Access token is missing or could not be decrypted. Edit this task and re-enter the token for the private repository.",
+        ]
       : []),
   ];
   const unavailableReason = unavailableReasons.join(" ");
@@ -68,11 +71,17 @@ export const TaskItem: FC<ITaskItem> = ({
 
   const items = [
     isRunning
-      ? { Icon: StopIcon, onClick: onStop }
-      : { Icon: PlayIcon, onClick: onRun, disabled: Boolean(unavailableReason), title: unavailableReason },
-    { Icon: ClockIcon, onClick: onSchedule },
-    { Icon: PenIcon, onClick: onEdit },
-    { Icon: TrashIcon, onClick: onDelete },
+      ? { Icon: StopIcon, onClick: onStop, tooltip: "Stop" }
+      : {
+          Icon: PlayIcon,
+          onClick: onRun,
+          disabled: Boolean(unavailableReason),
+          title: unavailableReason,
+          tooltip: "Run",
+        },
+    { Icon: ClockIcon, onClick: onSchedule, tooltip: "Schedule" },
+    { Icon: PenIcon, onClick: onEdit, tooltip: "Edit" },
+    { Icon: TrashIcon, onClick: onDelete, tooltip: "Delete" },
   ];
 
   return (
@@ -81,16 +90,26 @@ export const TaskItem: FC<ITaskItem> = ({
       <div className={styles.content}>
         <div className={styles.horizontalContainer}>
           <div className={styles.section}>
-            <TypeIcon className={styles.icon} />
-            <div className={styles.taskName}>{task.name}</div>
-            <Button kind={ButtonKind.SECONDARY} icon className={styles.pinButton} onClick={onPin}>
+            <Tooltip content={task.type}>
+              <TypeIcon className={styles.icon} />
+            </Tooltip>
+            <Tooltip content={task.name}>
+              <div className={styles.taskName}>{task.name}</div>
+            </Tooltip>
+            <Button
+              kind={ButtonKind.SECONDARY}
+              icon
+              className={styles.pinButton}
+              onClick={onPin}
+              tooltip={task.isPinned ? "Unpin" : "Pin"}
+            >
               <PinIcon className={task.isPinned ? "" : styles.iconPin} />
             </Button>
           </div>
           <div className={styles.section}>
             <div className={styles.progress}>{isRunning ? `${progress}%` : "\u00A0"}</div>
-            {items.map(({ Icon, ...props }) => (
-              <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon {...props}>
+            {items.map(({ Icon, tooltip, ...props }) => (
+              <Button key={props.onClick.toString()} kind={ButtonKind.PRIMARY} icon tooltip={tooltip} {...props}>
                 <Icon />
               </Button>
             ))}
@@ -100,8 +119,12 @@ export const TaskItem: FC<ITaskItem> = ({
           <div className={styles.section} style={{ paddingBottom: "var(--spacing-s)" }}>
             <ArrowTurnIcon className={styles.pathIcon} />
             <div className={styles.pathDetails}>
-              <div className={styles.path}>{task.source}</div>
-              <div className={styles.path}>{task.target}</div>
+              <Tooltip content={task.source}>
+                <div className={styles.path}>{task.source}</div>
+              </Tooltip>
+              <Tooltip content={task.target}>
+                <div className={styles.path}>{task.target}</div>
+              </Tooltip>
             </div>
           </div>
           {scheduleText && <div className={styles.schedule}>{scheduleText}</div>}

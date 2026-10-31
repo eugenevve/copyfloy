@@ -21,6 +21,7 @@ export const DaysSelector: FC<IDaysSelector> = ({ selectedDays, onChange }) => {
             label={day.label}
             checked={selectedDays.includes(day.id)}
             onChange={() => toggleDay(day.id)}
+            tooltip={day.fullLabel}
           />
         ))}
       </div>

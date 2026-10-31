@@ -23,8 +23,8 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
   };
 
   const items = [
-    { Icon: PenIcon, onClick: onEdit },
-    { Icon: TrashIcon, onClick: onDelete },
+    { Icon: PenIcon, onClick: onEdit, tooltip: "Edit" },
+    { Icon: TrashIcon, onClick: onDelete, tooltip: "Delete" },
   ];
 
   return (
@@ -34,8 +34,8 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
         <LabelChip name={label.name} color={label.color} />
       </div>
       <div className={styles.section}>
-        {items.map(({ Icon, ...props }) => (
-          <Button key={String(props.onClick)} kind={ButtonKind.PRIMARY} icon {...props}>
+        {items.map(({ Icon, tooltip, ...props }) => (
+          <Button key={String(props.onClick)} kind={ButtonKind.PRIMARY} icon tooltip={tooltip} {...props}>
             <Icon />
           </Button>
         ))}

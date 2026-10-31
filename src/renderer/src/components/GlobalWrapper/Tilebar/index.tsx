@@ -1,6 +1,7 @@
 import { CloneIcon, LineIcon, SquareIcon, XmarkIcon } from "@app/ui/Icons";
 import { TilebarButton } from "@app/ui/TilebarButton";
 import { TilebarButtonKind } from "@app/ui/TilebarButton/TilebarButton.types";
+import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import { FC, useEffect, useState } from "react";
 
 import styles from "./Tilebar.module.css";
@@ -27,11 +28,22 @@ export const Tilebar: FC = () => {
         Copyfloy {isPackaged ? "" : "(dev)"} {isAdmin && "(administrator)"}
       </div>
       <div className={styles.controls}>
-        <TilebarButton onClick={handleMinimize}>
+        <TilebarButton onClick={handleMinimize} tooltip="Minimize" tooltipPlacement={TooltipPlacement.LEFT}>
           <LineIcon />
         </TilebarButton>
-        <TilebarButton onClick={handleMaximize}>{isMaximized ? <CloneIcon /> : <SquareIcon />}</TilebarButton>
-        <TilebarButton kind={TilebarButtonKind.SECONDARY} onClick={handleClose}>
+        <TilebarButton
+          onClick={handleMaximize}
+          tooltip={isMaximized ? "Restore" : "Maximize"}
+          tooltipPlacement={TooltipPlacement.LEFT}
+        >
+          {isMaximized ? <CloneIcon /> : <SquareIcon />}
+        </TilebarButton>
+        <TilebarButton
+          kind={TilebarButtonKind.SECONDARY}
+          onClick={handleClose}
+          tooltip="Close"
+          tooltipPlacement={TooltipPlacement.LEFT}
+        >
           <XmarkIcon />
         </TilebarButton>
       </div>

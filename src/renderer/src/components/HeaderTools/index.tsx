@@ -5,6 +5,7 @@ import { ChevronIcon } from "@app/ui/Icons";
 import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
 import { Select } from "@app/ui/Select";
+import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import { FC, useRef } from "react";
 
 import styles from "./HeaderTools.module.css";
@@ -53,7 +54,13 @@ export const HeaderTools: FC<IHeaderTools> = ({
       </div>
       {labelsFilter && labelsFilter.labels.length > 0 && (
         <div className={styles.labelsContainer}>
-          <Button kind={ButtonKind.SECONDARY} icon onClick={() => scrollLabels(-1)}>
+          <Button
+            kind={ButtonKind.SECONDARY}
+            icon
+            onClick={() => scrollLabels(-1)}
+            tooltip="Scroll left"
+            tooltipPlacement={TooltipPlacement.RIGHT}
+          >
             <ChevronIcon className={styles.arrowLeft} />
           </Button>
           <div ref={labelsRef} className={styles.labels}>
@@ -67,7 +74,13 @@ export const HeaderTools: FC<IHeaderTools> = ({
               />
             ))}
           </div>
-          <Button icon kind={ButtonKind.SECONDARY} onClick={() => scrollLabels(1)}>
+          <Button
+            icon
+            kind={ButtonKind.SECONDARY}
+            onClick={() => scrollLabels(1)}
+            tooltip="Scroll right"
+            tooltipPlacement={TooltipPlacement.LEFT}
+          >
             <ChevronIcon className={styles.arrowRight} />
           </Button>
         </div>

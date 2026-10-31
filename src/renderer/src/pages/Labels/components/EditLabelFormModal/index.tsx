@@ -15,7 +15,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
 
   const initialValues = {
     name: initialData?.name || "",
-    color: initialData?.color || LABEL_COLORS[0],
+    color: initialData?.color || LABEL_COLORS[0].code,
   };
 
   const [name, setName] = useState(initialValues.name);
@@ -68,10 +68,11 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
         <div className={styles.section}>
           {LABEL_COLORS.map((labelColor) => (
             <ColorCircle
-              key={labelColor}
-              color={labelColor}
-              selected={color === labelColor}
-              onClick={() => setColor(labelColor)}
+              key={labelColor.code}
+              color={labelColor.code}
+              label={labelColor.label}
+              selected={color === labelColor.code}
+              onClick={() => setColor(labelColor.code)}
             />
           ))}
         </div>
