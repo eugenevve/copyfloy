@@ -168,7 +168,13 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
     <>
       <Modal title={isEditMode ? "Edit task" : "New task"} onClose={handleClose}>
         <div className={styles.container}>
-          <Input label="Task name" value={name} onChange={handleNameChange} placeholder="Example: Photo backup" />
+          <Input
+            label="Task name"
+            value={name}
+            onChange={handleNameChange}
+            placeholder="Example: Photo backup"
+            maxLength={100}
+          />
           <div className={styles.section}>
             <div>Labels</div>
             {labels.length > 0 ? (
