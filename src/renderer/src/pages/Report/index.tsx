@@ -9,6 +9,7 @@ import { IReport } from "@shared/types/report";
 import { FC, useEffect, useState } from "react";
 
 import { ReportBlockItem } from "./components/ReportBlockItem";
+import { ReportChart } from "./components/ReportChart";
 import { ReportTable } from "./components/ReportTable";
 import styles from "./Report.module.css";
 
@@ -73,7 +74,10 @@ export const Report: FC = () => {
         {report.records?.length === 0 ? (
           <NoData title="No stats" icon={<ReportIcon />} />
         ) : (
-          <ReportTable records={report.records} />
+          <>
+            <ReportChart records={report.records} />
+            <ReportTable records={report.records} />
+          </>
         )}
       </div>
     </PageWrapper>
