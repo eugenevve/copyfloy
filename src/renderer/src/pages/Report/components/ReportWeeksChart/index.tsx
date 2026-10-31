@@ -3,12 +3,12 @@ import { formatDate } from "@app/utils/dateTime";
 import { getDateTimeFormat, subscribeDateTimeFormat } from "@app/utils/dateTimeFormatState";
 import { RECHART_STYLE } from "@app/utils/rechartsStyle";
 import { FC, useSyncExternalStore } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { IReportChart } from "./ReportChart.types";
-import { getReportChartData } from "./reportChartData";
+import { getReportChartData } from "./reportChartWeeksData";
+import { IReportChartSwitcher } from "../ReportChartSwitcher/ReportChartSwitcher.types";
 
-export const ReportChart: FC<IReportChart> = ({ records }) => {
+export const ReportWeeksChart: FC<IReportChartSwitcher> = ({ records }) => {
   const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
   const data = getReportChartData(records, dateTimeFormat.dateFormat);
 
@@ -16,14 +16,6 @@ export const ReportChart: FC<IReportChart> = ({ records }) => {
     <WidgetContainer title="Report Chart">
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data} margin={{ top: 15, right: 18, bottom: 0, left: 0 }}>
-          <Legend
-            position="insideTopRight"
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ fontSize: RECHART_STYLE.main.fontSize }}
-            itemSorter={(item) => (item.dataKey === "success" ? 0 : 1)}
-            formatter={(value) => (value === "success" ? "Successful" : "Failed")}
-          />
           <Tooltip
             itemSorter={(item) => (item.dataKey === "success" ? 0 : 1)}
             formatter={(value, name) => [value, name === "success" ? "Successful" : "Failed"]}
