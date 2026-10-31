@@ -60,6 +60,8 @@ export const api = {
     run: (task: ITask): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.run, task),
     stop: (id: number): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.stop, id),
     getRunning: (): Promise<Record<number, number>> => invoke<Record<number, number>>(IPC_CHANNELS.tasks.getRunning),
+    getMissed: (): Promise<ITask[]> => invoke<ITask[]>(IPC_CHANNELS.tasks.getMissed),
+    dismissMissed: (id: number): Promise<void> => invoke<void>(IPC_CHANNELS.tasks.dismissMissed, id),
     onProgress: (callback: (progress: ITaskProgress) => void): (() => void) =>
       receive<ITaskProgress>(IPC_CHANNELS.tasks.progress, callback),
     isGitAvailable: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.tasks.gitAvailable),
