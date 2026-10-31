@@ -5,10 +5,10 @@ import { RECHART_STYLE } from "@app/utils/rechartsStyle";
 import { FC, useSyncExternalStore } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { IReportChart } from "./ReportChart.types";
-import { getReportChartData } from "./reportChartData";
+import { getReportChartData } from "./reportChartWeeksData";
+import { IReportWeeksChart } from "./ReportWeeksChart.types";
 
-export const ReportChart: FC<IReportChart> = ({ records }) => {
+export const ReportWeeksChart: FC<IReportWeeksChart> = ({ records }) => {
   const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
   const data = getReportChartData(records, dateTimeFormat.dateFormat);
 

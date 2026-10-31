@@ -1,5 +1,5 @@
 import { IReportRecord } from "@shared/types/report";
 
-export interface IReportChart {
+export interface IReportWeeksChart {
   records: IReportRecord[];
 }
