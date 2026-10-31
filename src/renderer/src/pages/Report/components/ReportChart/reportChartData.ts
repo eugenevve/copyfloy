@@ -1,4 +1,6 @@
+import { formatDate } from "@app/utils/dateTime";
 import { IReportRecord, ReportStatus } from "@shared/types/report";
+import { DateFormat } from "@shared/types/settings";
 
 export interface IReportChartData {
   date: Date;
@@ -9,7 +11,7 @@ export interface IReportChartData {
 
 const DAY_COUNT = 14;
 
-export const getReportChartData = (records: IReportRecord[]): IReportChartData[] => {
+export const getReportChartData = (records: IReportRecord[], dateFormat: DateFormat): IReportChartData[] => {
   const countsByDay = new Map<number, { success: number; error: number }>();
 
   records.forEach((record) => {
@@ -41,7 +43,7 @@ export const getReportChartData = (records: IReportRecord[]): IReportChartData[]
 
     return {
       date,
-      label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      label: formatDate(date, dateFormat, false),
       success: counts?.success ?? 0,
       error: counts?.error ?? 0,
     };

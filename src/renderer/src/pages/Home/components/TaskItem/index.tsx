@@ -16,10 +16,12 @@ import {
 import { LabelChip } from "@app/ui/LabelChip";
 import { Tooltip } from "@app/ui/Tooltip";
 import { classNames } from "@app/utils/classNames";
+import { getDateTimeFormat, subscribeDateTimeFormat } from "@app/utils/dateTimeFormatState";
 import { getScheduleText } from "@app/utils/shedule";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ITaskItem, TaskType } from "@shared/types/tasks";
+import { useSyncExternalStore } from "react";
 import type { CSSProperties, FC } from "react";
 
 import styles from "./TaskItem.module.css";
@@ -44,6 +46,7 @@ export const TaskItem: FC<ITaskItem> = ({
   onDelete,
   onPin,
 }) => {
+  const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     disabled: !reorder,
@@ -67,7 +70,7 @@ export const TaskItem: FC<ITaskItem> = ({
       : []),
   ];
   const unavailableReason = unavailableReasons.join(" ");
-  const scheduleText = getScheduleText(task.schedule);
+  const scheduleText = getScheduleText(task.schedule, dateTimeFormat.timeFormat);
 
   const items = [
     isRunning

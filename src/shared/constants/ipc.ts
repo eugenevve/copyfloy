@@ -21,6 +21,8 @@ export const IPC_CHANNELS = {
     setZoom: "settings:set-zoom",
     getTray: "settings:get-tray",
     setTray: "settings:set-tray",
+    getDateTimeFormat: "settings:get-date-time-format",
+    setDateTimeFormat: "settings:set-date-time-format",
   },
   tasks: {
     get: "tasks:get",

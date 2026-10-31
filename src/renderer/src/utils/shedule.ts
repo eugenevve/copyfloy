@@ -1,12 +1,15 @@
 import { DAYS_LIST } from "@app/utils/daysList";
 import { ISchedule, ScheduleType } from "@shared/types/schedule";
+import { TimeFormat } from "@shared/types/settings";
+
+import { formatTime } from "./dateTime";
 
 const pad = (value = 0) => String(value).padStart(2, "0");
 
-export const getScheduleText = (schedule?: ISchedule) => {
+export const getScheduleText = (schedule?: ISchedule, timeFormat = TimeFormat.TWENTY_FOUR_HOUR) => {
   if (!schedule) return "";
 
-  const time = `${pad(schedule.hours)}:${pad(schedule.minutes)}`;
+  const time = formatTime(new Date(2000, 0, 1, schedule.hours, schedule.minutes), timeFormat);
 
   switch (schedule.type) {
     case ScheduleType.DAILY:

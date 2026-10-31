@@ -3,6 +3,7 @@ import stylesGlobal from "@app/styles/page.module.css"
 import { FC } from "react";
 
 import { AutoStart } from "./components/AutoStart";
+import { DateTimeFormatWidget } from "./components/DateTimeFormat";
 import { MinimizeTray } from "./components/MinimizeTray";
 import { RunAdmin } from "./components/RunAdmin";
 import { TaskTransfer } from "./components/TaskTransfer";
@@ -17,6 +18,7 @@ export const Settings: FC = () => {
         <RunAdmin />
         <ZoomController />
         <MinimizeTray />
+        <DateTimeFormatWidget />
         <TaskTransfer />
         <UpdateChecker />
       </div>

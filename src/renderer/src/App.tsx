@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { HashRouter, Route, Routes } from "react-router";
 
 import { GlobalWrapper } from "./components/GlobalWrapper";
@@ -9,10 +9,15 @@ import { Home } from "./pages/Home";
 import { Labels } from "./pages/Labels";
 import { Report } from "./pages/Report";
 import { Settings } from "./pages/Settings";
+import { initDateTimeFormat } from "./utils/dateTimeFormatState";
 import { AppPath } from "./utils/router";
 
 export const App: FC = () => {
   useZoomShortcuts();
+
+  useEffect(() => {
+    void initDateTimeFormat();
+  }, []);
 
   return (
     <GlobalWrapper>
