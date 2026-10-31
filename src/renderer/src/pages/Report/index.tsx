@@ -6,6 +6,7 @@ import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ReportIcon, TrashIcon } from "@app/ui/Icons";
 import { Loader } from "@app/ui/Loader";
 import { NoData } from "@app/ui/NoData";
+import { classNames } from "@app/utils/classNames";
 import { IReport } from "@shared/types/report";
 import { FC, useEffect, useState } from "react";
 
@@ -71,7 +72,7 @@ export const Report: FC = () => {
 
   return (
     <PageWrapper header={header}>
-      <div className={stylesGlobal.container}>
+      <div className={classNames(stylesGlobal.container, styles.container)}>
         {report.records?.length === 0 ? (
           <NoData title="No stats" icon={<ReportIcon />} />
         ) : (
