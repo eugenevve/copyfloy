@@ -36,6 +36,8 @@ export const ReportChart: FC<IReportChart> = ({ records }) => {
           <CartesianGrid stroke={RECHART_STYLE.main.colorStroke} strokeDasharray="10 10" />
           <YAxis
             width={40}
+            domain={[0, "dataMax"]}
+            allowDecimals={false}
             tick={{ fill: RECHART_STYLE.main.colorStroke, fontSize: RECHART_STYLE.main.fontSize }}
             tickLine={false}
           />
