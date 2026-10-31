@@ -1,7 +1,9 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
+  gap: 0;
+}
+
+.container > :nth-child(n + 3) {
+  margin-top: var(--spacing-s);
 }
 
 .header {

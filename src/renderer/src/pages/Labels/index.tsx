@@ -3,6 +3,7 @@ import { PageWrapper } from "@app/components/PageWrapper";
 import { useLabelFilter } from "@app/hooks/useLabelFilter";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
+import stylesGlobal from "@app/styles/page.module.css";
 import { Loader } from "@app/ui/Loader";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
@@ -10,7 +11,6 @@ import { FC, useState } from "react";
 
 import { EditLabelFormModal } from "./components/EditLabelFormModal";
 import { LabelsList } from "./components/LabelsList";
-import styles from "./Labels.module.css";
 
 export const Labels: FC = () => {
   const { showConfirm } = useModal();
@@ -84,7 +84,7 @@ export const Labels: FC = () => {
   return (
     <>
       <PageWrapper header={header}>
-        <div className={styles.container}>
+        <div className={stylesGlobal.container}>
           {isLoading ? (
             <Loader label="Loading labels..." />
           ) : (

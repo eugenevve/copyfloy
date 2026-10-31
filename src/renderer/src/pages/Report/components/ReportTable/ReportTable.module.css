@@ -1,31 +1,61 @@
 .table {
   width: 100%;
-  border-collapse: separate;
   border-spacing: 0;
-  border-radius: var(--spacing-l);
-  overflow: hidden;
   font-size: 14px;
 }
 
 .table th,
 .table td {
   padding: var(--spacing-s);
+  padding-top: var(--spacing-l);
   text-align: left;
 }
 
+/* Sticky header for table */
 .table th {
-  background: var(--content-gray-dark);
+  position: sticky;
+  top: 0;
+  background: var(--background-primary);
   font-weight: var(--heading);
 }
 
+.table th::before {
+  content: "";
+  position: absolute;
+  margin-top: var(--spacing-s);
+  inset: 0;
+  z-index: -1;
+  background: var(--content-gray-light);
+}
+
+/* Error styling for the second column */
+.error td:nth-child(2) {
+  color: var(--red);
+}
+
+/* Border radius for the first row */
+.table th:first-child::before {
+  border-radius: var(--spacing-l) 0 0 0;
+}
+
+.table th:last-child::before {
+  border-radius: 0 var(--spacing-l) 0 0;
+}
+
+/* Border radius for the last row */
+.table tr:last-child td:last-child {
+  border-radius: 0 0 var(--spacing-l) 0;
+}
+
+.table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--spacing-l);
+}
+
+/* Zebra striping for table rows */
 .table tbody tr:nth-child(odd) {
   background: var(--background-secondary);
 }
 
 .table tbody tr:nth-child(even) {
   background: var(--content-gray-dark);
-}
-
-.error td:nth-child(2) {
-  color: var(--red);
 }
