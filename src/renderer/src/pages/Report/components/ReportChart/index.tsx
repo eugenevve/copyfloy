@@ -1,13 +1,16 @@
 import { WidgetContainer } from "@app/pages/Settings/components/WidgetContainer";
+import { formatDate } from "@app/utils/dateTime";
+import { getDateTimeFormat, subscribeDateTimeFormat } from "@app/utils/dateTimeFormatState";
 import { RECHART_STYLE } from "@app/utils/rechartsStyle";
-import { FC } from "react";
+import { FC, useSyncExternalStore } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { IReportChart } from "./ReportChart.types";
 import { getReportChartData } from "./reportChartData";
 
 export const ReportChart: FC<IReportChart> = ({ records }) => {
-  const data = getReportChartData(records);
+  const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
+  const data = getReportChartData(records, dateTimeFormat.dateFormat);
 
   return (
     <WidgetContainer title="Report Chart">
@@ -24,7 +27,10 @@ export const ReportChart: FC<IReportChart> = ({ records }) => {
           <Tooltip
             itemSorter={(item) => (item.dataKey === "success" ? 0 : 1)}
             formatter={(value, name) => [value, name === "success" ? "Successful" : "Failed"]}
-            labelFormatter={(label) => data.find((day) => day.label === label)?.date.toLocaleDateString() ?? label}
+            labelFormatter={(label) => {
+              const date = data.find((day) => day.label === label)?.date;
+              return date ? formatDate(date, dateTimeFormat.dateFormat) : label;
+            }}
             itemStyle={{ display: "block", paddingTop: "var(--spacing-xs)", paddingBottom: 0 }}
             contentStyle={{
               border: "none",
