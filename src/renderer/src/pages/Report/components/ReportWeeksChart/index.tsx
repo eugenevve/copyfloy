@@ -6,9 +6,9 @@ import { FC, useSyncExternalStore } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { getReportChartData } from "./reportChartWeeksData";
-import { IReportWeeksChart } from "./ReportWeeksChart.types";
+import { IReportChartSwitcher } from "../ReportChartSwitcher/ReportChartSwitcher.types";
 
-export const ReportWeeksChart: FC<IReportWeeksChart> = ({ records }) => {
+export const ReportWeeksChart: FC<IReportChartSwitcher> = ({ records }) => {
   const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
   const data = getReportChartData(records, dateTimeFormat.dateFormat);
 

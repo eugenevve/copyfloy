@@ -7,10 +7,10 @@ import { TimeFormat } from "@shared/types/settings";
 import { FC, useMemo, useState, useSyncExternalStore } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { IReportDayChart } from "./ReportDayChart.types";
 import { getAvailableDays, getReportDayChartData } from "./reportDayChartData";
+import { IReportChartSwitcher } from "../ReportChartSwitcher/ReportChartSwitcher.types";
 
-export const ReportDayChart: FC<IReportDayChart> = ({ records }) => {
+export const ReportDayChart: FC<IReportChartSwitcher> = ({ records }) => {
   const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
   const days = useMemo(() => getAvailableDays(records), [records]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -35,7 +35,7 @@ export const ReportDayChart: FC<IReportDayChart> = ({ records }) => {
         options={options}
         placeholder="No days"
       />
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={214}>
         <LineChart data={data} margin={{ top: 15, right: 18, bottom: 0, left: 0 }}>
           <Tooltip
             itemSorter={(item) => (item.dataKey === "success" ? 0 : 1)}

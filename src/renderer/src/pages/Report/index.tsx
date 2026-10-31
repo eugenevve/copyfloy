@@ -11,7 +11,7 @@ import { IReport } from "@shared/types/report";
 import { FC, useEffect, useState } from "react";
 
 import { ReportBlockItem } from "./components/ReportBlockItem";
-import { ReportChart } from "./components/ReportChart";
+import { ReportChartSwitcher } from "./components/ReportChartSwitcher";
 import { ReportTable } from "./components/ReportTable";
 import styles from "./Report.module.css";
 
@@ -77,7 +77,7 @@ export const Report: FC = () => {
           <NoData title="No stats" icon={<ReportIcon />} />
         ) : (
           <>
-            <ReportChart records={report.records} />
+            <ReportChartSwitcher records={report.records} />
             <ReportTable records={report.records} />
           </>
         )}
