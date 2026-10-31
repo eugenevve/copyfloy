@@ -2,6 +2,7 @@ import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ILabel } from "@shared/types/labels";
 import { IReport } from "@shared/types/report";
+import { IDateTimeFormat } from "@shared/types/settings";
 import { ITask, ITaskProgress, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer, ImportMode } from "@shared/types/transfer";
 import { ipcRenderer } from "electron";
@@ -44,6 +45,10 @@ export const api = {
     minimizeTray: {
       get: (): Promise<boolean> => invoke<boolean>(IPC_CHANNELS.settings.getTray),
       set: (minimizeTray: boolean): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setTray, minimizeTray),
+    },
+    dateTimeFormat: {
+      get: (): Promise<IDateTimeFormat> => invoke<IDateTimeFormat>(IPC_CHANNELS.settings.getDateTimeFormat),
+      set: (format: IDateTimeFormat): Promise<void> => invoke<void>(IPC_CHANNELS.settings.setDateTimeFormat, format),
     },
   },
   tasks: {

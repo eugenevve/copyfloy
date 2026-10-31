@@ -1,3 +1,4 @@
+import { DateFormat, IDateTimeFormat, TimeFormat } from "@shared/types/settings";
 import { IAppSettings, IWindowState } from "@shared/types/window";
 
 import { AutoStartService } from "./AutoStartService";
@@ -17,6 +18,10 @@ export class SettingsService {
     runAdmin: false,
     zoomFactor: 1,
     minimizeTray: true,
+    dateTimeFormat: {
+      dateFormat: DateFormat.DMY,
+      timeFormat: TimeFormat.TWENTY_FOUR_HOUR,
+    },
   };
 
   // Loading settings data from a file
@@ -85,6 +90,15 @@ export class SettingsService {
 
   async setMinimizeTray(minimizeTray: boolean): Promise<void> {
     await this.updateSettings({ minimizeTray });
+  }
+
+  // Date and Time Format
+  getDateTimeFormat(): IDateTimeFormat {
+    return this.settings.dateTimeFormat;
+  }
+
+  async setDateTimeFormat(dateTimeFormat: IDateTimeFormat): Promise<void> {
+    await this.updateSettings({ dateTimeFormat });
   }
 
   // Saves the current window state

@@ -1,5 +1,6 @@
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { clampZoom } from "@shared/constants/zoom";
+import { IDateTimeFormat } from "@shared/types/settings";
 import { ipcMain } from "electron";
 
 import { SettingsService } from "./SettingsService";
@@ -60,6 +61,16 @@ export class SettingsIpc {
     // Sets the app minimize tray
     ipcMain.handle(IPC_CHANNELS.settings.setTray, async (_, minimizeTray: boolean) => {
       await this.settingsService.setMinimizeTray(minimizeTray);
+    });
+
+    // Returns the current date and time format
+    ipcMain.handle(IPC_CHANNELS.settings.getDateTimeFormat, () => {
+      return this.settingsService.getDateTimeFormat();
+    });
+
+    // Sets the date and time format
+    ipcMain.handle(IPC_CHANNELS.settings.setDateTimeFormat, async (_, dateTimeFormat: IDateTimeFormat) => {
+      await this.settingsService.setDateTimeFormat(dateTimeFormat);
     });
   }
 }

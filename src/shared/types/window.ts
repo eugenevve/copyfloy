@@ -1,3 +1,5 @@
+import { IDateTimeFormat } from "./settings";
+
 export interface IAppSettings {
   windowState?: IWindowState;
   autoStart: boolean;
@@ -5,6 +7,7 @@ export interface IAppSettings {
   sidebarOpen: boolean;
   zoomFactor: number;
   minimizeTray: boolean;
+  dateTimeFormat: IDateTimeFormat;
 }
 
 export interface IWindowState {
