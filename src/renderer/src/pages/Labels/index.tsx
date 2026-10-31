@@ -69,19 +69,22 @@ export const Labels: FC = () => {
     );
   };
 
+  const header = (
+    <HeaderTools
+      title="Labels"
+      count={filteredLabels.length}
+      addText="Add label"
+      onAdd={handleAddLabel}
+      addDisabled={labels.length >= MAX_LIST_ITEMS}
+      search={search}
+      onSearchChange={setSearch}
+    />
+  );
+
   return (
     <>
-      <PageWrapper>
+      <PageWrapper header={header}>
         <div className={styles.container}>
-          <HeaderTools
-            title="Labels"
-            count={filteredLabels.length}
-            addText="Add label"
-            onAdd={handleAddLabel}
-            addDisabled={labels.length >= MAX_LIST_ITEMS}
-            search={search}
-            onSearchChange={setSearch}
-          />
           {isLoading ? (
             <Loader label="Loading labels..." />
           ) : (

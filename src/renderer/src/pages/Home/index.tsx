@@ -108,25 +108,28 @@ export const Home: FC = () => {
     );
   };
 
+  const header = (
+    <HeaderTools
+      title="Tasks"
+      count={filteredTasks.length}
+      addText="Add task"
+      onAdd={handleAddTask}
+      addDisabled={tasks.length >= MAX_LIST_ITEMS}
+      search={search}
+      onSearchChange={setSearch}
+      filter={{
+        options: TYPE_OPTIONS_FILTER,
+        value: typeFilter,
+        onChange: (value) => setTypeFilter(value as typeof typeFilter),
+      }}
+      labelsFilter={{ labels, selectedIds: selectedLabelIds, onToggle: toggleLabel }}
+    />
+  );
+
   return (
     <>
-      <PageWrapper>
+      <PageWrapper header={header}>
         <div className={styles.container}>
-          <HeaderTools
-            title="Tasks"
-            count={filteredTasks.length}
-            addText="Add task"
-            onAdd={handleAddTask}
-            addDisabled={tasks.length >= MAX_LIST_ITEMS}
-            search={search}
-            onSearchChange={setSearch}
-            filter={{
-              options: TYPE_OPTIONS_FILTER,
-              value: typeFilter,
-              onChange: (value) => setTypeFilter(value as typeof typeFilter),
-            }}
-            labelsFilter={{ labels, selectedIds: selectedLabelIds, onToggle: toggleLabel }}
-          />
           {isLoading ? (
             <Loader label="Loading tasks..." />
           ) : (

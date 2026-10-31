@@ -53,18 +53,23 @@ export const Report: FC = () => {
     });
   };
 
+  const header = (
+    <div className={styles.header}>
+      <div className={styles.stats}>
+        {stats.map(({ label, value }) => (
+          <ReportBlockItem key={label} label={label} value={value} />
+        ))}
+      </div>
+      <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
+        <TrashIcon />
+        Clear history
+      </Button>
+    </div>
+  );
+
   return (
-    <PageWrapper>
+    <PageWrapper header={header}>
       <div className={styles.container}>
-        <div className={styles.stats}>
-          {stats.map(({ label, value }) => (
-            <ReportBlockItem key={label} label={label} value={value} />
-          ))}
-        </div>
-        <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
-          <TrashIcon />
-          Clear history
-        </Button>
         {report.records?.length === 0 ? (
           <NoData title="No stats" icon={<ReportIcon />} />
         ) : (
