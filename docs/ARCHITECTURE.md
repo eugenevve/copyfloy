@@ -30,7 +30,7 @@ Application is built on Electron and is split into three layers:
 - **Main process** - contains all the core logic. It has full access to Node.js and the file system.
 - **Preload** - the only bridge between the two worlds. It exposes `window.api` with a limited set of methods to the interface.
 - **Renderer** - the React interface. It has no direct access to Node.js and talks to the main process only through IPC.
-- **Shared** - code used by both sides: IPC channel names, types (`ITask`, `ILabel`, `IReport`, ...) and constants.
+- **Shared** - code used by both sides: IPC channel names, types (`ITask`, `ILabel`, `IReport`, ...) and constants (limits, zoom range).
 
 Most main-process services follow one pattern:
 
@@ -46,10 +46,31 @@ The entry point is `src/main/index.ts`:
 
 1. In development mode `userData` is redirected to a separate `<name>-dev` directory, so a development build never touches the data of the installed application. This happens before any service is created, because storages resolve their paths at construction.
 2. A single-instance lock is requested. If the lock is not acquired, the second process exits; the running instance receives the `second-instance` event and restores its window.
-3. After `app.whenReady()` the services are initialized (tasks and scheduler, labels, reports, updater, Discord), then IPC handlers are registered.
+3. After `app.whenReady()` the services are initialized (tasks, scheduler and missed-run detection, labels, reports, updater, Discord), then IPC handlers are registered.
 4. The main window is created, and the services that depend on it (tray, updater events) are initialized.
+5. When the interface is ready, it asks the main process for the runs that were missed while the application was closed (see [Missed Runs](#-missed-runs)).
 
 The application supports a `--hidden` command-line flag: the window is created but not shown, so the app can start silently in the tray.
+
+---
+
+<br />
+
+## 🔌 IPC
+
+All channel names are declared in one place, `src/shared/constants/ipc.ts`, and are used by both the main process and the preload script. The interface never calls `ipcRenderer` directly; it uses `window.api`.
+
+| Group      | Purpose                                                                                                                     |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `app`      | Whether the build is packaged, whether the process has administrator rights                                                 |
+| `window`   | Title bar controls (minimize, maximize, close), maximized state and its change event                                        |
+| `settings` | Getters and setters of every application setting: sidebar, auto-start, administrator mode, zoom, tray, date and time format |
+| `tasks`    | CRUD, order, run / stop, progress, running tasks, missed runs, Git availability, export / import, file dialogs              |
+| `labels`   | CRUD and order                                                                                                              |
+| `report`   | Get and clear the history                                                                                                   |
+| `updater`  | Check, download, install, and the events forwarded to the interface (available, not available, progress, downloaded, error) |
+
+Two kinds of messages go from the main process to the interface without a request: **task progress** (`tasks.progress`) and **updater events**; the maximized state of the window is pushed the same way. Everything else is a request that returns a result (`ipcMain.handle`). The only synchronous channel is `settings.getSidebar`, which the interface reads at start.
 
 ---
 
@@ -63,31 +84,39 @@ Each task contains information about the source, destination, schedule, exclusio
 
 ### Task types
 
-| Type         | Source                                   | Result                                                                |
-| ------------ | ---------------------------------------- | --------------------------------------------------------------------- |
-| `file`       | A local file                             | The file is copied to `<destination>\<file name>`                     |
-| `folder`     | A local folder                           | The folder is copied recursively to `<destination>\<folder name>`     |
-| `repository` | HTTPS URL of a GitHub or GitLab repo     | The repository is cloned to `<destination>\<repository name>`         |
+| Type         | Source                               | Result                                                            |
+| ------------ | ------------------------------------ | ----------------------------------------------------------------- |
+| `file`       | A local file                         | The file is copied to `<destination>\<file name>`                 |
+| `folder`     | A local folder                       | The folder is copied recursively to `<destination>\<folder name>` |
+| `repository` | HTTPS URL of a GitHub or GitLab repo | The repository is cloned to `<destination>\<repository name>`     |
 
 Any task can additionally be marked as an **archive** task (`isArchive`). In this mode the result is a single ZIP file instead of a copy of the file tree. See [Archive Mode](#-archive-mode).
 
 ### Task fields
 
-| Field                | Description                                                           |
-| -------------------- | --------------------------------------------------------------------- |
-| `id`                 | Numeric task ID                                                       |
-| `name`               | Display name                                                          |
-| `type`               | `file`, `folder` or `repository`                                      |
-| `source`             | Path to a file / folder, or the repository URL                        |
-| `target`             | Destination folder                                                    |
-| `schedule`           | Optional schedule and the `notify` flag                               |
-| `exceptions`         | Excluded paths (files and folders only)                               |
-| `labelsIds`          | IDs of the labels attached to the task                                |
-| `isPinned`           | The task is pinned to the top of the list                             |
-| `isArchive`          | Pack the result into a ZIP archive                                    |
-| `repositoryProvider` | `github` or `gitlab` (repository tasks only)                          |
-| `isPrivate`          | The repository is private (repository tasks only)                     |
-| `accessToken`        | Personal access token for a private repository (stored encrypted)    |
+| Field                | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `id`                 | Numeric task ID (the creation timestamp, made unique if needed)   |
+| `name`               | Display name                                                      |
+| `type`               | `file`, `folder` or `repository`                                  |
+| `source`             | Path to a file / folder, or the repository URL                    |
+| `target`             | Destination folder                                                |
+| `schedule`           | Optional schedule and the `notify` flag                           |
+| `exceptions`         | Excluded paths (the interface offers them for folder tasks)       |
+| `labelsIds`          | IDs of the labels attached to the task                            |
+| `isPinned`           | The task is pinned to the top of the list                         |
+| `isArchive`          | Pack the result into a ZIP archive                                |
+| `repositoryProvider` | `github` or `gitlab` (repository tasks only)                      |
+| `isPrivate`          | The repository is private (repository tasks only)                 |
+| `accessToken`        | Personal access token for a private repository (stored encrypted) |
+
+The ID of a task is its creation time. This is used by [Missed Runs](#-missed-runs): for a task that has never run, the creation time is the moment from which runs are counted.
+
+### Creating and editing a task
+
+A task is created in a form with the name, labels, type, source, destination, exclusions (folders), the repository settings (provider, visibility, token) and the **Create ZIP archive instead of copying** option. The form validates the repository URL and disables saving while a private repository has no token.
+
+The **schedule is not a part of this form.** A task is saved first, and its schedule is set later in a separate dialog (the clock button on the task card), which updates only the `schedule` field. Both dialogs ask for confirmation when closed with unsaved changes.
 
 ### Task execution
 
@@ -113,7 +142,9 @@ CopyService
 File / Folder / Repository
 ```
 
-When a task is created, updated, or deleted, the scheduler is automatically updated to reflect the current task configuration.
+A third path, a run offered after a missed schedule, ends in the same `CopyService.run()` (see [Missed Runs](#-missed-runs)).
+
+When a task is created, updated, deleted or imported, the scheduler is automatically updated to reflect the current task configuration.
 
 ### Task lifecycle
 
@@ -136,6 +167,8 @@ Unregister the run, progress event with null (finished)
 - A task that is **already running is not started again**. This also applies to scheduled starts: if the previous run has not finished, the new one is ignored.
 - Several different tasks can run at the same time.
 - Progress is a percentage (0-100) broadcast to every window through the `tasks.progress` channel. The UI can also request the progress of all running tasks (`tasks.getRunning`), for example after the window was hidden and shown again.
+- The task card shows the percentage while the task is running, and the **Run** button turns into **Stop**.
+- A repository task whose Git or token is not available cannot be started: its **Run** button is disabled and the reason is shown on the card.
 
 ### Stopping a task
 
@@ -158,13 +191,13 @@ Uses `node-cron` to schedule automatic task execution.
 
 Supported schedule types include:
 
-| Schedule | Description                               |
-| -------- | ----------------------------------------- |
-| Minutes  | Run every configured number of minutes    |
-| Hourly   | Run every hour at a configured minute     |
-| Daily    | Run once per day at a configured time     |
-| Weekly   | Run on selected days at a configured time |
-| Disabled | Disable automatic execution               |
+| Schedule | Fields                     | Description                               |
+| -------- | -------------------------- | ----------------------------------------- |
+| Minutes  | `interval` (1-60)          | Run every configured number of minutes    |
+| Hourly   | `minutes`                  | Run every hour at a configured minute     |
+| Daily    | `hours`, `minutes`         | Run once per day at a configured time     |
+| Weekly   | `hours`, `minutes`, `days` | Run on selected days at a configured time |
+| Disabled | -                          | Disable automatic execution               |
 
 For example:
 
@@ -184,11 +217,59 @@ Every Monday at 03:30
 
 `SchedulerService` keeps one cron job per task (`task ID → job`). Whenever tasks change, all jobs are stopped and recreated from the current list (`rescheduleAll`). Tasks without a schedule, or with the schedule disabled, get no job. If a schedule cannot be converted to a valid cron expression, the task is skipped and a warning is written to the log.
 
-The schedule also carries the `notify` flag. When it is enabled, a notification is shown after every successful run of the task. Errors are always reported regardless of this flag.
+The schedule also carries the `notify` flag. When it is enabled, a system notification is shown after every successful run of the task; for a new schedule it is enabled by default. Errors are always reported regardless of this flag.
+
+The schedule is shown on the task card in a short form, for example `Daily at 12:00`, `Every hour at :30`, `Every 5 min` or `Mon, Wed at 03:30`. The time follows the selected [time format](#-date-and-time-format).
 
 The application process must remain running for scheduled tasks to execute.
 
 Application can remain active in the Windows system tray, allowing scheduled operations to continue without keeping the main application window open.
+
+---
+
+<br />
+
+## 🕓 Missed Runs
+
+Cron jobs exist only while the application is running. If the application was closed at the scheduled time, the run would be silently lost. `MissedTaskService` detects such runs on the next launch and offers to run them.
+
+```text
+Startup
+   ↓
+MissedTaskService.findMissed()  ──→  list of tasks, kept in memory
+   ↓
+Interface is ready: tasks.getMissed  (the list is returned once and cleared)
+   ↓
+"Task skipped" prompt, one task at a time:
+   Run now ──→ tasks.dismissMissed + tasks.run
+   Skip    ──→ tasks.dismissMissed
+```
+
+### How a missed run is detected
+
+A task is checked only if it has an **hourly, daily or weekly** schedule. Tasks that run every N minutes and tasks with the schedule disabled are never reported.
+
+For such a task the service calculates two moments:
+
+- **The last scheduled time** - the latest moment, not later than now, at which the schedule should have fired. For an hourly schedule it is the configured minute of the current or the previous hour; for daily and weekly schedules the service looks back up to seven days for a day that matches the schedule. If no moment can be found (for example a weekly schedule without days), the task is not reported.
+- **The last run** - the latest of: the start of the newest record of this task in the report (successful or failed), the creation time of the task (its ID), and the time the user last answered the prompt for this task.
+
+The task is considered missed if the last scheduled time is **later than** the last run.
+
+### The prompt
+
+The interface shows a modal **Task skipped** for each missed task, one after another: _Task "…" was not executed on schedule because the application was not running. Run now?_
+
+- **Run now** starts the task and remembers the answer.
+- **Skip** (or closing the dialog) only remembers the answer.
+
+The answer is stored in `missed-dismissed.json` (`task ID → time of the answer`). Thanks to it the same missed run is not offered again at the next launch. If the file cannot be written, the prompt may appear once more - nothing else is affected. Entries of deleted tasks are not removed from the file.
+
+### Limitations
+
+- The check is done once per launch, and the list is handed to the interface once.
+- The last run is taken from the report, so **clearing the report history makes the application forget when tasks last ran**; at the next launch a task whose schedule fired after its creation may be offered again.
+- A run stopped by the user is not recorded in the report and therefore does not count as a run.
 
 ---
 
@@ -246,7 +327,7 @@ Exclusions apply to file and folder tasks, including those in archive mode. They
 
 ## 🗜 Archive Mode
 
-When `isArchive` is enabled, the result of a run is a single ZIP file instead of a copy of the file tree. The archive is created with the `archiver` package (compression level 6).
+When `isArchive` is enabled, the result of a run is a single ZIP file instead of a copy of the file tree. The archive is created with the `archiver` package (compression level 6). The mode is available for every task type.
 
 **Files and folders**
 
@@ -281,7 +362,7 @@ Progress of the packing step is reported from the number of bytes processed. If 
 
 ## 🌿 Git Repositories
 
-A task of the `repository` type backs up a Git repository. `GitRepositoryService` works through the system `git` executable (it is started as a child process), so **Git must be installed and available in `PATH`**. The availability is checked on demand (`git --version`) and exposed to the UI: if Git is missing, repository tasks cannot be created or started, and the interface shows a hint.
+A task of the `repository` type backs up a Git repository. `GitRepositoryService` works through the system `git` executable (it is started as a child process), so **Git must be installed and available in `PATH`**. The availability is checked on demand (`git --version`) and exposed to the UI: if Git is missing, repository tasks cannot be started, and the interface shows a hint.
 
 ### Supported sources
 
@@ -325,7 +406,7 @@ A private repository requires a personal access token.
 
 - The token is passed to `git` through the `http.extraheader` configuration of the single process (`GIT_CONFIG_*` environment variables), as a Basic `Authorization` header. It is never put into the URL, so it does not appear in `.git/config`, in the command line, or in logs.
 - For GitHub the user name `x-access-token` is used, for GitLab `oauth2`.
-- If a private task has no token (it was never entered, was removed on export, or cannot be decrypted), the **Run** button is disabled and the reason is shown in a tooltip.
+- If a private task has no token (it was never entered, was removed on export, or cannot be decrypted), the **Run** button is disabled and the reason is shown on the card.
 
 ### Token storage
 
@@ -366,11 +447,21 @@ The storage layer is responsible for:
 
 Every task read from a file is validated (types of all fields, supported task types and providers). A file with an invalid structure is rejected as a whole, and an empty or missing file is reported as an error.
 
+### Limits
+
+The number of tasks and the number of labels are each limited to **1000** (`MAX_LIST_ITEMS`). When the limit is reached, the **Add** button is disabled, and the main process ignores attempts to create more items. An import is truncated to the same limit. The report keeps the last 1000 records.
+
 ### Order of tasks
 
-The order of tasks is the order in which they are stored in `tasks.json`. The user can change it by drag and drop; the UI sends the new order of IDs (`tasks.reorder`), the main process validates it and saves the reordered list.
+In `tasks.json` tasks are stored from the oldest to the newest. The interface shows them the other way round: **the newest task is at the top**, and pinned tasks form a separate group above the others.
 
-Pinned tasks form a separate group at the top of the list. A task can be moved only within its own group (pinned or regular). Reordering is available only when no search, type filter or label filter is active, because otherwise the visible list is only a part of all tasks.
+The user can change the order by drag and drop, with the mouse or the keyboard:
+
+1. The interface sends the IDs of **all** tasks in the order in which they are displayed (not only the ones on the current page).
+2. The main process checks that the list contains exactly the stored IDs, each once, with no unknown ones (`reorderDisplayIds`). Otherwise the request is ignored and the current list is returned.
+3. The list is saved in reversed form, so the displayed order matches the stored one.
+
+A task can be moved only within its own group (pinned or regular). Reordering is available only when no search, type filter or label filter is active, because otherwise the visible list is only a part of all tasks. The same mechanism is used for labels.
 
 ### Export and import
 
@@ -381,11 +472,13 @@ This makes it possible to back up or transfer task configurations between instal
 Task export files include both tasks and labels.
 
 - **Access tokens are not exported.** After importing a private repository task, the token has to be entered again.
-- Import offers two modes: **add** the imported tasks to the existing ones or **replace** the existing tasks.
+- Import offers two modes: **add** the imported tasks to the existing ones or **replace** the existing tasks. If the file contains no tasks, nothing is replaced.
 - Imported tasks always receive new unique IDs.
 - During import, labels that already exist with the same name and color are reused; otherwise, imported labels are added with unique IDs. Task label references are updated to use the resulting IDs.
 - Files in the legacy format (a plain array of tasks without labels) are still accepted.
+- The result is truncated to the limit of 1000 tasks and 1000 labels.
 - After an import the scheduler is rebuilt for the resulting list of tasks.
+- A file with an invalid structure is rejected, and the interface shows an **Import error**.
 
 ---
 
@@ -397,17 +490,17 @@ Every finished run of a task is recorded, so the user can see what was done and 
 
 A record contains:
 
-| Field          | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| `taskId`       | ID of the task                                            |
-| `taskName`     | Name of the task at the moment of the run                 |
-| `startedAt`    | Start time                                                |
-| `durationMs`   | Duration of the run                                       |
-| `status`       | `success` or `error`                                      |
-| `filesCopied`  | Number of copied files (files only, not directories)      |
-| `filesSkipped` | Number of excluded paths that were skipped                |
-| `totalBytes`   | Total size of the copied data                             |
-| `error`        | Error message for failed runs                             |
+| Field          | Description                                          |
+| -------------- | ---------------------------------------------------- |
+| `taskId`       | ID of the task                                       |
+| `taskName`     | Name of the task at the moment of the run            |
+| `startedAt`    | Start time                                           |
+| `durationMs`   | Duration of the run                                  |
+| `status`       | `success` or `error`                                 |
+| `filesCopied`  | Number of copied files (files only, not directories) |
+| `filesSkipped` | Number of excluded paths that were skipped           |
+| `totalBytes`   | Total size of the copied data                        |
+| `error`        | Error message for failed runs                        |
 
 The report is stored in the `userData` directory:
 
@@ -416,12 +509,29 @@ report.json
 ```
 
 - Only the **last 1000** records are kept; older ones are dropped automatically.
-- A record is written for successful and failed runs, whether started manually or by the scheduler. Runs stopped by the user are not recorded.
+- A record is written for successful and failed runs, whether started manually, by the scheduler or after a missed-run prompt. Runs stopped by the user are not recorded.
 - The task name is saved in the record, so the history stays readable after a task was renamed or deleted.
 - Record IDs are based on the start time; if two runs start in the same millisecond, the ID is increased until it is unique (the IDs are used as list keys in the UI).
 - A damaged or invalid `report.json` is ignored and treated as an empty history.
 
 `ReportService` returns the history together with the summary: the current number of tasks, the number of successful runs and the number of failed runs. Records are returned from the newest to the oldest. The history can be cleared from the Report page after a confirmation.
+
+The history is also the source of information for [Missed Runs](#-missed-runs).
+
+### The Report page
+
+The page consists of the summary (tasks, successful and failed operations), the **Clear history** button, a chart and a table.
+
+**Charts.** The chart is drawn with Recharts as a line chart with two lines: successful runs (green) and failed runs (red). Two views are available:
+
+| View     | What it shows                                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| By weeks | The last 14 days, ending with the latest day that has records; the number of runs per day, days without runs are shown as zero |
+| By hours | 24 hours of one day chosen in a drop-down list that contains only days with records (the newest first)                         |
+
+Labels of the axes and the tooltips follow the selected [date and time format](#-date-and-time-format). Charts are calculated in the interface from the records that were already received; there is no separate request.
+
+**Table.** The history table shows the task, the start time, the number of copied and skipped files, the duration and the total size. A failed run is highlighted, and the error message is shown on hover. Records are displayed 100 at a time; the next ones are loaded with the **Show more** button.
 
 ---
 
@@ -437,9 +547,29 @@ Labels are stored separately from tasks as JSON in the Electron `userData` direc
 labels.json
 ```
 
-The label service handles label retrieval, creation, updates, and deletion through IPC. When a label is deleted, its ID is also removed from every task that references it.
+The label service handles label retrieval, creation, updates, deletion and reordering through IPC. When a label is deleted, its ID is also removed from every task that references it.
 
-Labels can also be used to filter the task list on the Home page.
+On the Labels page the list is searchable by name and can be reordered by drag and drop (when no search is active). The newest label is shown first, the same way as tasks, and 100 labels are displayed at a time.
+
+Labels are also used to filter the task list on the Home page: the chips of all labels are shown under the search field (they can be scrolled horizontally), and selecting several of them shows the tasks that have **at least one** of the selected labels.
+
+---
+
+<br />
+
+## 🔎 Task List
+
+The Home page shows the list of tasks with the following tools:
+
+- **Search** by task name (case-insensitive).
+- **Type filter** - all, file, folder or repository.
+- **Label filter** - see [Labels](#-labels).
+
+All three work together: a task is shown if it matches the type, the search text and the labels at the same time. The counter in the header shows the number of tasks that match.
+
+The list is displayed 100 tasks at a time. The **Show more** button adds the next 100. Drag and drop works on the full list, not only on the visible part.
+
+Each card shows the type icon, the name, the pin button, the progress of a running task, the buttons **Run / Stop**, **Schedule**, **Edit** and **Delete**, the source and the destination, the short text of the schedule and the labels of the task. Deleting a task asks for confirmation.
 
 ---
 
@@ -458,7 +588,7 @@ How it works:
 - When **Minimize to tray on close** is enabled (the default) and the application is not quitting, the close event of the window is cancelled and the window is only hidden.
 - A click on the tray icon shows the window (restoring it if it was minimized) and focuses it. A right click opens a menu with **Open** and **Close**.
 - **Close** in the tray menu really quits the application: it marks the application as quitting and calls `app.quit()`.
-- When the option is disabled, closing the window quits the application, and scheduled tasks stop.
+- When the option is disabled, closing the window quits the application, and scheduled tasks stop. The runs scheduled for the time the application was closed are then offered at the next launch, see [Missed Runs](#-missed-runs).
 - Launching the application a second time does not create another process; it restores the window of the running instance.
 
 ---
@@ -469,39 +599,75 @@ How it works:
 
 Application settings are stored in `settings.json` in the `userData` directory:
 
-| Setting        | Default | Description                                               |
-| -------------- | ------- | --------------------------------------------------------- |
-| `sidebarOpen`  | `true`  | Whether the sidebar is expanded                           |
-| `autoStart`    | `false` | Start the application with Windows                        |
-| `runAdmin`     | `false` | Run the application as administrator                      |
-| `zoomFactor`   | `1`     | Page zoom; clamped to an allowed range                    |
-| `minimizeTray` | `true`  | Hide the window to the tray instead of quitting on close  |
-| `windowState`  | -       | Position, size and maximized state of the window          |
+| Setting          | Default          | Description                                              |
+| ---------------- | ---------------- | -------------------------------------------------------- |
+| `sidebarOpen`    | `true`           | Whether the sidebar is expanded                          |
+| `autoStart`      | `false`          | Start the application with Windows                       |
+| `runAdmin`       | `false`          | Run the application as administrator                     |
+| `zoomFactor`     | `1`              | Page zoom, from 0.5 to 3.0                               |
+| `minimizeTray`   | `true`           | Hide the window to the tray instead of quitting on close |
+| `dateTimeFormat` | `DMY`, `24-hour` | Format of dates and time in the interface                |
+| `windowState`    | -                | Position, size and maximized state of the window         |
 
 When a setting changes, `SettingsService` stores the new value and applies the related system settings.
 
+The Settings page contains one widget for each of them: auto-start, run as administrator, page zoom, minimize to tray, date and time format, import / export of tasks and the update checker.
+
 ### Auto-start and run as administrator
 
-Both options work only in the **packaged build on Windows**; in development they have no effect.
+Both options work only in the **packaged build on Windows**; in development they have no effect, and the widgets are disabled.
 
-| Auto-start | Run as admin | What is configured                                                                    |
-| ---------- | ------------ | ------------------------------------------------------------------------------------- |
-| off        | any          | The login item and the scheduled task are removed                                     |
-| on         | off          | A regular login item is registered through Electron                                   |
+| Auto-start | Run as admin | What is configured                                                                     |
+| ---------- | ------------ | -------------------------------------------------------------------------------------- |
+| off        | any          | The login item and the scheduled task are removed                                      |
+| on         | off          | A regular login item is registered through Electron                                    |
 | on         | on           | A Windows scheduled task `<name>-auto-start` runs the app at logon with highest rights |
 
 Elevated applications are not started by a regular login item, because Windows blocks it. That is why the combination of both options uses Task Scheduler (`schtasks`, `/sc onlogon /rl highest`) and turns the regular login item off.
 
-"Run as administrator" itself is implemented in `RunAdminService`: it adds or removes the `~ RUNASADMIN` flag for the executable in the registry key `HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`, so Windows requests elevation on every launch.
+"Run as administrator" itself is implemented in `RunAdminService`: it adds or removes the `~ RUNASADMIN` flag for the executable in the registry key `HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`, so Windows requests elevation on every launch. The change takes effect after the application is restarted.
 
 ### Window
 
 - The window is frameless; the title bar buttons (minimize, maximize, close) are drawn by the interface and call the main process through IPC.
 - Position, size and maximized state are saved (with a delay, so the file is not written on every pixel of a resize) and restored on the next launch. If the saved position is no longer visible, for example a monitor was disconnected, the window is centered.
-- The minimum window size is 720 × 540.
-- Page zoom can be changed from the interface and with keyboard shortcuts; the value is clamped, applied immediately and saved.
-- Links that the interface tries to open in a new window are opened in the default browser of the system.
+- The window cannot be made smaller than its base size.
 - Developer tools are available only in development mode.
+- Links that the interface tries to open in a new window are opened in the default browser of the system.
+
+### Page zoom
+
+- The zoom is changed in 10 % steps from 50 % to 300 % with the buttons on the Settings page or with the keyboard: `Ctrl` + `+` / `-` to change and `Ctrl` + `0` to reset to 100 %.
+- The value is clamped to the allowed range in the main process, applied to the window immediately and saved in `settings.json`.
+
+---
+
+<br />
+
+## 🎨 Appearance
+
+### Theme
+
+The interface has three themes: **light**, **dark** and **system**. One button in the sidebar switches them in a cycle `system → dark → light → system`.
+
+- The choice is stored in the `localStorage` of the application window under the key `theme`, not in `settings.json`. The default is the system theme.
+- The resolved theme (`light` or `dark`) is written to the `data-theme` attribute of the root element, and the colors of the interface are CSS variables that depend on it.
+- In the system mode the application follows the operating system and reacts to its changes at once.
+
+### Date and time format
+
+The date and time format is a setting of the application, not of the operating system. It is chosen in the **Date & Time Format** widget.
+
+| Option      | Values                                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Date format | `DD/MM/YYYY`, `DD.MM.YYYY`, `DD-MM-YYYY`, `MM/DD/YYYY`, `MM.DD.YYYY`, `MM-DD-YYYY`, `YYYY-MM-DD`, `YYYY.MM.DD`, `YYYY/MM/DD` |
+| Time format | 24-hour (`13:00`) or 12-hour (`1:00 PM`)                                                                                     |
+
+How it works:
+
+- The main process only stores the pair `dateFormat` / `timeFormat` in `settings.json` and returns it through IPC.
+- The interface keeps the current value in a small store (`dateTimeFormatState`) with subscriptions. Components subscribe to it with `useSyncExternalStore`, so a change is applied everywhere at once, without reloading the page: in the task cards, in the report table and in the charts.
+- On startup the saved value is read and checked against the allowed values; an unknown value is replaced by the default.
 
 ---
 
@@ -526,7 +692,7 @@ Install: close the windows and restart with the new version
 - Automatic download is disabled; an update is downloaded only after the user asks for it.
 - A downloaded update is also installed when the application quits (`autoInstallOnAppQuit`).
 - The events of `electron-updater` (available, not available, progress, downloaded, error) are forwarded to the interface through IPC.
-- During installation a separate status window is shown.
+- During installation a separate small window with a spinner is shown. The other windows are closed, and after a short pause (3 seconds) the installer is started silently and restarts the application.
 - In development there is no packaged application, so the installation step does nothing.
 
 ---
@@ -547,15 +713,24 @@ The activity is set on startup and shows the application name, a short status an
 
 The renderer is a React application with `HashRouter` and CSS Modules. It contains the following pages:
 
-| Page     | Purpose                                                                                       |
-| -------- | --------------------------------------------------------------------------------------------- |
-| Home     | Task list: search, filters by type and label, run / stop, progress, pinning, drag-and-drop    |
-| Labels   | Creating, editing and deleting labels                                                         |
-| Report   | Summary and history of task runs                                                              |
-| Settings | Auto-start, administrator mode, tray behavior, zoom, updates, import and export of tasks      |
-| About    | Information about the application                                                            |
+| Page     | Purpose                                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------------------------- |
+| Home     | Task list: search, filters by type and label, run / stop, progress, pinning, schedule, drag and drop           |
+| Labels   | Creating, editing, deleting, searching and reordering labels                                                   |
+| Report   | Summary, charts and history of task runs                                                                       |
+| Settings | Auto-start, administrator mode, zoom, tray behavior, date and time format, import and export of tasks, updates |
+| About    | Information about the application                                                                              |
 
-The interface keeps no data of its own: tasks, labels, settings and reports are always read from and written to the main process through `window.api`. The drag-and-drop list is built with `@dnd-kit` and supports both pointer and keyboard control.
+Common parts of the interface:
+
+- **Header tools** - the title with the counter, the **Add** button, search, the type filter and the label chips; it is shared by the Home and Labels pages.
+- **Modals** - confirmations, alerts and forms are shown through one modal provider. Besides the forms, the **Task skipped** prompt for [missed runs](#-missed-runs) is shown from it at startup.
+- **Pagination** - lists of tasks, labels and report records show 100 items (`PAGE_ITEMS`) at a time, with the **Show more** button.
+- **Drag and drop** - lists are sorted with `@dnd-kit` (pointer and keyboard sensors, movement restricted to the vertical axis and to the list).
+- **Charts** - the Report page uses Recharts with the colors of the current theme.
+- **Shared state outside React** - theme, zoom and date and time format. They are small stores with subscriptions, so any component can follow them.
+
+The interface keeps no important data of its own: tasks, labels, settings and reports are always read from and written to the main process through `window.api`. The only values the interface stores itself are the selected theme and the temporary state of filters, search and forms.
 
 ---
 
@@ -565,12 +740,15 @@ The interface keeps no data of its own: tasks, labels, settings and reports are 
 
 All persistent data is stored locally as JSON files in Electron's `userData` directory:
 
-| File            | Content                                                              |
-| --------------- | -------------------------------------------------------------------- |
-| `tasks.json`    | Tasks (access tokens are stored encrypted)                           |
-| `labels.json`   | Labels                                                               |
-| `settings.json` | Application settings and the state of the window                     |
-| `report.json`   | History of task runs (up to 1000 latest records)                     |
+| File                    | Content                                                                |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `tasks.json`            | Tasks (access tokens are stored encrypted)                             |
+| `labels.json`           | Labels                                                                 |
+| `settings.json`         | Application settings, date and time format and the state of the window |
+| `report.json`           | History of task runs (up to 1000 latest records)                       |
+| `missed-dismissed.json` | Time of the last answer to the "Task skipped" prompt for each task     |
+
+The selected theme is not in these files: it is stored in the local storage of the application window.
 
 In development mode the directory is `<appData>/<name>-dev`, separate from the installed application.
 
@@ -622,7 +800,7 @@ Provides success and error notifications for task execution.
 
 ### `LabelService`
 
-Manages label storage and IPC operations. When labels are deleted, it also removes their references from stored tasks.
+Manages label storage and IPC operations: retrieval, creation, updates, deletion and reordering. When labels are deleted, it also removes their references from stored tasks.
 
 ### `ReportService`
 
@@ -631,6 +809,11 @@ Provides the history of task runs and the summary (tasks, successful and failed 
 ### `SchedulerService`
 
 Responsible for scheduling and rescheduling tasks using `node-cron`.
+
+Helpers:
+
+- `ScheduleUtils` - converts a schedule to a cron expression
+- `MissedTaskService` - finds the runs missed while the application was closed and handles the answers of the user; it is created and initialized by `TaskService`
 
 ### `SettingsService`
 
@@ -641,6 +824,7 @@ Manages application settings such as:
 - Window/application behavior
 - Minimize to tray
 - Sidebar state and page zoom
+- Date and time format
 - Other persistent application settings
 
 Helpers: `AutoStartService`, `RunAdminService`, `SettingsStorage`.
@@ -652,6 +836,7 @@ Coordinates the task-related services:
 - Task storage
 - Copy operations
 - Scheduling
+- Missed-run detection
 - IPC communication
 
 ### `TrayService`
@@ -679,4 +864,6 @@ Helpers: `WindowEvents` (window events), `WindowStateService` (saving and restor
 - Repository URLs are strictly validated: only `https` and only `github.com` / `gitlab.com`, with no embedded credentials.
 - A repository task never overwrites a foreign repository and never deletes an existing folder on cancellation.
 - Copying never deletes anything in the destination.
+- The order of tasks and labels received from the interface is validated before it is saved: it must be exactly the set of stored IDs.
+- The size of the lists is limited, so the data files cannot grow without bounds.
 - Links opened from the interface go to the system browser instead of a new application window.
