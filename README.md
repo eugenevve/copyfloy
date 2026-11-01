@@ -23,6 +23,19 @@
 
 <br />
 
+## 🌅 Application interface
+
+<details>
+  <summary><b>View screenshots (click to expand)</b></summary>
+  <img src="./resources/readme/Home.png" />
+  <img src="./resources/readme/Labels.png" />
+  <img src="./resources/readme/Settings.png" />
+  <img src="./resources/readme/Report-weeks.png" />
+  <img src="./resources/readme/Report-hours.png" />
+</details>
+
+<br />
+
 ## ✨ About
 
 Windows desktop application that automates recurring copying and backup of local files, folders and Git repositories.
