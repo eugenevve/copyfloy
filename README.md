@@ -25,11 +25,11 @@
 
 ## ✨ About
 
-Windows desktop application that automates recurring copying of local files and folders.
+Windows desktop application that automates recurring copying and backup of local files, folders and Git repositories.
 
 Instead of copying the same folders by hand, you create a task once - a source, a destination and, optionally, a schedule - and application runs it for you. Tasks can be started manually or on a schedule, and the app can keep working in the system tray with its window closed. Typical uses are periodic backups to another drive or a USB stick.
 
-A task has a single source (a **file or a folder**) and a destination **folder**. The source name is appended to the destination path:
+A task has a single source (a **file, a folder or a Git repository**) and a destination **folder**. For files and folders the source name is appended to the destination path:
 
 ```text
 Source        D:\Documents
@@ -37,7 +37,7 @@ Destination   E:\Backup
 Result        E:\Backup\Documents
 ```
 
-Copying is one-way: existing files in the destination are overwritten, and nothing is ever deleted there.
+Copying is one-way: existing files in the destination are overwritten, and nothing is ever deleted there. Instead of a copy, a task can also produce a single **ZIP archive**.
 
 ---
 
@@ -49,22 +49,31 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 
 - Create, edit, delete and manually run tasks
 - Copy a single file, an entire folder (recursively) or a Git repository
+- Optional **ZIP archive** instead of a copy: `<destination>\<name>.zip`
 - Live progress for running tasks and a **Stop** button to cancel them
 - Pin important tasks to the top of the list
-- Reorder tasks by drag and drop (within the pinned / regular group; available when no search or filter is active)
-- Search tasks and filter them by type (file / folder / repository) and by labels
+- Reorder tasks by drag and drop, with the mouse or the keyboard (within the pinned / regular group; available when no search or filter is active)
+- Search tasks and filter them by type (file / folder / repository) and by labels (several labels can be selected at once)
+- Schedule of a task is shown right on its card
+- Up to 1000 tasks and 1000 labels; lists show the first 100 items, the rest is loaded with the **Show more** button
 - Confirmation before deleting a task or closing a form with unsaved changes
 
 **Exclusions**
 
-- Exclude specific files and folders from a copy; multiple paths can be selected at once
+- Exclude specific files and folders from a copy or an archive (folder tasks); multiple paths can be selected at once
 - An excluded folder is skipped together with all of its contents
+
+**ZIP archives**
+
+- Any task can be switched to _Create ZIP archive instead of copying_
+- Files and folders: the source is packed into `<destination>\<source name>.zip`; exclusions are applied, an existing archive with the same name is replaced
+- Repositories: the whole repository, including `.git`, is packed into `<destination>\<repository name>.zip`
+- Progress is shown while packing; a stopped or failed run leaves no incomplete archive behind
 
 **Git repositories**
 
 - Back up repositories from **GitHub** and **GitLab** (HTTPS URLs on `github.com` / `gitlab.com` only)
 - First run clones the repository into `<destination>\<repository name>`; later runs update it with `git pull --ff-only`. If the destination already contains a different repository, the task fails instead of overwriting it
-- **Archive mode:** clone into a temporary folder and pack the whole repository, including `.git`, into `<destination>\<repository name>.zip`; the temporary clone is removed afterwards
 - Private repositories are supported with a personal access token. The token is encrypted with Electron `safeStorage` (OS-level encryption) before it is written to `tasks.json`
 - Requires [Git](https://git-scm.com/) to be installed and available in `PATH`; otherwise repository tasks are disabled in the UI
 
@@ -74,22 +83,31 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 - A partially written file is removed; a partial clone is removed only if it was created by that run, an existing folder is never deleted
 - Cancelled runs are not recorded in the report
 
+**Scheduling**
+
+- Every N minutes (1-60), hourly, daily or on selected days of the week
+- The schedule is configured in a separate dialog (the clock button on the task card) and can be switched off per task
+- Optional system notification after a successful run, enabled by default (also for repository tasks); failures are always reported
+- Scheduled tasks run only while the app is running - the tray keeps it alive after the window is closed
+
+**Missed runs**
+
+- If the app was not running at the scheduled time, it notices that on the next launch
+- For every task with an hourly, daily or weekly schedule that did not run since its last scheduled time, a **Task skipped** prompt offers to **Run now** or **Skip**; prompts are shown one by one
+- The answer is remembered, so the same missed run is not offered again
+- Tasks that run every N minutes are not checked
+
 **Reports**
 
 - A separate **Report** page with the number of tasks, successful and failed operations
+- Charts of successful and failed runs: **By weeks** (14 days ending with the latest day that has records) and **By hours** (24 hours of a selected day)
 - History table: task, start time, copied files, skipped files (excluded paths), duration, total size; failed runs are highlighted and show the error on hover
 - Records are stored in `report.json` (the last 1000 are kept) and can be cleared with one click
 
-**Scheduling**
-
-- Every N minutes, hourly, daily or on selected days of the week
-- Scheduling can be switched off per task
-- Optional success notification per task (also for repository tasks) failures are always reported
-- Scheduled tasks run only while the app is running - the tray keeps it alive after the window is closed
-
 **Labels**
 
-- Colored labels with a name, managed on a separate page
+- Colored labels with a name, managed on a separate page with search
+- Reorder labels by drag and drop
 - Several labels per task; deleting a label removes it from every task
 
 **Import and export**
@@ -98,6 +116,12 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 - Access tokens of private repositories are **never exported**: after import, edit such a task and enter the token again
 - Import either adds to the existing tasks or replaces them
 - Imported labels with the same name and color are reused; other tasks and labels get new unique IDs
+
+**Appearance**
+
+- Light, dark or system theme, switched with one button in the sidebar
+- Date format (`DD/MM/YYYY`, `MM/DD/YYYY`, `YYYY-MM-DD` and other variants with `/`, `.` or `-`) and 12 / 24-hour time format; the choice is applied to the task list, the report and the charts
+- Page zoom with a reset button
 
 **Windows integration**
 
@@ -113,7 +137,7 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 - Built-in updater (`electron-updater`) with releases published on GitHub
 - Updates are checked, downloaded and installed manually from the Settings page
 
-All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`, `report.json`).
+All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`, `report.json`, `missed-dismissed.json`). The selected theme is stored in the local storage of the application window.
 
 ---
 
@@ -121,7 +145,7 @@ All data is stored locally as JSON files in Electron's `userData` directory (`ta
 
 ## 🛠 Getting Started
 
-**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.12 or newer and npm. [Git](https://git-scm.com/) is optional and needed only for repository tasks.
+**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.22 or newer and npm. [Git](https://git-scm.com/) is optional and needed only for repository tasks.
 
 ```bash
 git clone https://github.com/eugenevve/copyfloy.git
@@ -132,16 +156,20 @@ npm run dev
 
 ### Scripts
 
-| Command                | Description                                                  |
-| ---------------------- | ------------------------------------------------------------ |
-| `npm run dev`          | Start the app in development mode (`electron-vite`)          |
-| `npm run build`        | Lint CSS and JS/TS, then create the production build         |
-| `npm run preview`      | Preview the generated production build                       |
-| `npm run build:win`    | Production build + Windows installer (`electron-builder`)    |
-| `npm run lint`         | Lint JavaScript/TypeScript with ESLint (no warnings allowed) |
-| `npm run lint:fix`     | Lint JavaScript/TypeScript and apply automatic fixes         |
-| `npm run lint:css`     | Lint CSS with Stylelint                                      |
-| `npm run lint:css:fix` | Lint CSS and apply automatic fixes                           |
+| Command                | Description                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`          | Start the app in development mode (`electron-vite`)                              |
+| `npm run build`        | Lint CSS and JS/TS, then create the production build                             |
+| `npm run preview`      | Preview the generated production build                                           |
+| `npm run build:win`    | Production build + Windows installer (`electron-builder`)                        |
+| `npm run lint`         | Lint JavaScript/TypeScript with ESLint (no warnings allowed)                     |
+| `npm run lint:fix`     | Lint JavaScript/TypeScript and apply automatic fixes                             |
+| `npm run lint:css`     | Lint CSS with Stylelint                                                          |
+| `npm run lint:css:fix` | Lint CSS and apply automatic fixes                                               |
+| `npm run icons`        | Generate `resources/icon.ico` and `resources/icon.png` from `resources/icon.svg` |
+| `npm run icons-check`  | Print the sizes stored in `resources/icon.ico`                                   |
+
+In development mode the app stores its data in a separate `<name>-dev` folder, so it never touches the data of the installed version.
 
 ---
 
@@ -174,9 +202,9 @@ The packaging settings live in the `build` section of `package.json`. The instal
 src/
 ├── main/            # Electron main process
 │   ├── services/    # AppService, CopyService, DiscordService, LabelService,
-│   │                # NotificationService, ReportService, SchedulerService,
-│   │                # SettingsService, TaskService, TrayService,
-│   │                # UpdaterService, WindowService
+│   │                # NotificationService, ReportService, SchedulerService
+│   │                # (incl. MissedTaskService), SettingsService, TaskService,
+│   │                # TrayService, UpdaterService, WindowService
 │   └── utils/
 ├── preload/         # Secure bridge between main and renderer
 ├── renderer/        # React UI: Home (tasks), Labels, Report, Settings, About
@@ -199,15 +227,17 @@ For the task lifecycle, scheduling, storage format and the responsibilities of e
 | --------------- | ------------------------------------------------------------------------ |
 | Desktop runtime | Electron                                                                 |
 | UI              | React, React Router (`HashRouter`), CSS Modules                          |
+| Charts          | Recharts                                                                 |
+| Drag and drop   | dnd-kit                                                                  |
 | Language        | TypeScript                                                               |
 | File system     | fs-extra                                                                 |
+| Archives        | archiver (ZIP)                                                           |
+| Git             | System `git`, started as a child process                                 |
 | Scheduling      | node-cron                                                                |
 | Updates         | electron-updater (GitHub releases)                                       |
 | Integrations    | @xhayper/discord-rpc, Electron Toolkit (`preload`, `utils`)              |
 | Build           | electron-vite, electron-builder (NSIS)                                   |
 | Code quality    | ESLint (+ TypeScript, React, import plugins), Stylelint, Prettier config |
-| Git             | System, via child process                                                |
-| DND-kit         | Drag and drop                                                            |
 
 ---
 
