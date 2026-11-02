@@ -96,7 +96,7 @@ jobs:
       - run: npm ci
 
       - name: Build
-        run: npm run build:win -- --publish never
+        run: npm run build:win:all -- --publish never
 
       - uses: actions/upload-artifact@v7
         with:

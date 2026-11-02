@@ -53,6 +53,7 @@
     "build": "npm run lint:css && npm run lint && electron-vite build",
     "preview": "electron-vite preview",
     "build:win": "npm run build && electron-builder --win",
+    "build:win:all": "npm run build && electron-builder --win --x64 --arm64",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
