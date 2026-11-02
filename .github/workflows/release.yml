@@ -104,6 +104,8 @@ jobs:
           path: |
             dist/Copyfloy-setup-${{ needs.prepare.outputs.version }}.exe
             dist/Copyfloy-setup-${{ needs.prepare.outputs.version }}.exe.blockmap
+            dist/Copyfloy-portable-${{ needs.prepare.outputs.version }}-x64.zip
+            dist/Copyfloy-portable-${{ needs.prepare.outputs.version }}-arm64.zip
             dist/latest.yml
           retention-days: 1
           if-no-files-found: error
@@ -132,8 +134,10 @@ jobs:
         run: |
           gh release create "$VERSION" \
             "files/Copyfloy-setup-$VERSION.exe" \
+            "files/Copyfloy-portable-$VERSION-x64.zip" \
+            "files/Copyfloy-portable-$VERSION-arm64.zip" \
             "files/Copyfloy-setup-$VERSION.exe.blockmap" \
-            files/latest.yml \
+            "files/latest.yml" \
             --title "Copyfloy $VERSION" \
             --notes-file notes/notes.md \
             --target "${{ github.sha }}"

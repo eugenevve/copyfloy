@@ -20,8 +20,16 @@
     ],
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
+      "artifactName": "${name}-portable-${version}-${arch}.${ext}",
       "icon": "resources/icon.ico",
       "verifyUpdateCodeSignature": false
     },
@@ -52,7 +60,7 @@
     "dev": "npx electron --version && electron-vite dev",
     "build": "npm run lint:css && npm run lint && electron-vite build",
     "preview": "electron-vite preview",
-    "build:win": "npm run build && electron-builder --win",
+    "build:win": "npm run build && electron-builder --win nsis --x64",
     "build:win:all": "npm run build && electron-builder --win --x64 --arm64",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
