@@ -5,27 +5,40 @@ on:
 
 permissions:
   contents: write
+  statuses: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  release:
+  # 1. Preparation: version, verification, release notes
+  prepare:
+    name: Prepare
     if: github.ref == 'refs/heads/main'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
+      - name: Status pending
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state=pending -f context="Release build" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
       - name: Read version and check release does not exist
-        shell: bash
+        id: version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           if gh release view "$VERSION" >/dev/null 2>&1; then
             echo "Release $VERSION already exists. Bump the version in package.json first."
@@ -33,9 +46,8 @@ jobs:
           fi
 
       - name: Generate release notes
-        shell: bash
         run: |
-          # The previous release commit (X.Y.Z), excluding the current version
+          # Предыдущий релизный коммит (X.Y.Z), не считая текущей версии
           PREV=$(git log -E --grep='^[0-9]+\.[0-9]+\.[0-9]+$' --format='%H %s' \
             | awk -v v="$VERSION" 'NF==2 && $2 ~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $2 != v {print $1; exit}')
           if [ -n "$PREV" ]; then RANGE="$PREV..HEAD"; else RANGE="HEAD"; fi
@@ -61,20 +73,88 @@ jobs:
 
           cat notes.md
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: notes.md
+          retention-days: 1
+          if-no-files-found: error
+
+  # 2. Building the application
+  build:
+    name: Build
+    needs: prepare
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - run: npm ci
 
       - name: Build
         run: npm run build:win -- --publish never
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: |
+            dist/Copyfloy-setup-${{ needs.prepare.outputs.version }}.exe
+            dist/Copyfloy-setup-${{ needs.prepare.outputs.version }}.exe.blockmap
+            dist/latest.yml
+          retention-days: 1
+          if-no-files-found: error
+
+  # 3. Creating the release
+  release:
+    name: Release
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: notes
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: files
+
       - name: Create release
-        shell: bash
+        run: |
+          gh release create "$VERSION" \
+            "files/Copyfloy-setup-$VERSION.exe" \
+            "files/Copyfloy-setup-$VERSION.exe.blockmap" \
+            files/latest.yml \
+            --title "Copyfloy $VERSION" \
+            --notes-file notes/notes.md \
+            --target "${{ github.sha }}"
+
+  # Final commit status (icon next to the commit)
+  status:
+    name: Commit status
+    if: always() && github.ref == 'refs/heads/main'
+    needs: [prepare, build, release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Status final
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$VERSION" \
-            "dist/Copyfloy-setup-$VERSION.exe" \
-            "dist/Copyfloy-setup-$VERSION.exe.blockmap" \
-            dist/latest.yml \
-            --title "Copyfloy $VERSION" \
-            --notes-file notes.md \
-            --target "$(git rev-parse HEAD)"
+          RESULTS="${{ needs.prepare.result }} ${{ needs.build.result }} ${{ needs.release.result }}"
+          case "$RESULTS" in
+            *failure*)   STATE=failure ;;
+            *cancelled*) STATE=error ;;
+            *)           STATE=success ;;
+          esac
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state=$STATE -f context="Release build" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
