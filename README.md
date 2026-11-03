@@ -2,14 +2,14 @@
 
 <div align="center">
 
-[![Electron](https://img.shields.io/badge/Electron-43-1a1a1a?style=for-the-badge&logo=electron&logoColor=white&labelColor=000000)](https://www.electronjs.org/)
+[![Electron](https://img.shields.io/badge/Electron-45-1a1a1a?style=for-the-badge&logo=electron&logoColor=white&labelColor=000000)](https://www.electronjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-Electron_Vite-1a1a1a?style=for-the-badge&logo=vite&logoColor=white&labelColor=000000)](https://electron-vite.org/)
 [![React](https://img.shields.io/badge/React-19-1a1a1a?style=for-the-badge&logo=react&logoColor=white&labelColor=000000)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-1a1a1a?style=for-the-badge&logo=typescript&logoColor=white&labelColor=000000)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-24-1a1a1a?style=for-the-badge&logo=nodedotjs&logoColor=white&labelColor=000000)](https://nodejs.org/)
 [![ESLint](https://img.shields.io/badge/ESLint-9-1a1a1a?style=for-the-badge&logo=eslint&logoColor=white&labelColor=000000)](https://eslint.org/)
 [![Stylelint](https://img.shields.io/badge/Stylelint-17-1a1a1a?style=for-the-badge&logo=stylelint&logoColor=white&labelColor=000000)](https://stylelint.io/)
-[![Platform](https://img.shields.io/badge/Platform-Windows-1a1a1a?style=for-the-badge&labelColor=000000)](https://www.microsoft.com/windows)
+[![Platform](https://img.shields.io/badge/Platform-Windows_x64_%7C_ARM64-1a1a1a?style=for-the-badge&labelColor=000000)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-1a1a1a?style=for-the-badge&labelColor=000000)](./LICENSE)
 
 </div>
@@ -56,6 +56,22 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 
 <br />
 
+## 📥 Download
+
+Ready-made builds are published on the [Releases](https://github.com/eugenevve/copyfloy/releases) page. Windows on x64 (Intel / AMD) and on ARM64 are supported.
+
+| Build         | File                                                 | Description                                                                                                                                                               |
+| ------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Installer** | `Copyfloy-setup-<version>.exe`                       | Recommended. One file for both x64 and ARM64: the matching version is installed automatically. The installation folder can be chosen; updates are installed from the app. |
+| **Portable**  | `Copyfloy-portable-<version>-x64.zip` / `-arm64.zip` | No installation: unpack the archive and run the executable. Updated manually.                                                                                             |
+
+> [!NOTE]
+> **Windows security warning.** The executable is not code-signed yet, so Windows Defender SmartScreen may show a warning on launch. This only means the app has no trusted digital signature. Code signing may be added in a future release.
+
+---
+
+<br />
+
 ## 🚀 Features
 
 **Tasks**
@@ -73,7 +89,7 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 
 **Exclusions**
 
-- Exclude specific files and folders from a copy or an archive (folder tasks); multiple paths can be selected at once
+- Exclude specific files and folders from a copy or an archive (folder tasks): choose what to add - a **file** or a **folder** - and then select one or several of them in the dialog
 - An excluded folder is skipped together with all of its contents
 
 **ZIP archives**
@@ -134,21 +150,23 @@ Copying is one-way: existing files in the destination are overwritten, and nothi
 
 - Light, dark or system theme, switched with one button in the sidebar
 - Date format (`DD/MM/YYYY`, `MM/DD/YYYY`, `YYYY-MM-DD` and other variants with `/`, `.` or `-`) and 12 / 24-hour time format; the choice is applied to the task list, the report and the charts
-- Page zoom with a reset button
+- Page zoom (50-300 %) with a reset button and keyboard shortcuts: `Ctrl` + `+` / `-` / `0`
 
 **Windows integration**
 
+- Windows on x64 and ARM64, as an installed or a portable application
 - System tray icon (click to open, right-click for the _Open_ / _Close_ menu)
 - Optional minimize-to-tray when the window is closed (enabled by default)
 - Optional auto-start with Windows and optional run as administrator. When both are on, the app is launched at logon through a Windows scheduled task, so the elevated start is not blocked. Both options take effect only in the packaged build.
 - Single instance: launching the app a second time restores the existing window
-- Window state, sidebar state and page zoom (also via keyboard shortcuts) are remembered between launches
+- Window state, sidebar state and page zoom are remembered between launches
 - Discord Rich Presence status in the user's Discord profile
 
 **Updates**
 
 - Built-in updater (`electron-updater`) with releases published on GitHub
-- Updates are checked, downloaded and installed manually from the Settings page
+- **Installed version:** updates are checked, downloaded and installed manually from the Settings page; the app restarts itself after the installation
+- **Portable version:** the check works, but nothing is downloaded or installed. When a new version is found, the app shows a message with a link to the Releases page - download the new ZIP archive and replace the application files
 
 All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`, `report.json`, `missed-dismissed.json`). The selected theme is stored in the local storage of the application window.
 
@@ -169,18 +187,19 @@ npm run dev
 
 ### Scripts
 
-| Command                | Description                                                                      |
-| ---------------------- | -------------------------------------------------------------------------------- |
-| `npm run dev`          | Start the app in development mode (`electron-vite`)                              |
-| `npm run build`        | Lint CSS and JS/TS, then create the production build                             |
-| `npm run preview`      | Preview the generated production build                                           |
-| `npm run build:win`    | Production build + Windows installer (`electron-builder`)                        |
-| `npm run lint`         | Lint JavaScript/TypeScript with ESLint (no warnings allowed)                     |
-| `npm run lint:fix`     | Lint JavaScript/TypeScript and apply automatic fixes                             |
-| `npm run lint:css`     | Lint CSS with Stylelint                                                          |
-| `npm run lint:css:fix` | Lint CSS and apply automatic fixes                                               |
-| `npm run icons`        | Generate `resources/icon.ico` and `resources/icon.png` from `resources/icon.svg` |
-| `npm run icons-check`  | Print the sizes stored in `resources/icon.ico`                                   |
+| Command                 | Description                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Start the app in development mode (`electron-vite`)                                                            |
+| `npm run build`         | Lint CSS and JS/TS, then create the production build                                                           |
+| `npm run preview`       | Preview the generated production build                                                                         |
+| `npm run build:win`     | Production build + Windows installer for x64 (`electron-builder`)                                              |
+| `npm run build:win:all` | Production build + all Windows packages: installer (x64 and ARM64) and portable ZIP archives for x64 and ARM64 |
+| `npm run lint`          | Lint JavaScript/TypeScript with ESLint (no warnings allowed)                                                   |
+| `npm run lint:fix`      | Lint JavaScript/TypeScript and apply automatic fixes                                                           |
+| `npm run lint:css`      | Lint CSS with Stylelint                                                                                        |
+| `npm run lint:css:fix`  | Lint CSS and apply automatic fixes                                                                             |
+| `npm run icons`         | Generate `resources/icon.ico` and `resources/icon.png` from `resources/icon.svg`                               |
+| `npm run icons-check`   | Print the sizes stored in `resources/icon.ico`                                                                 |
 
 In development mode the app stores its data in a separate `<name>-dev` folder, so it never touches the data of the installed version.
 
@@ -188,22 +207,58 @@ In development mode the app stores its data in a separate `<name>-dev` folder, s
 
 <br />
 
-## 📦 Building the Windows Installer
+## 📦 Building for Windows
 
 ```bash
-npm run build:win
+npm run build:win       # installer for x64 only
+npm run build:win:all   # everything: installer + portable archives, x64 and ARM64
 ```
 
-The command runs the linters, builds the app and packages it with `electron-builder`. The installer is written to the `dist` directory:
+Both commands run the linters, build the app and package it with `electron-builder`. The result is written to the `dist` directory:
 
 ```text
-dist/Copyfloy-setup-<version>.exe
+dist/Copyfloy-setup-<version>.exe                  # installer (NSIS)
+dist/Copyfloy-setup-<version>.exe.blockmap         # data for differential updates
+dist/Copyfloy-portable-<version>-x64.zip           # portable, Intel / AMD
+dist/Copyfloy-portable-<version>-arm64.zip         # portable, Windows on ARM
+dist/latest.yml                                    # update metadata for electron-updater
 ```
 
-The packaging settings live in the `build` section of `package.json`. The installer uses the NSIS target and provides a selectable installation directory (per-user install), a desktop shortcut, application icons, an uninstaller and the MIT license text.
+`build:win:all` produces all of the files above. When both architectures are built, the NSIS installer is a single file that contains x64 and ARM64 versions and installs the matching one. `build:win` builds only the x64 installer.
 
-> [!NOTE]
-> **Windows security warning.** The executable is not code-signed yet, so Windows Defender SmartScreen may show a warning on launch. This only means the app has no trusted digital signature. Code signing may be added in a future release.
+The packaging settings live in the `build` section of `package.json`. The installer provides a selectable installation directory (per-user install), a desktop shortcut, application icons, an uninstaller and the MIT license text.
+
+### Installed and portable builds
+
+The application detects the portable build at startup: the NSIS installer puts `Uninstall <name>.exe` next to the executable, and the ZIP build has no such file. The only difference in behavior is the update process (see **Updates** in [Features](#-features)): the portable build does not download or install updates by itself.
+
+---
+
+<br />
+
+## 🚢 Releases
+
+Releases are created by the **Release** workflow in GitHub Actions (`.github/workflows/release.yml`). It is started manually (`workflow_dispatch`) and works only on the `main` branch.
+
+```text
+1. Prepare  - reads the version from package.json, stops if a release with this version
+              already exists, generates the release notes
+2. Build    - npm ci, npm run build:win:all on Windows, checks that all files exist
+              and that latest.yml references the installer
+3. Release  - creates the GitHub release with the installer, the blockmap, both
+              portable archives and latest.yml
+```
+
+To publish a new release:
+
+1. Raise the `version` in `package.json` and commit it with the version number as the commit message (`X.Y.Z`).
+2. Run the **Release** workflow on `main`.
+
+Notes:
+
+- The **release notes** list the commit subjects made since the previous version commit (a commit whose whole message is `X.Y.Z`). Commits that are themselves version bumps are not listed. Subjects that end with a pull request number (`(#123)`) are listed as they are; for the others the commit hash is appended. The notes end with the installation instructions and the warnings from `.github/release-footer.md`.
+- The result of the run is also shown as the **Release build** status next to the commit.
+- The built-in updater reads releases from the GitHub repository set in the `build.publish` section of `package.json`.
 
 ---
 
@@ -249,7 +304,8 @@ For the task lifecycle, scheduling, storage format and the responsibilities of e
 | Scheduling      | node-cron                                                                |
 | Updates         | electron-updater (GitHub releases)                                       |
 | Integrations    | @xhayper/discord-rpc, Electron Toolkit (`preload`, `utils`)              |
-| Build           | electron-vite, electron-builder (NSIS)                                   |
+| Build           | electron-vite, electron-builder (NSIS installer, ZIP), x64 and ARM64     |
+| Releases        | GitHub Actions                                                           |
 | Code quality    | ESLint (+ TypeScript, React, import plugins), Stylelint, Prettier config |
 
 ---
