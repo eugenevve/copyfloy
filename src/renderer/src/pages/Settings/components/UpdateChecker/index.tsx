@@ -10,11 +10,20 @@ export const UpdateChecker: FC = () => {
   const [status, setStatus] = useState<UpdateStatus>(UpdateStatus.IDLE);
   const [progress, setProgress] = useState(0);
 
-  const { appVersion, isPackaged } = window.api.app;
+  const { appVersion, isPackaged, isPortable } = window.api.app;
 
   useEffect(() => {
     const unsubscribe = [
-      window.api.updater.onAvailable(() => {
+      window.api.updater.onAvailable((version) => {
+        if (isPortable) {
+          setStatus(UpdateStatus.IDLE);
+          showAlert(
+            "Update available",
+            `Version ${version} is available. The portable version is not updated automatically: download the new ZIP archive from https://github.com/eugenevve/copyfloy/releases and replace the application files.`
+          );
+          return;
+        }
+
         setStatus(UpdateStatus.AVAILABLE);
       }),
 
@@ -39,7 +48,7 @@ export const UpdateChecker: FC = () => {
     ];
 
     return () => unsubscribe.forEach((unsubscribe) => unsubscribe());
-  }, [showAlert]);
+  }, [isPortable, showAlert]);
 
   const handleAction = (): void => {
     if (!isPackaged) {

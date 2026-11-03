@@ -13,6 +13,11 @@ export class AppIpc {
       event.returnValue = this.appService.isPackaged();
     });
 
+    // Returns whether the application is a portable (unpacked ZIP) build
+    ipcMain.on(IPC_CHANNELS.app.isPortable, (event) => {
+      event.returnValue = this.appService.isPortable();
+    });
+
     // Returns whether the application is running with administrator privileges
     ipcMain.handle(IPC_CHANNELS.app.isAdmin, () => {
       return checkIsAdmin();

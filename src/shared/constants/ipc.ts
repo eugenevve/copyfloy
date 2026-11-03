@@ -1,6 +1,7 @@
 export const IPC_CHANNELS = {
   app: {
     isPackaged: "app:is-packaged",
+    isPortable: "app:is-portable",
     isAdmin: "app:is-admin",
   },
   window: {
