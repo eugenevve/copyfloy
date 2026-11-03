@@ -45,12 +45,19 @@ Storage  - reads and writes the JSON file of the service
 The entry point is `src/main/index.ts`:
 
 1. In development mode `userData` is redirected to a separate `<name>-dev` directory, so a development build never touches the data of the installed application. This happens before any service is created, because storages resolve their paths at construction.
-2. A single-instance lock is requested. If the lock is not acquired, the second process exits; the running instance receives the `second-instance` event and restores its window.
-3. After `app.whenReady()` the services are initialized (tasks, scheduler and missed-run detection, labels, reports, updater, Discord), then IPC handlers are registered.
-4. The main window is created, and the services that depend on it (tray, updater events) are initialized.
-5. When the interface is ready, it asks the main process for the runs that were missed while the application was closed (see [Missed Runs](#-missed-runs)).
+2. The services are created while the module is loaded. `SettingsService` reads `settings.json` in its constructor and immediately re-applies the saved auto-start setting (see [Auto-start and run as administrator](#auto-start-and-run-as-administrator)).
+3. A single-instance lock is requested. If the lock is not acquired, the second process exits; the running instance receives the `second-instance` event and restores its window.
+4. After `app.whenReady()` the application ID is configured (`AppUserModelId`, needed for Windows notifications and the taskbar), the services are initialized (tasks, scheduler and missed-run detection, labels, reports, updater, Discord), and then IPC handlers are registered.
+5. The main window is created, and the services that depend on it (tray, updater events) are initialized.
+6. When the interface is ready, it asks the main process for the runs that were missed while the application was closed (see [Missed Runs](#-missed-runs)).
 
-The application supports a `--hidden` command-line flag: the window is created but not shown, so the app can start silently in the tray.
+The application supports a `--hidden` command-line flag: the window is created but not shown (`ready-to-show` only writes a message to the log), so the app can start silently in the tray. The flag is **not** added by the application's own auto-start; it has to be passed manually, for example from a shortcut.
+
+On exit (`before-quit`) the application marks itself as quitting, so that the window close handler stops hiding the window into the tray, and closes the Discord connection. When all windows are closed, the application quits on every platform except macOS.
+
+### Logging
+
+`Logger` (`src/main/utils/logger.ts`) is a thin wrapper over the console with three levels (`info`, `warn`, `error`). Every message has a scope (`CopyService`, `TaskStorage`, ...), a text and optional details. It is used by the services for events that are useful when something goes wrong: start and end of a task, failed storage reads and writes, schedule problems, auto-start changes. There is no log file; the messages are visible in the console when the application is started from a terminal or in development mode.
 
 ---
 
@@ -62,7 +69,7 @@ All channel names are declared in one place, `src/shared/constants/ipc.ts`, and 
 
 | Group      | Purpose                                                                                                                     |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `app`      | Whether the build is packaged, whether the process has administrator rights                                                 |
+| `app`      | Whether the build is packaged, whether it is a portable build, whether the process has administrator rights                 |
 | `window`   | Title bar controls (minimize, maximize, close), maximized state and its change event                                        |
 | `settings` | Getters and setters of every application setting: sidebar, auto-start, administrator mode, zoom, tray, date and time format |
 | `tasks`    | CRUD, order, run / stop, progress, running tasks, missed runs, Git availability, export / import, file dialogs              |
@@ -70,7 +77,9 @@ All channel names are declared in one place, `src/shared/constants/ipc.ts`, and 
 | `report`   | Get and clear the history                                                                                                   |
 | `updater`  | Check, download, install, and the events forwarded to the interface (available, not available, progress, downloaded, error) |
 
-Two kinds of messages go from the main process to the interface without a request: **task progress** (`tasks.progress`) and **updater events**; the maximized state of the window is pushed the same way. Everything else is a request that returns a result (`ipcMain.handle`). The only synchronous channel is `settings.getSidebar`, which the interface reads at start.
+Two kinds of messages go from the main process to the interface without a request: **task progress** (`tasks.progress`) and **updater events**; the maximized state of the window is pushed the same way. Everything else is a request that returns a result (`ipcMain.handle`).
+
+Three channels are **synchronous** (`sendSync`): `app.isPackaged`, `app.isPortable` and `settings.getSidebar`. Their values never change while the application is running or are needed before the first render, so the interface reads them once at startup, and `window.api` exposes them as plain values (`window.api.app.isPackaged`, `window.api.app.isPortable`) instead of promises.
 
 ---
 
@@ -114,7 +123,9 @@ The ID of a task is its creation time. This is used by [Missed Runs](#-missed-ru
 
 ### Creating and editing a task
 
-A task is created in a form with the name, labels, type, source, destination, exclusions (folders), the repository settings (provider, visibility, token) and the **Create ZIP archive instead of copying** option. The form validates the repository URL and disables saving while a private repository has no token.
+A task is created in a form with the name, labels, type, source, destination, exclusions (folders), the repository settings (provider, visibility, token) and the **Create ZIP archive instead of copying** option. The form validates the repository URL and disables saving while a private repository has no token. Changing the type of the task clears the source and the exclusions.
+
+Exclusions are added in two steps: the **Add a file or folder** button opens a small dialog where the user chooses what to exclude - a folder or a file, because the system dialog cannot select both at once - and then the system dialog opens in the source folder with multiple selection enabled. Paths that are already in the list are not added twice.
 
 The **schedule is not a part of this form.** A task is saved first, and its schedule is set later in a separate dialog (the clock button on the task card), which updates only the `schedule` field. Both dialogs ask for confirmation when closed with unsaved changes.
 
@@ -609,13 +620,13 @@ Application settings are stored in `settings.json` in the `userData` directory:
 | `dateTimeFormat` | `DMY`, `24-hour` | Format of dates and time in the interface                |
 | `windowState`    | -                | Position, size and maximized state of the window         |
 
-When a setting changes, `SettingsService` stores the new value and applies the related system settings.
+When a setting changes, `SettingsService` stores the new value and applies the related system settings. At startup the saved values are merged with the defaults, so a setting that was added in a newer version gets its default value instead of being missing.
 
 The Settings page contains one widget for each of them: auto-start, run as administrator, page zoom, minimize to tray, date and time format, import / export of tasks and the update checker.
 
 ### Auto-start and run as administrator
 
-Both options work only in the **packaged build on Windows**; in development they have no effect, and the widgets are disabled.
+Both options work only in the **packaged build on Windows**; in development they have no effect, and the widgets are disabled. This applies to the installed and to the portable build alike.
 
 | Auto-start | Run as admin | What is configured                                                                     |
 | ---------- | ------------ | -------------------------------------------------------------------------------------- |
@@ -625,14 +636,17 @@ Both options work only in the **packaged build on Windows**; in development they
 
 Elevated applications are not started by a regular login item, because Windows blocks it. That is why the combination of both options uses Task Scheduler (`schtasks`, `/sc onlogon /rl highest`) and turns the regular login item off.
 
-"Run as administrator" itself is implemented in `RunAdminService`: it adds or removes the `~ RUNASADMIN` flag for the executable in the registry key `HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`, so Windows requests elevation on every launch. The change takes effect after the application is restarted.
+"Run as administrator" itself is implemented in `RunAdminService`: it adds or removes the `~ RUNASADMIN` flag for the executable in the registry key `HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`, so Windows requests elevation on every launch. The change takes effect after the application is restarted, and the Settings page says so.
+
+Both services register the path of the **current executable** (`app.getPath("exe")`). The auto-start setting is applied again on every launch, so after the application was updated or moved (which is typical for the portable build) it is enough to start it once from the new place for the registration to follow. The administrator flag is written only when the setting is changed, so it has to be switched off and on again to be registered for a new path.
 
 ### Window
 
 - The window is frameless; the title bar buttons (minimize, maximize, close) are drawn by the interface and call the main process through IPC.
-- Position, size and maximized state are saved (with a delay, so the file is not written on every pixel of a resize) and restored on the next launch. If the saved position is no longer visible, for example a monitor was disconnected, the window is centered.
-- The window cannot be made smaller than its base size.
-- Developer tools are available only in development mode.
+- The base size of the window is 720 × 540. It is also the minimum size: the window cannot be made smaller.
+- Position, size and maximized state are saved (with a delay, so the file is not written on every pixel of a resize) and restored on the next launch. If the saved position is no longer visible, for example a monitor was disconnected, the window is centered. While the window is minimized or full screen, the previously saved state is kept.
+- On displays with a scale factor above 100 % Windows reports the borders of a resized window differently, so the real window bounds are saved in this case.
+- Developer tools are available only in development mode; the shortcuts `Ctrl` + `Shift` + `I` and `F12` are blocked in the packaged application.
 - Links that the interface tries to open in a new window are opened in the default browser of the system.
 
 ### Page zoom
@@ -673,9 +687,45 @@ How it works:
 
 <br />
 
+## 🧩 Build Variants
+
+The application is distributed in two forms. The code is the same; the build type is detected at runtime by `isPortable()`.
+
+| Variant       | Package                                              | How it is detected                                           | Updates                               |
+| ------------- | ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------- |
+| **Installed** | NSIS installer `Copyfloy-setup-<version>.exe`        | `Uninstall <name>.exe` is located next to the executable     | Downloaded and installed by the app   |
+| **Portable**  | ZIP archive `Copyfloy-portable-<version>-<arch>.zip` | The packaged app has no `Uninstall <name>.exe` in its folder | Manually: the user replaces the files |
+
+### Detection
+
+`isPortable()` (`src/main/utils/isPortable.ts`) returns `true` when all of the following is true:
+
+1. The application is packaged (a development run is never portable).
+2. The folder of the executable can be read.
+3. It contains no file that matches `Uninstall *.exe` - the NSIS installer puts such a file next to the application, while a ZIP archive does not have it.
+
+If the folder cannot be read, the build is treated as **installed**, because this is the safe default: the normal update flow stays available.
+
+The result is available to the main process (`AppService.isPortable()`) and to the interface (`window.api.app.isPortable`, read synchronously at startup).
+
+### What is different
+
+The only place where the two variants behave differently is the update process (see [Updates](#-updates)). Everything else is identical:
+
+- The code has no separate data location for the portable build, so both variants use the same default Electron `userData` directory and, therefore, the same `tasks.json`, `labels.json`, `settings.json`, `report.json` and `missed-dismissed.json`.
+- Auto-start and run as administrator work the same way and use the path of the current executable (see [Settings](#-settings)).
+
+### Architectures
+
+Windows on **x64** and on **ARM64** are supported. When both are built, the installer is a single `.exe` that contains both versions and installs the matching one; the portable build is a separate archive for each architecture (`-x64.zip`, `-arm64.zip`).
+
+---
+
+<br />
+
 ## 🔄 Updates
 
-`UpdaterService` is built on `electron-updater` and uses GitHub releases.
+`UpdaterService` is built on `electron-updater` and uses GitHub releases. The repository is set in the `build.publish` section of `package.json`, and the metadata of a release is read from `latest.yml`.
 
 The update is controlled manually from the Settings page:
 
@@ -694,6 +744,94 @@ Install: close the windows and restart with the new version
 - The events of `electron-updater` (available, not available, progress, downloaded, error) are forwarded to the interface through IPC.
 - During installation a separate small window with a spinner is shown. The other windows are closed, and after a short pause (3 seconds) the installer is started silently and restarts the application.
 - In development there is no packaged application, so the installation step does nothing.
+- The update signature check is turned off (`verifyUpdateCodeSignature: false`), because the executable is not code-signed yet.
+
+### Portable build
+
+A portable build must not be updated with the NSIS installer, so the update flow is limited:
+
+| Step                   | Installed build                       | Portable build                                                                                       |
+| ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Check                  | Works                                 | Works                                                                                                |
+| Update found           | The **Download the update** button    | A message with the new version and a link to the Releases page; the widget returns to the idle state |
+| Download               | Downloads the installer               | Does nothing (an empty result is returned)                                                           |
+| Install                | Closes the app and runs the installer | Does nothing                                                                                         |
+| `autoInstallOnAppQuit` | Enabled                               | Disabled                                                                                             |
+
+The checks are made in the main process (`UpdaterService`), so the installer cannot be downloaded or started even if the interface is bypassed. The interface only changes what the user sees: for a portable build it shows the message _"The portable version is not updated automatically: download the new ZIP archive from the Releases page and replace the application files"_.
+
+---
+
+<br />
+
+## 📦 Packaging
+
+Packaging is done by `electron-builder`; its settings are in the `build` section of `package.json`. The source is compiled by `electron-vite` into the `out` directory, and only `out/**/*` is put into the package.
+
+| Command                 | Result                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| `npm run build:win`     | Lint, build, then the NSIS installer for x64 only                                        |
+| `npm run build:win:all` | Lint, build, then everything for x64 and ARM64: the installer and both portable archives |
+
+The files are written to the `dist` directory:
+
+```text
+Copyfloy-setup-<version>.exe                  installer (NSIS)
+Copyfloy-setup-<version>.exe.blockmap         data for differential updates
+Copyfloy-portable-<version>-x64.zip           portable, Intel / AMD
+Copyfloy-portable-<version>-arm64.zip         portable, Windows on ARM
+latest.yml                                    update metadata for electron-updater
+```
+
+Notes:
+
+- The names are set by `artifactName` (`nsis.artifactName` for the installer, `win.artifactName` for the archives).
+- The installer is not one-click: the user can choose the installation folder; it installs for the current user (not per machine), creates a desktop shortcut and a shortcut named after the application, and shows the MIT license. It also writes `Uninstall <name>.exe` - the file by which the installed build is recognized.
+- The icon of the application is also copied next to the executable (`extraResources`, `icon.png`), for the window and the tray.
+- The icons are generated from `resources/icon.svg` by `npm run icons`; `npm run icons-check` prints the sizes stored in `icon.ico`.
+
+---
+
+<br />
+
+## 🚢 Releases
+
+A release is created by the **Release** workflow in GitHub Actions (`.github/workflows/release.yml`).
+
+- It is started manually (`workflow_dispatch`) and runs **only on `main`**.
+- Only one release run at a time is allowed (`concurrency`), and a started run is not cancelled by another one.
+- The workflow needs the permissions `contents: write` (to create a release) and `statuses: write` (to set the commit status).
+
+```text
+Prepare (Ubuntu)
+   status "pending" for the commit
+   version = package.json → fails if a release with this version already exists
+   release notes = commit subjects since the previous version commit
+        ↓
+Build (Windows)
+   Node.js 22, npm ci, npm run build:win:all -- --publish never
+   checks that the installer, the blockmap, both ZIP archives and latest.yml exist
+   checks that latest.yml references the installer of this version
+        ↓
+Release (Ubuntu)
+   gh release create <version> with the five files and the notes
+        ↓
+Status (always)
+   final status "Release build" for the commit: success / failure / error
+```
+
+### Version and release notes
+
+- The version of the release is the `version` from `package.json`. To make a new release, raise it first; if a release with such a tag exists, the workflow stops at the first step.
+- The **release notes** are the list of commit subjects between the previous version commit and the current one. A version commit is a commit whose whole message is `X.Y.Z`; the commit of the version that is being released is not included. If there is no previous version commit, the notes are built from the whole history.
+- A subject that ends with a pull request number (`(#123)`) is written as it is; for the other commits the hash is added to the subject. Merge commits are skipped.
+- At the end of the notes the text of `.github/release-footer.md` is added: the installation instructions (which file to choose) and the warnings about the experimental status and about the missing code signature. The placeholder `__VERSION__` in it is replaced by the version.
+
+### Result
+
+The release is created with the title `Copyfloy <version>` for the commit that the workflow was run on. The built-in updater of the installed application finds it through `latest.yml`; the portable build only shows a link to the Releases page.
+
+The workflow does not run the tests or the linters itself, but `npm run build:win:all` starts `npm run build`, which includes the CSS and JS/TS linters with zero allowed warnings, so a build with lint errors does not produce a release.
 
 ---
 
@@ -719,7 +857,7 @@ The renderer is a React application with `HashRouter` and CSS Modules. It contai
 | Labels   | Creating, editing, deleting, searching and reordering labels                                                   |
 | Report   | Summary, charts and history of task runs                                                                       |
 | Settings | Auto-start, administrator mode, zoom, tray behavior, date and time format, import and export of tasks, updates |
-| About    | Information about the application                                                                              |
+| About    | Description of the application, its version and a link to the GitHub repository                                |
 
 Common parts of the interface:
 
@@ -729,6 +867,7 @@ Common parts of the interface:
 - **Drag and drop** - lists are sorted with `@dnd-kit` (pointer and keyboard sensors, movement restricted to the vertical axis and to the list).
 - **Charts** - the Report page uses Recharts with the colors of the current theme.
 - **Shared state outside React** - theme, zoom and date and time format. They are small stores with subscriptions, so any component can follow them.
+- **Build-dependent behavior** - widgets read `window.api.app.isPackaged` and `window.api.app.isPortable`: in development the auto-start, administrator and update widgets are disabled or explain that the setting is not available, and the update widget changes its messages for a portable build.
 
 The interface keeps no important data of its own: tasks, labels, settings and reports are always read from and written to the main process through `window.api`. The only values the interface stores itself are the selected theme and the temporary state of filters, search and forms.
 
@@ -750,7 +889,7 @@ All persistent data is stored locally as JSON files in Electron's `userData` dir
 
 The selected theme is not in these files: it is stored in the local storage of the application window.
 
-In development mode the directory is `<appData>/<name>-dev`, separate from the installed application.
+In development mode the directory is `<appData>/<name>-dev`, separate from the installed application. The installed and the portable builds use the same directory.
 
 ---
 
@@ -764,8 +903,9 @@ The main process is organized into dedicated services, each responsible for a sp
 
 Responsible for:
 
-- Information about the application package
-- Information about granted administrator privileges
+- Configuring the application ID (`AppUserModelId`) at startup
+- Information about the application package: whether it is packaged and whether it is a portable build
+- Information about granted administrator privileges (`net session` on Windows)
 
 ### `CopyService`
 
@@ -845,13 +985,26 @@ Handles the Windows system tray integration.
 
 ### `UpdaterService`
 
-Provides application update functionality.
+Provides application update functionality: check, download and installation of updates, forwarding of the updater events to the interface. For a portable build the download and the installation are disabled (see [Updates](#-updates)).
 
 ### `WindowService`
 
 Controls the main application window, including its state and window behavior.
 
 Helpers: `WindowEvents` (window events), `WindowStateService` (saving and restoring the window state), `WindowIpc` (title bar controls).
+
+### Utilities
+
+Shared helpers of the main process (`src/main/utils`):
+
+| Utility             | Purpose                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `Logger`            | Console logging with levels and scopes                                                     |
+| `environment`       | Platform flags (`isWindows`, `isPackagedWindows`) and the application state (`isQuitting`) |
+| `exePath`           | Path of the current executable, used by auto-start and the administrator flag              |
+| `isPortable`        | Detection of the portable build                                                            |
+| `checkIsAdmin`      | Check of administrator rights                                                              |
+| `reorderDisplayIds` | Validation and saving order of a reordered list of tasks or labels                         |
 
 ---
 
@@ -867,3 +1020,5 @@ Helpers: `WindowEvents` (window events), `WindowStateService` (saving and restor
 - The order of tasks and labels received from the interface is validated before it is saved: it must be exactly the set of stored IDs.
 - The size of the lists is limited, so the data files cannot grow without bounds.
 - Links opened from the interface go to the system browser instead of a new application window.
+- The portable build cannot download or start the installer: the restriction is enforced in the main process, not only in the interface.
+- Developer tools and their shortcuts are disabled in the packaged application.
