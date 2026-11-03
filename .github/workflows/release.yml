@@ -98,6 +98,35 @@ jobs:
       - name: Build
         run: npm run build:win:all -- --publish never
 
+      - name: Check build output
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          ls -la dist
+
+          missing=0
+          for f in \
+            "Copyfloy-setup-$VERSION.exe" \
+            "Copyfloy-setup-$VERSION.exe.blockmap" \
+            "Copyfloy-portable-$VERSION-x64.zip" \
+            "Copyfloy-portable-$VERSION-arm64.zip" \
+            "latest.yml"; do
+            if [ ! -f "dist/$f" ]; then
+              echo "::error::Missing build output: dist/$f"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+
+          echo "--- latest.yml ---"
+          cat dist/latest.yml
+
+          grep -q "Copyfloy-setup-$VERSION.exe" dist/latest.yml || {
+            echo "::error::latest.yml does not reference Copyfloy-setup-$VERSION.exe"
+            exit 1
+          }
+
       - uses: actions/upload-artifact@v7
         with:
           name: release-files
@@ -134,9 +163,9 @@ jobs:
         run: |
           gh release create "$VERSION" \
             "files/Copyfloy-setup-$VERSION.exe" \
+            "files/Copyfloy-setup-$VERSION.exe.blockmap" \
             "files/Copyfloy-portable-$VERSION-x64.zip" \
             "files/Copyfloy-portable-$VERSION-arm64.zip" \
-            "files/Copyfloy-setup-$VERSION.exe.blockmap" \
             "files/latest.yml" \
             --title "Copyfloy $VERSION" \
             --notes-file notes/notes.md \

@@ -15,6 +15,7 @@ export const api = {
   app: {
     appVersion: packageJson.version,
     isPackaged: ipcRenderer.sendSync(IPC_CHANNELS.app.isPackaged) as boolean,
+    isPortable: ipcRenderer.sendSync(IPC_CHANNELS.app.isPortable) as boolean,
     isAdmin: (): Promise<boolean> => ipcRenderer.invoke(IPC_CHANNELS.app.isAdmin),
   },
   window: {

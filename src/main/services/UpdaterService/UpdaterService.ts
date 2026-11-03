@@ -1,3 +1,4 @@
+import { isPortable } from "@main/utils/isPortable";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { app, BrowserWindow } from "electron";
 import { autoUpdater } from "electron-updater";
@@ -8,7 +9,7 @@ import { getUpdateWindowHtml } from "./UpdaterServiceHtml";
 export class UpdaterService {
   // Initializes the updater configuration
   init(): void {
-    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoInstallOnAppQuit = !isPortable();
     autoUpdater.autoDownload = false;
   }
 
@@ -19,11 +20,20 @@ export class UpdaterService {
 
   // Starts downloading the available update
   download() {
+    // A portable build is updated manually, the NSIS installer must not be downloaded
+    if (isPortable()) {
+      return Promise.resolve<string[]>([]);
+    }
+
     return autoUpdater.downloadUpdate();
   }
 
   // Closes the application and installs the downloaded update
   install(): void {
+    if (isPortable()) {
+      return;
+    }
+
     this.quitAndInstall();
   }
 
