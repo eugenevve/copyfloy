@@ -14,13 +14,13 @@ export class WindowStateService {
   }
 
   // Saves the current window state
-  saveState(state: IWindowState): void {
+  saveState(state: IWindowState) {
     this.settingsService.updateWindowState(state);
   }
 
   // Schedules saving the window state after a short delay
   // This prevents writing to disk on every resize/move event
-  scheduleSave(getState: () => IWindowState): void {
+  scheduleSave(getState: () => IWindowState) {
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
@@ -32,7 +32,7 @@ export class WindowStateService {
   }
 
   // Cancels a pending state save
-  cancelPendingSave(): void {
+  cancelPendingSave() {
     if (!this.saveTimeout) {
       return;
     }

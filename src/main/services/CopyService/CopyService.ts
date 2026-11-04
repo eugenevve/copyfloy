@@ -32,16 +32,16 @@ export class CopyService {
   }
 
   // Stops a running task; already copied files are kept
-  stop(taskId: number): void {
+  stop(taskId: number) {
     this.running.get(taskId)?.controller.abort();
   }
 
-  async isGitAvailable(): Promise<boolean> {
+  async isGitAvailable() {
     return isGitAvailable();
   }
 
   // Copies a source file or directory to a target directory and honors the task's excluded paths
-  async run(task: ITask): Promise<void> {
+  async run(task: ITask) {
     if (this.running.has(task.id)) {
       return;
     }
@@ -57,7 +57,7 @@ export class CopyService {
 
     try {
       if (task.type === TaskType.REPOSITORY) {
-        const report = (percent: number): void => {
+        const report = (percent: number) => {
           if (percent > state.percent) {
             state.percent = percent;
             this.broadcast(task.id, percent);
@@ -87,7 +87,7 @@ export class CopyService {
 
       if (task.isArchive) {
         const archivePath = path.join(task.target, `${path.basename(task.source)}.zip`);
-        const onProgress = (percent: number): void => {
+        const onProgress = (percent: number) => {
           if (percent > state.percent) {
             state.percent = percent;
             this.broadcast(task.id, percent);
@@ -120,7 +120,7 @@ export class CopyService {
       const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
       let copiedSize = 0;
 
-      const report = (): void => {
+      const report = () => {
         const percent = totalSize === 0 ? 0 : Math.min(100, Math.floor((copiedSize / totalSize) * 100));
 
         if (percent !== state.percent) {
@@ -196,7 +196,7 @@ export class CopyService {
     signal: AbortSignal,
     onProgress: (percent: number) => void,
     stats: IOperationStats
-  ): Promise<void> {
+  ) {
     const tempDir = await fs.mkdtemp(path.join(app.getPath("temp"), "copyfloy-"));
 
     try {
@@ -217,13 +217,13 @@ export class CopyService {
     }
   }
 
-  private applyEntryStats(entries: ICopyEntry[], stats: IOperationStats): void {
+  private applyEntryStats(entries: ICopyEntry[], stats: IOperationStats) {
     stats.filesCopied = entries.filter((entry) => !entry.isDirectory).length;
     stats.totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
   }
 
   // Copies one file, removing the partial result if the copy is interrupted
-  private async copyFile(entry: ICopyEntry, signal: AbortSignal, onBytes: (bytes: number) => void): Promise<void> {
+  private async copyFile(entry: ICopyEntry, signal: AbortSignal, onBytes: (bytes: number) => void) {
     const readStream = createReadStream(entry.source);
     readStream.on("data", (chunk) => onBytes(chunk.length));
 
@@ -242,7 +242,7 @@ export class CopyService {
     exceptions: string[] | undefined,
     entries: ICopyEntry[],
     operationStats?: IOperationStats
-  ): Promise<void> {
+  ) {
     if (this.isExcluded(source, exceptions)) {
       if (operationStats) {
         operationStats.skipped += 1;
@@ -272,7 +272,7 @@ export class CopyService {
     entries.push({ source, destination, isDirectory: false, size: fileStats.size });
   }
 
-  private broadcast(taskId: number, percent: number | null): void {
+  private broadcast(taskId: number, percent: number | null) {
     BrowserWindow.getAllWindows().forEach((window) => {
       if (!window.isDestroyed()) {
         window.webContents.send(IPC_CHANNELS.tasks.progress, { taskId, percent });

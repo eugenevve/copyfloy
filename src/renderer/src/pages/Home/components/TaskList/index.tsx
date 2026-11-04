@@ -51,7 +51,7 @@ export const TaskList: FC<ITaskList> = ({
   const pinnedIds = displayItems.filter((task) => task.isPinned).map(({ id }) => id);
   const regularIds = displayIds.filter((id) => !pinnedIds.includes(id));
 
-  const handleDragEnd = ({ active, over }: DragEndEvent): void => {
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
     if (!over || active.id === over.id) {
       setActiveId(null);
       return;

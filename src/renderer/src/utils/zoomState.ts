@@ -7,18 +7,18 @@ const listeners = new Set<Listener>();
 
 export const getZoom = (): number => zoomFactor;
 
-export const subscribeZoom = (listener: Listener): (() => void) => {
+export const subscribeZoom = (listener: Listener) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
 
-export const setZoom = (value: number): void => {
+export const setZoom = (value: number) => {
   zoomFactor = clampZoom(value);
   listeners.forEach((listener) => listener(zoomFactor));
-  void window.api?.settings?.zoom?.set(zoomFactor);
+  window.api?.settings?.zoom?.set(zoomFactor);
 };
 
-export const initZoom = async (): Promise<void> => {
+export const initZoom = async () => {
   const saved = await window.api?.settings?.zoom?.get();
   if (typeof saved === "number") {
     zoomFactor = clampZoom(saved);

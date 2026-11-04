@@ -70,8 +70,8 @@ export default defineConfig([
     },
     rules: {
       eqeqeq: ["warn", "smart"],
-      "@typescript-eslint/no-floating-promises": "warn",
-      "@typescript-eslint/no-misused-promises": "warn",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/no-misused-promises": ["warn", { checksVoidReturn: false }],
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["warn"],
     },

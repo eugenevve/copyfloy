@@ -21,7 +21,7 @@ export const Sidebar: FC = () => {
   const handleSidebar = () => {
     const newState = !isSidebarOpen;
     setSidebarOpen(newState);
-    void window.api.settings.sidebar.set(newState);
+    window.api.settings.sidebar.set(newState);
   };
 
   const getKind = (path: string) => {
@@ -79,7 +79,7 @@ export const Sidebar: FC = () => {
               icon={!isSidebarOpen}
               position="left"
               className={styles.button}
-              onClick={() => void navigate(path)}
+              onClick={() => navigate(path)}
               tooltip={isSidebarOpen ? undefined : label}
               tooltipPlacement={TooltipPlacement.RIGHT}
             >

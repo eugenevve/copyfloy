@@ -9,7 +9,7 @@ import { app } from "electron";
 export class AutoStartService {
   private readonly TASK_NAME = `${packageJson.name}-auto-start`;
 
-  update(openAtLogin: boolean, runAdmin: boolean): void {
+  update(openAtLogin: boolean, runAdmin: boolean) {
     if (!isPackagedWindows) return;
 
     Logger.info("AutoStartService", `Updating: openAtLogin=${openAtLogin}, runAdmin=${runAdmin}`);

@@ -9,13 +9,13 @@ export const RunAdmin: FC = () => {
 
   useEffect(() => {
     if (!isPackaged) return;
-    void window.api.settings.runAdmin.get().then(setRunAdmin);
+    window.api.settings.runAdmin.get().then(setRunAdmin);
   }, [isPackaged]);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const enabled = event.target.checked;
     setRunAdmin(enabled);
-    void window.api.settings.runAdmin.set(enabled);
+    window.api.settings.runAdmin.set(enabled);
   };
 
   const hint = isPackaged

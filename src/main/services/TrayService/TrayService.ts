@@ -10,7 +10,7 @@ export class TrayService {
   constructor(private readonly mainWindow: BrowserWindow) {}
 
   // Initializes the tray icon and its events
-  init(): void {
+  init() {
     this.tray = new Tray(this.createTrayIcon());
 
     this.tray.setToolTip(`${packageJson.name} ${app.isPackaged ? "" : "(dev)"}`);
@@ -55,7 +55,7 @@ export class TrayService {
   }
 
   // Restores and focuses the main window
-  private showWindow(): void {
+  private showWindow() {
     if (this.mainWindow.isMinimized()) {
       this.mainWindow.restore();
     }

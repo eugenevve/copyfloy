@@ -35,7 +35,7 @@ export class SettingsService {
   }
 
   // Applies new settings
-  private async updateSettings(newSettings: Partial<IAppSettings>): Promise<void> {
+  private async updateSettings(newSettings: Partial<IAppSettings>) {
     const previousSettings = { ...this.settings };
 
     this.settings = {
@@ -52,7 +52,7 @@ export class SettingsService {
     return this.settings.sidebarOpen;
   }
 
-  async setSidebar(sidebarOpen: boolean): Promise<void> {
+  async setSidebar(sidebarOpen: boolean) {
     await this.updateSettings({ sidebarOpen });
   }
 
@@ -61,7 +61,7 @@ export class SettingsService {
     return this.settings.runAdmin;
   }
 
-  async setAdmin(runAdmin: boolean): Promise<void> {
+  async setAdmin(runAdmin: boolean) {
     await this.updateSettings({ runAdmin });
   }
 
@@ -70,7 +70,7 @@ export class SettingsService {
     return this.settings.autoStart;
   }
 
-  async setAutoStart(autoStart: boolean): Promise<void> {
+  async setAutoStart(autoStart: boolean) {
     await this.updateSettings({ autoStart });
   }
 
@@ -79,7 +79,7 @@ export class SettingsService {
     return this.settings.zoomFactor;
   }
 
-  async setZoom(zoomFactor: number): Promise<void> {
+  async setZoom(zoomFactor: number) {
     await this.updateSettings({ zoomFactor });
   }
 
@@ -88,7 +88,7 @@ export class SettingsService {
     return this.settings.minimizeTray;
   }
 
-  async setMinimizeTray(minimizeTray: boolean): Promise<void> {
+  async setMinimizeTray(minimizeTray: boolean) {
     await this.updateSettings({ minimizeTray });
   }
 
@@ -97,18 +97,18 @@ export class SettingsService {
     return this.settings.dateTimeFormat;
   }
 
-  async setDateTimeFormat(dateTimeFormat: IDateTimeFormat): Promise<void> {
+  async setDateTimeFormat(dateTimeFormat: IDateTimeFormat) {
     await this.updateSettings({ dateTimeFormat });
   }
 
   // Saves the current window state
-  updateWindowState(state: IWindowState): void {
+  updateWindowState(state: IWindowState) {
     this.settings.windowState = state;
     this.saveSettings();
   }
 
   // Loads settings from disk.
-  private loadSettings(): void {
+  private loadSettings() {
     const loadedSettings = this.settingsStorage.load();
 
     if (!loadedSettings) {
@@ -127,7 +127,7 @@ export class SettingsService {
   }
 
   // Applies system-level changes
-  private async applySystemSettings(previousSettings: IAppSettings): Promise<void> {
+  private async applySystemSettings(previousSettings: IAppSettings) {
     if (this.settings.runAdmin !== previousSettings.runAdmin) {
       await this.runAdminService.update(this.settings.runAdmin);
     }
@@ -141,7 +141,7 @@ export class SettingsService {
   }
 
   // Saves settings to disk
-  private saveSettings(): void {
+  private saveSettings() {
     this.settingsStorage.save(this.settings);
   }
 }

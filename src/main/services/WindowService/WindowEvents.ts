@@ -19,7 +19,7 @@ export class WindowEvents {
   ) {}
 
   // Registers all BrowserWindow events
-  init(): void {
+  init() {
     this.window.on("resize", () => {
       this.options.onResize();
     });
@@ -57,7 +57,7 @@ export class WindowEvents {
     });
 
     this.window.webContents.setWindowOpenHandler((details) => {
-      void shell.openExternal(details.url);
+      shell.openExternal(details.url);
 
       return {
         action: "deny",

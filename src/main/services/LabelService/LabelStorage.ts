@@ -38,7 +38,7 @@ export class LabelStorage {
     }
   }
 
-  save(labels: ILabel[]): void {
+  save(labels: ILabel[]) {
     try {
       const directory = path.dirname(this.dataPath);
 

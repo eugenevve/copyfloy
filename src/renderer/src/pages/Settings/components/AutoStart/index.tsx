@@ -9,13 +9,13 @@ export const AutoStart: FC = () => {
 
   useEffect(() => {
     if (!isPackaged) return;
-    void window.api.settings.autoStart.get().then(setAutoStart);
+    window.api.settings.autoStart.get().then(setAutoStart);
   }, [isPackaged]);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const enabled = event.target.checked;
     setAutoStart(enabled);
-    void window.api.settings.autoStart.set(enabled);
+    window.api.settings.autoStart.set(enabled);
   };
 
   const hint = isPackaged

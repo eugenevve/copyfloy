@@ -25,7 +25,7 @@ export const ModalAlert: FC<IModalAlert> = ({
             </Button>
             <Button
               onClick={() => {
-                void onConfirm();
+                onConfirm();
               }}
             >
               {confirmTitle}

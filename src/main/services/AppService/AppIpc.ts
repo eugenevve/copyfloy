@@ -7,7 +7,7 @@ import { AppService } from "./AppService";
 export class AppIpc {
   constructor(private readonly appService: AppService) {}
 
-  init(): void {
+  init() {
     // Returns whether the application is packaged
     ipcMain.on(IPC_CHANNELS.app.isPackaged, (event) => {
       event.returnValue = this.appService.isPackaged();

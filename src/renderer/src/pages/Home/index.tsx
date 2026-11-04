@@ -44,7 +44,7 @@ export const Home: FC = () => {
 
   const handleRunTask = (task: ITask) => {
     try {
-      void runTask(task);
+      runTask(task);
     } catch (error) {
       console.error("Error running task:", error);
     }
@@ -140,12 +140,12 @@ export const Home: FC = () => {
               progress={progress}
               gitAvailable={gitAvailable}
               onRun={handleRunTask}
-              onStop={(task) => void stopTask(task.id)}
+              onStop={(task) => stopTask(task.id)}
               onSchedule={handleScheduleTask}
               onEdit={handleEditTask}
               onDelete={(task) => handleDeleteTask(task.id)}
-              onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
-              onReorder={(orderedIds) => void reorderTasks(orderedIds)}
+              onPin={(task) => updateTask({ ...task, isPinned: !task.isPinned })}
+              onReorder={(orderedIds) => reorderTasks(orderedIds)}
             />
           )}
         </div>
