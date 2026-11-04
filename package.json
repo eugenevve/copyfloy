@@ -14,8 +14,8 @@
     ],
     "extraResources": [
       {
-        "from": "resources/icon.png",
-        "to": "icon.png"
+        "from": "resources/icon-prod.png",
+        "to": "icon-prod.png"
       }
     ],
     "win": {
@@ -30,7 +30,7 @@
         }
       ],
       "artifactName": "${name}-portable-${version}-${arch}.${ext}",
-      "icon": "resources/icon.ico",
+      "icon": "resources/icon-prod.ico",
       "verifyUpdateCodeSignature": false
     },
     "nsis": {
@@ -43,9 +43,9 @@
       "createDesktopShortcut": true,
       "unicode": true,
       "license": "LICENSE",
-      "installerIcon": "resources/icon.ico",
-      "uninstallerIcon": "resources/icon.ico",
-      "installerHeaderIcon": "resources/icon.ico"
+      "installerIcon": "resources/icon-prod.ico",
+      "uninstallerIcon": "resources/icon-prod.ico",
+      "installerHeaderIcon": "resources/icon-prod.ico"
     },
     "publish": [
       {
