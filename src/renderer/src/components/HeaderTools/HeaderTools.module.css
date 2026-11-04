@@ -30,6 +30,10 @@
   min-width: 0;
 }
 
+.runTasksButton {
+  min-width: fit-content;
+}
+
 .labels {
   display: flex;
   gap: var(--spacing-xs);

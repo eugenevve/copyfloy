@@ -13,6 +13,7 @@ import { FC, useState } from "react";
 
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
+import { RunTasksModal } from "./components/RunTasksModal";
 import { TaskList } from "./components/TaskList";
 
 export const Home: FC = () => {
@@ -26,6 +27,9 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
+  const [isRunningAll, setIsRunningAll] = useState(false);
+  const [isRunTasksModalOpen, setRunTasksModalOpen] = useState(false);
+
   const {
     tasks,
     isLoading,
@@ -47,6 +51,28 @@ export const Home: FC = () => {
       runTask(task);
     } catch (error) {
       console.error("Error running task:", error);
+    }
+  };
+
+  // Run multiple tasks at once
+  const handleRunTasks = async (tasksToRun: ITask[]) => {
+    setRunTasksModalOpen(false);
+    setIsRunningAll(true);
+
+    const orderedTasks = tasksToRun
+      .toReversed()
+      .toSorted((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)));
+
+    try {
+      for (const task of orderedTasks) {
+        try {
+          await runTask(task);
+        } catch (error) {
+          console.error(`Error running task "${task.name}":`, error);
+        }
+      }
+    } finally {
+      setIsRunningAll(false);
     }
   };
 
@@ -115,6 +141,8 @@ export const Home: FC = () => {
       addText="Add task"
       onAdd={handleAddTask}
       addDisabled={tasks.length >= MAX_LIST_ITEMS}
+      onRunTasks={() => setRunTasksModalOpen(true)}
+      runTasksDisabled={isRunningAll || tasks.length === 0}
       search={search}
       onSearchChange={setSearch}
       filter={{
@@ -158,6 +186,14 @@ export const Home: FC = () => {
           initialData={isInitScheduling}
           onClose={handleCloseScheduleTask}
           onSaved={handleSaveScheduleTask}
+        />
+      )}
+      {isRunTasksModalOpen && (
+        <RunTasksModal
+          allTasks={tasks}
+          matchingTasks={filteredTasks}
+          onClose={() => setRunTasksModalOpen(false)}
+          onRun={handleRunTasks}
         />
       )}
     </>

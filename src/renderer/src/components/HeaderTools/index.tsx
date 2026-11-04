@@ -18,6 +18,8 @@ export const HeaderTools: FC<IHeaderTools> = ({
   addText,
   onAdd,
   addDisabled,
+  onRunTasks,
+  runTasksDisabled,
   search,
   onSearchChange,
   filter,
@@ -34,6 +36,16 @@ export const HeaderTools: FC<IHeaderTools> = ({
       <div className={styles.content}>
         <div className={styles.section}>
           <InfoApp name={title} count={count} />
+          {onRunTasks && (
+            <Button
+              kind={ButtonKind.SECONDARY}
+              onClick={onRunTasks}
+              disabled={runTasksDisabled}
+              className={styles.runTasksButton}
+            >
+              {runTasksDisabled ? (count === 0 ? "No tasks" : "Running...") : "Run tasks"}
+            </Button>
+          )}
           <Button onClick={onAdd} disabled={addDisabled}>
             {addText}
           </Button>
