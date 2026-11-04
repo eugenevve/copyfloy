@@ -36,12 +36,12 @@ export class CopyService {
     this.running.get(taskId)?.controller.abort();
   }
 
-  async isGitAvailable(): Promise<boolean> {
+  async isGitAvailable() {
     return isGitAvailable();
   }
 
   // Copies a source file or directory to a target directory and honors the task's excluded paths
-  async run(task: ITask): Promise<void> {
+  async run(task: ITask) {
     if (this.running.has(task.id)) {
       return;
     }
@@ -196,7 +196,7 @@ export class CopyService {
     signal: AbortSignal,
     onProgress: (percent: number) => void,
     stats: IOperationStats
-  ): Promise<void> {
+  ) {
     const tempDir = await fs.mkdtemp(path.join(app.getPath("temp"), "copyfloy-"));
 
     try {
@@ -223,7 +223,7 @@ export class CopyService {
   }
 
   // Copies one file, removing the partial result if the copy is interrupted
-  private async copyFile(entry: ICopyEntry, signal: AbortSignal, onBytes: (bytes: number) => void): Promise<void> {
+  private async copyFile(entry: ICopyEntry, signal: AbortSignal, onBytes: (bytes: number) => void) {
     const readStream = createReadStream(entry.source);
     readStream.on("data", (chunk) => onBytes(chunk.length));
 
@@ -242,7 +242,7 @@ export class CopyService {
     exceptions: string[] | undefined,
     entries: ICopyEntry[],
     operationStats?: IOperationStats
-  ): Promise<void> {
+  ) {
     if (this.isExcluded(source, exceptions)) {
       if (operationStats) {
         operationStats.skipped += 1;

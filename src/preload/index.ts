@@ -10,7 +10,7 @@ if (process.contextIsolated) {
     const exposedElectronApi = {
       ...electronAPI,
       shell: {
-        openExternal: (url: string): Promise<void> => {
+        openExternal: (url: string) => {
           return shell.openExternal(url);
         },
       },

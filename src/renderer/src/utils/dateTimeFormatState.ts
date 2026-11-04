@@ -23,7 +23,7 @@ export const setDateTimeFormat = (format: IDateTimeFormat) => {
   window.api?.settings?.dateTimeFormat?.set(format);
 };
 
-export const initDateTimeFormat = async (): Promise<void> => {
+export const initDateTimeFormat = async () => {
   const saved = await window.api?.settings?.dateTimeFormat?.get();
   if (!saved) return;
 

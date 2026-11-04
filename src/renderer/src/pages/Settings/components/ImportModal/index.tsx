@@ -10,7 +10,7 @@ import { IImportModal } from "./ImportModal.types";
 export const ImportModal: FC<IImportModal> = ({ onClose }) => {
   const { showAlert } = useModal();
 
-  const handleImport = async (mode: ImportMode): Promise<void> => {
+  const handleImport = async (mode: ImportMode) => {
     try {
       const transfer = await window.api.tasks.import();
       if (!transfer) {

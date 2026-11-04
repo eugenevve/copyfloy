@@ -11,7 +11,7 @@ const execAsync = promisify(exec);
 // Uses the AppCompatFlags registry key, which allows Windows
 // to automatically request administrator rights when launching an application
 export class RunAdminService {
-  async update(enable: boolean): Promise<void> {
+  async update(enable: boolean) {
     if (!isPackagedWindows) return;
 
     // Registry section responsible for application compatibility settings

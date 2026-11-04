@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from "electron";
 
-export const invoke = <T>(channel: string, ...args: unknown[]): Promise<T> => {
+export const invoke = <T>(channel: string, ...args: unknown[]) => {
   return ipcRenderer.invoke(channel, ...args) as Promise<T>;
 };
 

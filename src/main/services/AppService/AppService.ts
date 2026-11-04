@@ -22,7 +22,7 @@ export class AppService {
     return isPortable();
   }
 
-  isAdmin(): Promise<boolean> {
+  isAdmin() {
     return checkIsAdmin();
   }
 }

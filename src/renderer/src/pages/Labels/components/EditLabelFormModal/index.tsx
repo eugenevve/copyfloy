@@ -25,7 +25,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
 
   const isDirty = name !== initialValues.name || color !== initialValues.color;
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
       return;

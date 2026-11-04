@@ -11,7 +11,7 @@ export const createZip = async (
   archivePath: string,
   signal: AbortSignal,
   onProgress: (percent: number) => void
-): Promise<void> => {
+) => {
   const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
   const output = createWriteStream(archivePath);
   const archive = new ZipArchive({ zlib: { level: 6 } });

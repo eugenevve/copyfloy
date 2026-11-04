@@ -18,7 +18,7 @@ export const setZoom = (value: number) => {
   window.api?.settings?.zoom?.set(zoomFactor);
 };
 
-export const initZoom = async (): Promise<void> => {
+export const initZoom = async () => {
   const saved = await window.api?.settings?.zoom?.get();
   if (typeof saved === "number") {
     zoomFactor = clampZoom(saved);
