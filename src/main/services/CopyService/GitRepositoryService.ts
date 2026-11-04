@@ -114,7 +114,7 @@ function runGit(
     let errorOutput = "";
 
     // Kill git on abort; the "close" handler rejects after git has exited
-    const onAbort = (): void => {
+    const onAbort = () => {
       git.kill();
     };
     signal?.addEventListener("abort", onAbort, { once: true });

@@ -25,7 +25,7 @@ export class SettingsStorage {
   }
 
   // Saving settings to disk
-  save(settings: IAppSettings): void {
+  save(settings: IAppSettings) {
     try {
       fs.writeJsonSync(this.settingsPath, settings, {
         spaces: 2,

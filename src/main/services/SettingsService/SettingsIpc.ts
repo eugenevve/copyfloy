@@ -8,7 +8,7 @@ import { SettingsService } from "./SettingsService";
 export class SettingsIpc {
   constructor(private readonly settingsService: SettingsService) {}
 
-  init(): void {
+  init() {
     // Returns the current sidebar setting
     ipcMain.on(IPC_CHANNELS.settings.getSidebar, (event) => {
       event.returnValue = this.settingsService.getSidebar();

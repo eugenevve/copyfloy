@@ -12,15 +12,15 @@ const listeners = new Set<Listener>();
 
 export const getDateTimeFormat = (): IDateTimeFormat => dateTimeFormat;
 
-export const subscribeDateTimeFormat = (listener: Listener): (() => void) => {
+export const subscribeDateTimeFormat = (listener: Listener) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
 
-export const setDateTimeFormat = (format: IDateTimeFormat): void => {
+export const setDateTimeFormat = (format: IDateTimeFormat) => {
   dateTimeFormat = format;
   listeners.forEach((listener) => listener());
-  void window.api?.settings?.dateTimeFormat?.set(format);
+  window.api?.settings?.dateTimeFormat?.set(format);
 };
 
 export const initDateTimeFormat = async (): Promise<void> => {

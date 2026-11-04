@@ -8,7 +8,7 @@ import { getUpdateWindowHtml } from "./UpdaterServiceHtml";
 // Service responsible for application updates
 export class UpdaterService {
   // Initializes the updater configuration
-  init(): void {
+  init() {
     autoUpdater.autoInstallOnAppQuit = !isPortable();
     autoUpdater.autoDownload = false;
   }
@@ -29,7 +29,7 @@ export class UpdaterService {
   }
 
   // Closes the application and installs the downloaded update
-  install(): void {
+  install() {
     if (isPortable()) {
       return;
     }
@@ -38,7 +38,7 @@ export class UpdaterService {
   }
 
   // Subscribes to autoUpdater events and forwards them to the Renderer
-  initEvents(mainWindow: BrowserWindow): void {
+  initEvents(mainWindow: BrowserWindow) {
     autoUpdater.on(IPC_CHANNELS.updater.events.available, (info) => {
       this.sendToRenderer(mainWindow, IPC_CHANNELS.updater.ipc.available, info.version);
     });
@@ -61,7 +61,7 @@ export class UpdaterService {
   }
 
   // Creates the update status window and starts the installation process
-  private quitAndInstall(): void {
+  private quitAndInstall() {
     this.createUpdateStatusWindow();
 
     // In development there is no packaged application to update
@@ -103,7 +103,7 @@ export class UpdaterService {
       },
     });
 
-    void window.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(getUpdateWindowHtml())}`);
+    window.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(getUpdateWindowHtml())}`);
 
     window.once("ready-to-show", () => {
       window.show();
@@ -113,7 +113,7 @@ export class UpdaterService {
   }
 
   // Sends an update event to the Renderer if the window is still available
-  private sendToRenderer<T>(window: BrowserWindow, channel: string, data?: T): void {
+  private sendToRenderer<T>(window: BrowserWindow, channel: string, data?: T) {
     if (window.isDestroyed()) {
       return;
     }

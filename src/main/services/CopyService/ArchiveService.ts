@@ -42,7 +42,7 @@ export const createZip = async (
     }
   }
 
-  void archive.finalize();
+  archive.finalize();
 
   try {
     await finished;

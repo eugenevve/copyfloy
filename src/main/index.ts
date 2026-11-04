@@ -47,12 +47,12 @@ if (!gotTheLock) {
     windowService.restoreOrCreate();
   });
 
-  void app.whenReady().then(() => {
+  app.whenReady().then(() => {
     initializeApplication();
   });
 }
 
-function initializeApplication(): void {
+function initializeApplication() {
   appService.configure();
 
   initializeServices();
@@ -65,7 +65,7 @@ function initializeApplication(): void {
   registerApplicationEvents();
 }
 
-function initializeServices(): void {
+function initializeServices() {
   taskService.init();
   labelService.init();
   reportService.init();
@@ -81,21 +81,21 @@ function initializeServices(): void {
   });
 }
 
-function registerIpcHandlers(): void {
+function registerIpcHandlers() {
   appIpc.init();
   settingsIpc.init();
   windowIpc.init();
   updaterIpc.init();
 }
 
-function initializeWindowDependentServices(mainWindow: BrowserWindow): void {
+function initializeWindowDependentServices(mainWindow: BrowserWindow) {
   const trayService = new TrayService(mainWindow);
   trayService.init();
 
   updater.initEvents(mainWindow);
 }
 
-function registerApplicationEvents(): void {
+function registerApplicationEvents() {
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });

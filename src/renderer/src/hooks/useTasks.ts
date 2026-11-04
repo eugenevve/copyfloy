@@ -36,12 +36,12 @@ export const useTasks = () => {
   };
 
   useEffect(() => {
-    void window.api.tasks
+    window.api.tasks
       .get()
       .then(setTasks)
       .finally(() => setIsLoading(false));
-    void window.api.tasks.getRunning().then(setProgress);
-    void window.api.tasks
+    window.api.tasks.getRunning().then(setProgress);
+    window.api.tasks
       .isGitAvailable()
       .then(setGitAvailable)
       .catch(() => setGitAvailable(false));

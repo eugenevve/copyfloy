@@ -6,7 +6,7 @@ import packageJson from "@package";
 import { app } from "electron";
 
 export class AppService {
-  configure(): void {
+  configure() {
     const appId = packageJson.appId;
     electronApp.setAppUserModelId(appId);
     if (isWindows) {

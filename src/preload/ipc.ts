@@ -4,8 +4,8 @@ export const invoke = <T>(channel: string, ...args: unknown[]): Promise<T> => {
   return ipcRenderer.invoke(channel, ...args) as Promise<T>;
 };
 
-export const receive = <T>(channel: string, callback: (value: T) => void): (() => void) => {
-  const listener = (_event: IpcRendererEvent, value: T): void => {
+export const receive = <T>(channel: string, callback: (value: T) => void) => {
+  const listener = (_event: IpcRendererEvent, value: T) => {
     callback(value);
   };
 
@@ -16,8 +16,8 @@ export const receive = <T>(channel: string, callback: (value: T) => void): (() =
   };
 };
 
-export const receiveNoData = (channel: string, callback: () => void): (() => void) => {
-  const listener = (): void => {
+export const receiveNoData = (channel: string, callback: () => void) => {
+  const listener = () => {
     callback();
   };
 

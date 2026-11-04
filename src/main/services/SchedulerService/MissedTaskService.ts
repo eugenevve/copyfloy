@@ -62,7 +62,7 @@ export class MissedTaskService {
   ) {}
 
   // Computes missed tasks on startup; the renderer takes them once when it is ready
-  init(): void {
+  init() {
     this.pending = this.findMissed();
 
     ipcMain.handle(IPC_CHANNELS.tasks.getMissed, () => {

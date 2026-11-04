@@ -29,8 +29,8 @@ export const ImportModal: FC<IImportModal> = ({ onClose }) => {
       <div className={styles.container}>
         <div className={styles.title}>How do you want to process the imported tasks?</div>
         <div className={styles.section}>
-          <Button onClick={() => void handleImport(ImportMode.ADD)}>Add to current ones</Button>
-          <Button onClick={() => void handleImport(ImportMode.REPLACE)}>Replace current ones</Button>
+          <Button onClick={() => handleImport(ImportMode.ADD)}>Add to current ones</Button>
+          <Button onClick={() => handleImport(ImportMode.REPLACE)}>Replace current ones</Button>
         </div>
       </div>
     </Modal>

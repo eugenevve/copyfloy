@@ -11,7 +11,7 @@ export const ZoomController: FC = () => {
   const zoomFactor = useSyncExternalStore(subscribeZoom, getZoom);
 
   useEffect(() => {
-    void initZoom();
+    initZoom();
   }, []);
 
   return (

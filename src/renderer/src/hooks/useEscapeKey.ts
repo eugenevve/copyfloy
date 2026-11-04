@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useEscapeKey(onClose: () => void): void {
+export function useEscapeKey(onClose: () => void) {
   const callbackRef = useRef(onClose);
 
   useEffect(() => {

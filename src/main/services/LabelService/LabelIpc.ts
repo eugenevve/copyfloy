@@ -13,7 +13,7 @@ export class LabelIpc {
     private readonly taskStorage: TaskStorage
   ) {}
 
-  init(): void {
+  init() {
     // Get labels
     ipcMain.handle(IPC_CHANNELS.labels.get, () => {
       return this.labelStorage.load();

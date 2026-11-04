@@ -112,7 +112,7 @@ export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialDat
       {type === ScheduleType.WEEKLY && <DaysSelector selectedDays={days} onChange={setDays} />}
       <Line />
       <Checkbox label="System notification?" checked={notify} onChange={() => setNotify((prev) => !prev)} />
-      <Button onClick={() => void handleSubmit()} className={styles.button}>
+      <Button onClick={() => handleSubmit()} className={styles.button}>
         Save
       </Button>
     </Modal>

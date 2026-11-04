@@ -21,7 +21,7 @@ export const useLabels = () => {
   };
 
   useEffect(() => {
-    void window.api.labels
+    window.api.labels
       .get()
       .then(setLabels)
       .finally(() => setIsLoading(false));

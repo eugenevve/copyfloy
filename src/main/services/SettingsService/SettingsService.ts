@@ -102,13 +102,13 @@ export class SettingsService {
   }
 
   // Saves the current window state
-  updateWindowState(state: IWindowState): void {
+  updateWindowState(state: IWindowState) {
     this.settings.windowState = state;
     this.saveSettings();
   }
 
   // Loads settings from disk.
-  private loadSettings(): void {
+  private loadSettings() {
     const loadedSettings = this.settingsStorage.load();
 
     if (!loadedSettings) {
@@ -141,7 +141,7 @@ export class SettingsService {
   }
 
   // Saves settings to disk
-  private saveSettings(): void {
+  private saveSettings() {
     this.settingsStorage.save(this.settings);
   }
 }

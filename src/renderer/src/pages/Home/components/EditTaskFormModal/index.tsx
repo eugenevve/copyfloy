@@ -25,7 +25,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   const [gitAvailable, setGitAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
-    void window.api.tasks
+    window.api.tasks
       .isGitAvailable()
       .then(setGitAvailable)
       .catch(() => setGitAvailable(false));
@@ -153,7 +153,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
       await window.api.tasks.save(taskData);
     }
 
-    void onSaved();
+    onSaved();
   };
 
   const handleClose = () => {
@@ -246,14 +246,14 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
                 placeholder={type === TaskType.FOLDER ? "Folder path" : "File path"}
                 readOnly
               />
-              <Button kind={ButtonKind.PRIMARY} onClick={() => void handleSelectPath(FormField.SOURCE)}>
+              <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.SOURCE)}>
                 Review
               </Button>
             </div>
           )}
           <div className={styles.group}>
             <Input label="Destination Path" value={target} readOnly placeholder="Folder path" />
-            <Button kind={ButtonKind.PRIMARY} onClick={() => void handleSelectPath(FormField.TARGET)}>
+            <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.TARGET)}>
               Review
             </Button>
           </div>
@@ -282,7 +282,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
         <div className={styles.section}>
           {!isEditMode && <div className={styles.hint}>The schedule can be configured after saving the task</div>}
           <Button
-            onClick={() => void handleSubmit()}
+            onClick={() => handleSubmit()}
             disabled={
               !name ||
               !source ||
@@ -297,7 +297,7 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
         </div>
       </Modal>
       {isChoiceOpen && (
-        <ExceptionChoiceModal onClose={() => setChoiceOpen(false)} onSelect={(mode) => void handleAddException(mode)} />
+        <ExceptionChoiceModal onClose={() => setChoiceOpen(false)} onSelect={(mode) => handleAddException(mode)} />
       )}
     </>
   );
