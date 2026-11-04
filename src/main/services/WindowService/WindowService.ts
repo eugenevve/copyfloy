@@ -1,8 +1,9 @@
 import { join } from "node:path";
 
 import { is } from "@electron-toolkit/utils";
-import { appState, isWindows } from "@main/utils/environment";
-import iconPath from "@resources/icon.png?asset";
+import { appState, isPackagedWindows, isWindows } from "@main/utils/environment";
+import { iconPath } from "@main/utils/iconPath";
+import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IWindowState } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
@@ -30,6 +31,7 @@ export class WindowService {
     const baseHeight = 540;
 
     const window = new BrowserWindow({
+      title: isPackagedWindows ? packageJson.name : packageJson.devName,
       width: windowState?.width ?? baseWidth,
       height: windowState?.height ?? baseHeight,
       useContentSize: false,
