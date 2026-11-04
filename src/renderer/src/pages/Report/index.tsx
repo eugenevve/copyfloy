@@ -63,10 +63,12 @@ export const Report: FC = () => {
           <ReportBlockItem key={label} label={label} value={value} />
         ))}
       </div>
-      <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
-        <TrashIcon />
-        Clear history
-      </Button>
+      {report.records?.length !== 0 && (
+        <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
+          <TrashIcon />
+          Clear history
+        </Button>
+      )}
     </div>
   );
 
