@@ -7,6 +7,8 @@ export interface IHeaderTools {
   addText: string;
   onAdd: () => void;
   addDisabled?: boolean;
+  onRunTasks?: () => void;
+  runTasksDisabled?: boolean;
   search: string;
   onSearchChange: (value: string) => void;
   filter?: IHeaderToolsFilter;

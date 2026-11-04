@@ -25,7 +25,7 @@ export const Tilebar: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        Copyfloy {isPackaged ? "" : "(dev)"} {isAdmin && "(administrator)"}
+        Copyfloy{isPackaged ? undefined : "-dev"} {isAdmin && "(administrator)"}
       </div>
       <div className={styles.controls}>
         <TilebarButton onClick={handleMinimize} tooltip="Minimize" tooltipPlacement={TooltipPlacement.LEFT}>

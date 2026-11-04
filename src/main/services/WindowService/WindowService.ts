@@ -1,8 +1,9 @@
 import { join } from "node:path";
 
 import { is } from "@electron-toolkit/utils";
-import { appState, isWindows } from "@main/utils/environment";
-import iconPath from "@resources/icon.png?asset";
+import { appState, isPackagedWindows, isWindows } from "@main/utils/environment";
+import { iconPath } from "@main/utils/iconPath";
+import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IWindowState } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
@@ -14,6 +15,8 @@ import { SettingsService } from "../SettingsService/SettingsService";
 // Service responsible for creating and managing the main application window
 export class WindowService {
   private mainWindow: BrowserWindow | null = null;
+  private currentDisplayId: number | null = null;
+  private taskbarRefreshTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly settingsService: SettingsService,
@@ -28,6 +31,7 @@ export class WindowService {
     const baseHeight = 540;
 
     const window = new BrowserWindow({
+      title: isPackagedWindows ? packageJson.name : packageJson.devName,
       width: windowState?.width ?? baseWidth,
       height: windowState?.height ?? baseHeight,
       useContentSize: false,
@@ -47,6 +51,7 @@ export class WindowService {
     this.mainWindow = window;
 
     this.restoreWindowState(window, windowState);
+    this.currentDisplayId = screen.getDisplayMatching(window.getBounds()).id;
     this.initWindowEvents(window, isSilentStart);
     this.loadRenderer(window);
 
@@ -87,6 +92,7 @@ export class WindowService {
 
       onMove: () => {
         this.scheduleWindowStateSave();
+        this.refreshTaskbarOnDisplayChange(window);
       },
 
       onMaximize: (isMaximized) => {
@@ -99,6 +105,10 @@ export class WindowService {
 
       onClosed: () => {
         this.windowStateService.cancelPendingSave();
+        if (this.taskbarRefreshTimeout) {
+          clearTimeout(this.taskbarRefreshTimeout);
+          this.taskbarRefreshTimeout = null;
+        }
         this.mainWindow = null;
       },
 
@@ -108,6 +118,39 @@ export class WindowService {
     });
 
     events.init();
+  }
+
+  private refreshTaskbarOnDisplayChange(window: BrowserWindow) {
+    const displayId = screen.getDisplayMatching(window.getBounds()).id;
+
+    if (displayId === this.currentDisplayId) {
+      return;
+    }
+
+    this.currentDisplayId = displayId;
+
+    if (!isWindows) {
+      return;
+    }
+
+    if (this.taskbarRefreshTimeout) {
+      clearTimeout(this.taskbarRefreshTimeout);
+    }
+
+    this.taskbarRefreshTimeout = setTimeout(() => {
+      this.taskbarRefreshTimeout = null;
+
+      if (window.isDestroyed()) {
+        return;
+      }
+
+      window.setSkipTaskbar(true);
+      setTimeout(() => {
+        if (!window.isDestroyed()) {
+          window.setSkipTaskbar(false);
+        }
+      }, 50);
+    }, 150);
   }
 
   // Handles the window close event according to the current application settings
