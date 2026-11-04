@@ -14,7 +14,7 @@
 
 </div>
 
-<img src="./resources/readme.png" />
+<img src="./resources/readme/Readme.png" />
 
 > [!WARNING]
 > **Experimental - not ready for public use.** The application is under active development and may contain bugs or incomplete features. It may change without notice and is not recommended for production use.
