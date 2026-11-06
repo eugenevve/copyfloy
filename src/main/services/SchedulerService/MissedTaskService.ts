@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ISchedule, ScheduleType } from "@shared/types/schedule";
 import { ITask } from "@shared/types/tasks";
@@ -77,7 +78,7 @@ export class MissedTaskService {
       dismissed[taskId] = Date.now();
 
       try {
-        fs.writeFileSync(this.dismissedPath, JSON.stringify(dismissed), "utf-8");
+        writeJsonAtomically(this.dismissedPath, dismissed, 0);
       } catch {
         // Worst case the prompt shows again on next start
       }

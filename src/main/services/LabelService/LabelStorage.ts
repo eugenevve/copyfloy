@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
+import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
 import { ILabel } from "@shared/types/labels";
 import { app } from "electron";
 
@@ -40,13 +41,7 @@ export class LabelStorage {
 
   save(labels: ILabel[]) {
     try {
-      const directory = path.dirname(this.dataPath);
-
-      if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory, { recursive: true });
-      }
-
-      fs.writeFileSync(this.dataPath, JSON.stringify(labels, null, 2), "utf-8");
+      writeJsonAtomically(this.dataPath, labels);
     } catch (error) {
       Logger.error("LabelStorage", `Failed to save labels to "${this.dataPath}"`, error);
     }
