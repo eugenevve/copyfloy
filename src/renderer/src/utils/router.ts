@@ -3,5 +3,6 @@ export enum AppPath {
   LABELS = "/labels",
   SETTINGS = "/settings",
   REPORT = "/report",
+  SHORTCUTS = "/shortcuts",
   ABOUT = "/about",
 }
