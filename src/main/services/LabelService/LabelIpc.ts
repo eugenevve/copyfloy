@@ -1,81 +1,26 @@
-import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
-import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
 import { ipcMain } from "electron";
 
-import { LabelStorage } from "./LabelStorage";
-import { TaskStorage } from "../TaskService/TaskStorage";
+import type { LabelService } from "./LabelService";
 
 export class LabelIpc {
-  constructor(
-    private readonly labelStorage: LabelStorage,
-    private readonly taskStorage: TaskStorage
-  ) {}
+  constructor(private readonly labelService: LabelService) {}
 
   init() {
-    // Get labels
-    ipcMain.handle(IPC_CHANNELS.labels.get, () => {
-      return this.labelStorage.load();
-    });
+    // Handle IPC request to get all labels
+    ipcMain.handle(IPC_CHANNELS.labels.get, () => this.labelService.get());
 
-    // Create a new label
-    ipcMain.handle(IPC_CHANNELS.labels.save, (_, newLabel: Omit<ILabel, "id">) => {
-      const labels = this.labelStorage.load();
+    // Handle IPC request to create a new label
+    ipcMain.handle(IPC_CHANNELS.labels.save, (_, newLabel: Omit<ILabel, "id">) => this.labelService.create(newLabel));
 
-      if (labels.length >= MAX_LIST_ITEMS) {
-        return labels;
-      }
+    // Handle IPC request to update a label
+    ipcMain.handle(IPC_CHANNELS.labels.update, (_, updatedLabel: ILabel) => this.labelService.update(updatedLabel));
 
-      const label: ILabel = {
-        id: Date.now(),
-        ...newLabel,
-      };
+    // Handle IPC request to delete a label
+    ipcMain.handle(IPC_CHANNELS.labels.delete, (_, id: number) => this.labelService.delete(id));
 
-      labels.push(label);
-
-      this.labelStorage.save(labels);
-
-      return labels;
-    });
-
-    // Update a label
-    ipcMain.handle(IPC_CHANNELS.labels.update, (_, updatedLabel: ILabel) => {
-      const labels = this.labelStorage.load().map((label) => {
-        return label.id === updatedLabel.id ? updatedLabel : label;
-      });
-
-      this.labelStorage.save(labels);
-
-      return labels;
-    });
-
-    // Delete a label
-    ipcMain.handle(IPC_CHANNELS.labels.delete, (_, id: number) => {
-      const labels = this.labelStorage.load().filter((label) => label.id !== id);
-      const tasks = this.taskStorage.load().map((task) => ({
-        ...task,
-        labelsIds: task.labelsIds?.filter((labelId) => labelId !== id),
-      }));
-
-      this.labelStorage.save(labels);
-      this.taskStorage.save(tasks);
-
-      return labels;
-    });
-
-    // Label order
-    ipcMain.handle(IPC_CHANNELS.labels.reorder, (_, orderedIds: number[]) => {
-      const labels = this.labelStorage.load();
-      const reorderedLabels = reorderDisplayIds(labels, orderedIds);
-
-      if (!reorderedLabels) {
-        return labels;
-      }
-
-      this.labelStorage.save(reorderedLabels);
-
-      return reorderedLabels;
-    });
+    // Handle IPC request to reorder labels
+    ipcMain.handle(IPC_CHANNELS.labels.reorder, (_, orderedIds: number[]) => this.labelService.reorder(orderedIds));
   }
 }
