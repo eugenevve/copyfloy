@@ -2,19 +2,16 @@ import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
 
-import { LabelIpc } from "./LabelIpc";
 import { LabelStorage } from "./LabelStorage";
 import { TaskStorage } from "../TaskService/TaskStorage";
 
 export class LabelService {
   private readonly labelStorage: LabelStorage;
   private readonly taskStorage: TaskStorage;
-  private readonly labelIpc: LabelIpc;
 
   constructor(taskStorage: TaskStorage) {
     this.taskStorage = taskStorage;
     this.labelStorage = new LabelStorage();
-    this.labelIpc = new LabelIpc(this);
   }
 
   get() {
@@ -66,9 +63,5 @@ export class LabelService {
     this.labelStorage.save(reorderedLabels);
 
     return reorderedLabels;
-  }
-
-  init() {
-    this.labelIpc.init();
   }
 }

@@ -11,7 +11,9 @@ import { TaskStorage } from "./TaskStorage";
 import { CopyService } from "../CopyService/CopyService";
 import { LabelStorage } from "../LabelService/LabelStorage";
 import { ReportStorage } from "../ReportService/ReportStorage";
+import { MissedTaskIpc } from "../SchedulerService/MissedTaskIpc";
 import { MissedTaskService } from "../SchedulerService/MissedTaskService";
+import { MissedTaskStorage } from "../SchedulerService/MissedTaskStorage";
 import { SchedulerService } from "../SchedulerService/SchedulerService";
 
 const createUniqueId = (usedIds: Set<number>): number => {
@@ -32,6 +34,7 @@ export class TaskService {
   private readonly scheduler: SchedulerService;
   private readonly taskIpc: TaskIpc;
   private readonly missedTasks: MissedTaskService;
+  private readonly missedTaskIpc: MissedTaskIpc;
 
   constructor(taskStorage: TaskStorage) {
     this.taskStorage = taskStorage;
@@ -43,7 +46,8 @@ export class TaskService {
     });
 
     this.taskIpc = new TaskIpc(this);
-    this.missedTasks = new MissedTaskService(this.taskStorage, new ReportStorage());
+    this.missedTasks = new MissedTaskService(this.taskStorage, new ReportStorage(), new MissedTaskStorage());
+    this.missedTaskIpc = new MissedTaskIpc(this.missedTasks);
   }
 
   get() {
@@ -229,6 +233,7 @@ export class TaskService {
   init() {
     this.taskIpc.init();
     this.missedTasks.init();
+    this.missedTaskIpc.init();
 
     const tasks = this.taskStorage.load();
     this.scheduler.init(tasks);
