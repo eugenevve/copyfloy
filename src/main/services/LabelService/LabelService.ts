@@ -1,3 +1,4 @@
+import { createUniqueId } from "@main/utils/createUniqueId";
 import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ILabel } from "@shared/types/labels";
@@ -25,7 +26,7 @@ export class LabelService {
       return labels;
     }
 
-    labels.push({ id: Date.now(), ...newLabel });
+    labels.push({ id: createUniqueId(new Set(labels.map((label) => label.id))), ...newLabel });
     this.labelStorage.save(labels);
 
     return labels;

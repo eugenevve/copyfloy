@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { createUniqueId } from "@main/utils/createUniqueId";
 import { reorderDisplayIds } from "@main/utils/reorderDisplayIds";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { ITask, TaskType } from "@shared/types/tasks";
@@ -15,16 +16,6 @@ import { MissedTaskIpc } from "../SchedulerService/MissedTaskIpc";
 import { MissedTaskService } from "../SchedulerService/MissedTaskService";
 import { MissedTaskStorage } from "../SchedulerService/MissedTaskStorage";
 import { SchedulerService } from "../SchedulerService/SchedulerService";
-
-const createUniqueId = (usedIds: Set<number>): number => {
-  let id = Date.now();
-  while (usedIds.has(id)) {
-    id += 1;
-  }
-
-  usedIds.add(id);
-  return id;
-};
 
 // Service responsible for coordinating task-related services
 export class TaskService {
