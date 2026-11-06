@@ -14,11 +14,7 @@ export async function isGitAvailable() {
 }
 
 // Clones a Git repository specified in the task, handling private repositories and existing clones
-export async function cloneRepository(
-  task: ITask,
-  onProgress?: (percent: number) => void,
-  signal?: AbortSignal
-) {
+export async function cloneRepository(task: ITask, onProgress?: (percent: number) => void, signal?: AbortSignal) {
   if (!(await isGitAvailable())) {
     throw new Error("Git is not installed or is not available in PATH");
   }
@@ -98,12 +94,7 @@ function parseGitProgress(chunk: string): number | null {
   return result;
 }
 
-function runGit(
-  args: string[],
-  env: NodeJS.ProcessEnv,
-  onProgress?: (percent: number) => void,
-  signal?: AbortSignal
-) {
+function runGit(args: string[], env: NodeJS.ProcessEnv, onProgress?: (percent: number) => void, signal?: AbortSignal) {
   return new Promise<string>((resolve, reject) => {
     const git = spawn("git", args, {
       env,
