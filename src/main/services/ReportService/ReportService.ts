@@ -5,8 +5,8 @@ import { TaskStorage } from "../TaskService/TaskStorage";
 export class ReportService {
   private readonly reportIpc: ReportIpc;
 
-  constructor() {
-    this.reportIpc = new ReportIpc(new ReportStorage(), new TaskStorage());
+  constructor(taskStorage: TaskStorage) {
+    this.reportIpc = new ReportIpc(new ReportStorage(), taskStorage);
   }
 
   init() {

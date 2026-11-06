@@ -6,9 +6,9 @@ export class LabelService {
   private readonly labelStorage: LabelStorage;
   private readonly labelIpc: LabelIpc;
 
-  constructor() {
+  constructor(taskStorage: TaskStorage) {
     this.labelStorage = new LabelStorage();
-    this.labelIpc = new LabelIpc(this.labelStorage, new TaskStorage());
+    this.labelIpc = new LabelIpc(this.labelStorage, taskStorage);
   }
 
   init() {
