@@ -1,12 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
-
-import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
-import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ISchedule, ScheduleType } from "@shared/types/schedule";
 import { ITask } from "@shared/types/tasks";
-import { app, ipcMain } from "electron";
 
+import { MissedTaskStorage } from "./MissedTaskStorage";
 import { ReportStorage } from "../ReportService/ReportStorage";
 import { TaskStorage } from "../TaskService/TaskStorage";
 
@@ -55,47 +50,39 @@ export function getLastScheduledTime(schedule: ISchedule, now: Date): number | n
 // Detects scheduled runs missed while the app was closed and offers to run them
 export class MissedTaskService {
   private pending: ITask[] | null = null;
-  private readonly dismissedPath = path.join(app.getPath("userData"), "missed-dismissed.json");
 
   constructor(
     private readonly taskStorage: TaskStorage,
-    private readonly reportStorage: ReportStorage
+    private readonly reportStorage: ReportStorage,
+    private readonly missedTaskStorage: MissedTaskStorage
   ) {}
 
   // Computes missed tasks on startup; the renderer takes them once when it is ready
   init() {
     this.pending = this.findMissed();
-
-    ipcMain.handle(IPC_CHANNELS.tasks.getMissed, () => {
-      const result = this.pending ?? [];
-      this.pending = null;
-
-      return result;
-    });
-
-    ipcMain.handle(IPC_CHANNELS.tasks.dismissMissed, (_, taskId: number) => {
-      const dismissed = this.loadDismissed();
-      dismissed[taskId] = Date.now();
-
-      try {
-        writeJsonAtomically(this.dismissedPath, dismissed, 0);
-      } catch {
-        // Worst case the prompt shows again on next start
-      }
-    });
   }
 
-  private loadDismissed(): Record<number, number> {
+  getMissed() {
+    const result = this.pending ?? [];
+    this.pending = null;
+
+    return result;
+  }
+
+  dismiss(taskId: number) {
+    const dismissed = this.missedTaskStorage.load();
+    dismissed[taskId] = Date.now();
+
     try {
-      return JSON.parse(fs.readFileSync(this.dismissedPath, "utf-8")) as Record<number, number>;
+      this.missedTaskStorage.save(dismissed);
     } catch {
-      return {};
+      // Worst case the prompt shows again on next start
     }
   }
 
   findMissed(now = new Date()): ITask[] {
     const lastRuns = new Map<number, number>();
-    const dismissed = this.loadDismissed();
+    const dismissed = this.missedTaskStorage.load();
 
     for (const record of this.reportStorage.load()) {
       lastRuns.set(record.taskId, Math.max(lastRuns.get(record.taskId) ?? 0, record.startedAt));
