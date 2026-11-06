@@ -1,13 +1,13 @@
 import { electronApp } from "@electron-toolkit/utils";
 import { checkIsAdmin } from "@main/utils/checkIsAdmin";
-import { isWindows } from "@main/utils/environment";
+import { isWindows, isPackagedWindows } from "@main/utils/environment";
 import { isPortable } from "@main/utils/isPortable";
 import packageJson from "@package";
 import { app } from "electron";
 
 export class AppService {
-  configure(): void {
-    const appId = packageJson.appId;
+  configure() {
+    const appId = isPackagedWindows ? packageJson.appId : packageJson.appIdDev;
     electronApp.setAppUserModelId(appId);
     if (isWindows) {
       app.setAppUserModelId(appId);
@@ -22,7 +22,7 @@ export class AppService {
     return isPortable();
   }
 
-  isAdmin(): Promise<boolean> {
+  isAdmin() {
     return checkIsAdmin();
   }
 }

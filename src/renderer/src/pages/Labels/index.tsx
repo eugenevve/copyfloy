@@ -41,21 +41,21 @@ export const Labels: FC = () => {
   ]);
 
   // Modal Label
-  const handleAddLabel = (): void => {
+  const handleAddLabel = () => {
     setLabelModal({
       open: true,
       label: null,
     });
   };
 
-  const handleEditLabel = (label: ILabel): void => {
+  const handleEditLabel = (label: ILabel) => {
     setLabelModal({
       open: true,
       label,
     });
   };
 
-  const handleCloseLabel = (): void => {
+  const handleCloseLabel = () => {
     setLabelModal({
       open: false,
       label: null,
@@ -67,7 +67,7 @@ export const Labels: FC = () => {
     handleCloseLabel();
   };
 
-  const handleDeleteLabel = (id: number): void => {
+  const handleDeleteLabel = (id: number) => {
     const labelToDelete = labels.find((label) => label.id === id);
     const labelName = labelToDelete ? `"${labelToDelete.name}"` : "label";
 
@@ -109,7 +109,7 @@ export const Labels: FC = () => {
               reorder={!search.trim()}
               onEdit={handleEditLabel}
               onDelete={(label) => handleDeleteLabel(label.id)}
-              onReorder={(orderedIds) => void reorderLabels(orderedIds)}
+              onReorder={(orderedIds) => reorderLabels(orderedIds)}
             />
           )}
         </div>

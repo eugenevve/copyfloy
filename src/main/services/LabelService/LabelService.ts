@@ -11,7 +11,7 @@ export class LabelService {
     this.labelIpc = new LabelIpc(this.labelStorage, new TaskStorage());
   }
 
-  init(): void {
+  init() {
     this.labelIpc.init();
   }
 }

@@ -8,7 +8,7 @@ export class WindowIpc {
   constructor(private readonly windowService: WindowService) {}
 
   // Registers all IPC handlers related to the main window
-  init(): void {
+  init() {
     ipcMain.on(IPC_CHANNELS.window.close, () => {
       this.windowService.close();
     });

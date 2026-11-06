@@ -7,7 +7,7 @@ import styles from "./About.module.css";
 
 export const About: FC = () => {
   const appVersion = window.api.app.appVersion;
-  const handleOpen = (): void => {
+  const handleOpen = () => {
     window.open("https://github.com/eugenevve/copyfloy", "_blank");
   };
 

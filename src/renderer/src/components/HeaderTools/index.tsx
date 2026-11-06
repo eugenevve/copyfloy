@@ -1,3 +1,4 @@
+import { useHorizontalScroll } from "@app/hooks/useHorizontalScroll";
 import { InfoApp } from "@app/pages/Home/components/InfoApp";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
@@ -6,7 +7,7 @@ import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
 import { Select } from "@app/ui/Select";
 import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
-import { FC, useRef } from "react";
+import { FC } from "react";
 
 import styles from "./HeaderTools.module.css";
 import { IHeaderTools } from "./HeaderTools.types";
@@ -18,23 +19,37 @@ export const HeaderTools: FC<IHeaderTools> = ({
   onAdd,
   addDisabled,
   searchId,
+  onRunTasks,
+  runTasksDisabled,
   search,
   onSearchChange,
   filter,
   labelsFilter,
 }) => {
-  const labelsRef = useRef<HTMLDivElement>(null);
-
-  const scrollLabels = (direction: -1 | 1) => {
-    labelsRef.current?.scrollBy({ left: direction * 200, behavior: "smooth" });
-  };
+  const {
+    ref: labelsRef,
+    isScrollable,
+    scrollBy: scrollLabels,
+  } = useHorizontalScroll<HTMLDivElement>(labelsFilter?.labels);
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.section}>
           <InfoApp name={title} count={count} />
-          <Button onClick={onAdd} disabled={addDisabled}>{addText}</Button>
+          {onRunTasks && (
+            <Button
+              kind={ButtonKind.SECONDARY}
+              onClick={onRunTasks}
+              disabled={runTasksDisabled}
+              className={styles.runTasksButton}
+            >
+              {runTasksDisabled ? (count === 0 ? "No tasks" : "Running...") : "Run tasks"}
+            </Button>
+          )}
+          <Button onClick={onAdd} disabled={addDisabled}>
+            {addText}
+          </Button>
         </div>
         <div className={styles.section}>
           <Input
@@ -56,15 +71,17 @@ export const HeaderTools: FC<IHeaderTools> = ({
       </div>
       {labelsFilter && labelsFilter.labels.length > 0 && (
         <div className={styles.labelsContainer}>
-          <Button
-            kind={ButtonKind.SECONDARY}
-            icon
-            onClick={() => scrollLabels(-1)}
-            tooltip="Scroll left"
-            tooltipPlacement={TooltipPlacement.RIGHT}
-          >
-            <ChevronIcon className={styles.arrowLeft} />
-          </Button>
+          {isScrollable && (
+            <Button
+              kind={ButtonKind.SECONDARY}
+              icon
+              onClick={() => scrollLabels(-1)}
+              tooltip="Scroll left"
+              tooltipPlacement={TooltipPlacement.RIGHT}
+            >
+              <ChevronIcon className={styles.arrowLeft} />
+            </Button>
+          )}
           <div ref={labelsRef} className={styles.labels}>
             {labelsFilter.labels.toReversed().map((label) => (
               <LabelChip
@@ -76,15 +93,17 @@ export const HeaderTools: FC<IHeaderTools> = ({
               />
             ))}
           </div>
-          <Button
-            icon
-            kind={ButtonKind.SECONDARY}
-            onClick={() => scrollLabels(1)}
-            tooltip="Scroll right"
-            tooltipPlacement={TooltipPlacement.LEFT}
-          >
-            <ChevronIcon className={styles.arrowRight} />
-          </Button>
+          {isScrollable && (
+            <Button
+              icon
+              kind={ButtonKind.SECONDARY}
+              onClick={() => scrollLabels(1)}
+              tooltip="Scroll right"
+              tooltipPlacement={TooltipPlacement.LEFT}
+            >
+              <ChevronIcon className={styles.arrowRight} />
+            </Button>
+          )}
         </div>
       )}
     </div>

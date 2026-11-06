@@ -34,7 +34,7 @@ export const App: FC = () => {
   useZoomShortcuts();
 
   useEffect(() => {
-    void initDateTimeFormat();
+    initDateTimeFormat();
   }, []);
 
   return (

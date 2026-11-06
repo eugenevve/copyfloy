@@ -25,7 +25,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
 
   const isDirty = name !== initialValues.name || color !== initialValues.color;
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
       return;
@@ -44,7 +44,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
       });
     }
 
-    void onSaved();
+    onSaved();
   };
 
   const handleClose = () => {
@@ -77,7 +77,7 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
           ))}
         </div>
         <LabelChip name={name || "Label"} color={color} />
-        <Button disabled={!name} onClick={() => void handleSubmit()} className={styles.button}>
+        <Button disabled={!name} onClick={() => handleSubmit()} className={styles.button}>
           Save
         </Button>
       </div>

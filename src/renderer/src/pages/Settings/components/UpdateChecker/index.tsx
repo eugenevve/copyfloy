@@ -50,7 +50,7 @@ export const UpdateChecker: FC = () => {
     return () => unsubscribe.forEach((unsubscribe) => unsubscribe());
   }, [isPortable, showAlert]);
 
-  const handleAction = (): void => {
+  const handleAction = () => {
     if (!isPackaged) {
       showAlert("Not available", "The local version of the application cannot be updated!");
       return;
@@ -59,16 +59,16 @@ export const UpdateChecker: FC = () => {
     switch (status) {
       case UpdateStatus.IDLE:
         setStatus(UpdateStatus.CHECKING);
-        void window.api.updater.check();
+        window.api.updater.check();
         break;
 
       case UpdateStatus.AVAILABLE:
         setProgress(0);
-        void window.api.updater.download();
+        window.api.updater.download();
         break;
 
       case UpdateStatus.READY:
-        void window.api.updater.install();
+        window.api.updater.install();
         break;
     }
   };

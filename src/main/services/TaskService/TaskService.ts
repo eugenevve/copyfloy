@@ -19,7 +19,7 @@ export class TaskService {
     this.copyService = new CopyService();
 
     this.scheduler = new SchedulerService((task) => {
-      void this.copyService.run(task);
+      this.copyService.run(task);
     });
 
     this.taskIpc = new TaskIpc(this.taskStorage, this.copyService, this.scheduler, new LabelStorage());
@@ -27,7 +27,7 @@ export class TaskService {
   }
 
   // Initializes the task system
-  init(): void {
+  init() {
     this.taskIpc.init();
     this.missedTasks.init();
 

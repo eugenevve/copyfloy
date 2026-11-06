@@ -11,8 +11,9 @@ export const createZip = async (
   archivePath: string,
   signal: AbortSignal,
   onProgress: (percent: number) => void
-): Promise<void> => {
+) => {
   const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
+  let processedSize = 0;
   const output = createWriteStream(archivePath);
   const archive = new ZipArchive({ zlib: { level: 6 } });
 
@@ -26,23 +27,25 @@ export const createZip = async (
     });
   });
 
-  archive.on("progress", (progress) => {
-    if (totalSize > 0) {
-      onProgress(Math.min(99, Math.floor((progress.fs.processedBytes / totalSize) * 100)));
-    }
-  });
-
   archive.pipe(output);
 
   for (const entry of entries) {
     if (entry.isDirectory) {
       archive.append("", { name: `${entry.destination.replaceAll("\\", "/")}/` });
     } else {
-      archive.append(createReadStream(entry.source), { name: entry.destination.replaceAll("\\", "/") });
+      const source = createReadStream(entry.source);
+      source.on("data", (chunk) => {
+        processedSize += chunk.length;
+
+        if (totalSize > 0) {
+          onProgress(Math.min(99, Math.floor((processedSize / totalSize) * 100)));
+        }
+      });
+      archive.append(source, { name: entry.destination.replaceAll("\\", "/") });
     }
   }
 
-  void archive.finalize();
+  archive.finalize();
 
   try {
     await finished;

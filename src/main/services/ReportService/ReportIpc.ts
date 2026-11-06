@@ -11,7 +11,7 @@ export class ReportIpc {
     private readonly taskStorage: TaskStorage
   ) {}
 
-  init(): void {
+  init() {
     // Handle fetching the report data
     ipcMain.handle(IPC_CHANNELS.report.get, (): IReport => {
       const records = this.reportStorage.load();
@@ -25,7 +25,7 @@ export class ReportIpc {
     });
 
     // Handle clearing the report history
-    ipcMain.handle(IPC_CHANNELS.report.clear, (): void => {
+    ipcMain.handle(IPC_CHANNELS.report.clear, () => {
       this.reportStorage.save([]);
     });
   }

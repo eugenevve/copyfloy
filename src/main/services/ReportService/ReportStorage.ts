@@ -35,7 +35,7 @@ export class ReportStorage {
     }
   }
 
-  save(records: IReportRecord[]): void {
+  save(records: IReportRecord[]) {
     try {
       fs.mkdirSync(path.dirname(this.dataPath), { recursive: true });
       fs.writeFileSync(this.dataPath, JSON.stringify(records, null, 2), "utf-8");
@@ -44,7 +44,7 @@ export class ReportStorage {
     }
   }
 
-  append(record: IReportRecord): void {
+  append(record: IReportRecord) {
     const records = this.load();
     const usedIds = new Set(records.map((item) => item.id));
     let id = record.id;

@@ -21,7 +21,7 @@ export const Report: FC = () => {
   const { showConfirm } = useModal();
 
   useEffect(() => {
-    void window.api.report
+    window.api.report
       .get()
       .then(setReport)
       .finally(() => setIsLoading(false));
@@ -63,10 +63,12 @@ export const Report: FC = () => {
           <ReportBlockItem key={label} label={label} value={value} />
         ))}
       </div>
-      <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
-        <TrashIcon />
-        Clear history
-      </Button>
+      {report.records?.length !== 0 && (
+        <Button kind={ButtonKind.SECONDARY} onClick={handleClear}>
+          <TrashIcon />
+          Clear history
+        </Button>
+      )}
     </div>
   );
 

@@ -13,12 +13,12 @@ export class SchedulerService {
   constructor(private readonly onTaskScheduled: (task: ITask) => void) {}
 
   // Initialize the scheduler
-  init(tasks: ITask[]): void {
+  init(tasks: ITask[]) {
     this.rescheduleAll(tasks);
   }
 
   // Restarts the schedule for all provided tasks
-  rescheduleAll(tasks: ITask[]): void {
+  rescheduleAll(tasks: ITask[]) {
     this.stopAll();
 
     for (const task of tasks) {
@@ -31,16 +31,16 @@ export class SchedulerService {
   }
 
   // Stops all active cron jobs
-  stopAll(): void {
+  stopAll() {
     for (const job of this.jobs.values()) {
-      void job.stop();
+      job.stop();
     }
 
     this.jobs.clear();
   }
 
   // Creates a cron job for a specific task
-  private scheduleTask(task: ITask): void {
+  private scheduleTask(task: ITask) {
     if (!task.schedule) {
       return;
     }

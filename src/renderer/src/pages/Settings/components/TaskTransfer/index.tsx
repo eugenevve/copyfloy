@@ -22,7 +22,7 @@ export const TaskTransfer: FC = () => {
     <>
       <WidgetContainer title="Save or restore tasks and labels">
         <div className={styles.container}>
-          <Button onClick={() => void handleExport()}>Export</Button>
+          <Button onClick={() => handleExport()}>Export</Button>
           <Button onClick={() => setOpenImport(true)}>Import</Button>
         </div>
       </WidgetContainer>

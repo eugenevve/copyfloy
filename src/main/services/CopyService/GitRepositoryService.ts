@@ -4,7 +4,7 @@ import path from "node:path";
 import { RepositoryProvider, ITask } from "@shared/types/tasks";
 import fs from "fs-extra";
 
-export async function isGitAvailable(): Promise<boolean> {
+export async function isGitAvailable() {
   try {
     await runGit(["--version"], process.env);
     return true;
@@ -18,7 +18,7 @@ export async function cloneRepository(
   task: ITask,
   onProgress?: (percent: number) => void,
   signal?: AbortSignal
-): Promise<string> {
+) {
   if (!(await isGitAvailable())) {
     throw new Error("Git is not installed or is not available in PATH");
   }
@@ -103,8 +103,8 @@ function runGit(
   env: NodeJS.ProcessEnv,
   onProgress?: (percent: number) => void,
   signal?: AbortSignal
-): Promise<string> {
-  return new Promise((resolve, reject) => {
+) {
+  return new Promise<string>((resolve, reject) => {
     const git = spawn("git", args, {
       env,
       windowsHide: true,
@@ -114,7 +114,7 @@ function runGit(
     let errorOutput = "";
 
     // Kill git on abort; the "close" handler rejects after git has exited
-    const onAbort = (): void => {
+    const onAbort = () => {
       git.kill();
     };
     signal?.addEventListener("abort", onAbort, { once: true });

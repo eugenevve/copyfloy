@@ -14,6 +14,7 @@ import { FC, useState } from "react";
 
 import { EditSchedulerFormModal } from "./components/EditSchedulerFormModal";
 import { EditTaskFormModal } from "./components/EditTaskFormModal";
+import { RunTasksModal } from "./components/RunTasksModal";
 import { TaskList } from "./components/TaskList";
 
 export const Home: FC = () => {
@@ -27,6 +28,9 @@ export const Home: FC = () => {
     task: null,
   });
   const [isInitScheduling, setInitScheduling] = useState<ITask | null>(null);
+  const [isRunningAll, setIsRunningAll] = useState(false);
+  const [isRunTasksModalOpen, setRunTasksModalOpen] = useState(false);
+
   const {
     tasks,
     isLoading,
@@ -45,9 +49,31 @@ export const Home: FC = () => {
 
   const handleRunTask = (task: ITask) => {
     try {
-      void runTask(task);
+      runTask(task);
     } catch (error) {
       console.error("Error running task:", error);
+    }
+  };
+
+  // Run multiple tasks at once
+  const handleRunTasks = async (tasksToRun: ITask[]) => {
+    setRunTasksModalOpen(false);
+    setIsRunningAll(true);
+
+    const orderedTasks = tasksToRun
+      .toReversed()
+      .toSorted((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)));
+
+    try {
+      for (const task of orderedTasks) {
+        try {
+          await runTask(task);
+        } catch (error) {
+          console.error(`Error running task "${task.name}":`, error);
+        }
+      }
+    } finally {
+      setIsRunningAll(false);
     }
   };
 
@@ -131,6 +157,8 @@ export const Home: FC = () => {
       onAdd={handleAddTask}
       addDisabled={tasks.length >= MAX_LIST_ITEMS}
       searchId="task-search"
+      onRunTasks={() => setRunTasksModalOpen(true)}
+      runTasksDisabled={isRunningAll || tasks.length === 0}
       search={search}
       onSearchChange={setSearch}
       filter={{
@@ -156,12 +184,12 @@ export const Home: FC = () => {
               progress={progress}
               gitAvailable={gitAvailable}
               onRun={handleRunTask}
-              onStop={(task) => void stopTask(task.id)}
+              onStop={(task) => stopTask(task.id)}
               onSchedule={handleScheduleTask}
               onEdit={handleEditTask}
               onDelete={(task) => handleDeleteTask(task.id)}
-              onPin={(task) => void updateTask({ ...task, isPinned: !task.isPinned })}
-              onReorder={(orderedIds) => void reorderTasks(orderedIds)}
+              onPin={(task) => updateTask({ ...task, isPinned: !task.isPinned })}
+              onReorder={(orderedIds) => reorderTasks(orderedIds)}
             />
           )}
         </div>
@@ -174,6 +202,14 @@ export const Home: FC = () => {
           initialData={isInitScheduling}
           onClose={handleCloseScheduleTask}
           onSaved={handleSaveScheduleTask}
+        />
+      )}
+      {isRunTasksModalOpen && (
+        <RunTasksModal
+          allTasks={tasks}
+          matchingTasks={filteredTasks}
+          onClose={() => setRunTasksModalOpen(false)}
+          onRun={handleRunTasks}
         />
       )}
     </>

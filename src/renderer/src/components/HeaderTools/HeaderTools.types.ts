@@ -8,6 +8,8 @@ export interface IHeaderTools {
   onAdd: () => void;
   addDisabled?: boolean;
   searchId: string;
+  onRunTasks?: () => void;
+  runTasksDisabled?: boolean;
   search: string;
   onSearchChange: (value: string) => void;
   filter?: IHeaderToolsFilter;

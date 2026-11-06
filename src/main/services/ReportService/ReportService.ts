@@ -9,7 +9,7 @@ export class ReportService {
     this.reportIpc = new ReportIpc(new ReportStorage(), new TaskStorage());
   }
 
-  init(): void {
+  init() {
     this.reportIpc.init();
   }
 }

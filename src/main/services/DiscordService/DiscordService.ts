@@ -9,24 +9,24 @@ export class DiscordService {
 
   private currentPresence: IDiscordService | null = null;
 
-  public init(): void {
+  public init() {
     this.client.on("ready", () => {
       if (this.currentPresence) {
         this.setActivity(this.currentPresence);
       }
     });
 
-    void this.client.login();
+    this.client.login();
   }
 
-  public setActivity(presence: IDiscordService): void {
+  public setActivity(presence: IDiscordService) {
     this.currentPresence = presence;
 
     if (!this.client.user) {
       return;
     }
 
-    void this.client.request("SET_ACTIVITY", {
+    this.client.request("SET_ACTIVITY", {
       pid: process.pid,
       activity: {
         type: 0,
@@ -45,19 +45,19 @@ export class DiscordService {
     });
   }
 
-  public clearActivity(): void {
+  public clearActivity() {
     this.currentPresence = null;
 
     if (!this.client.user) {
       return;
     }
 
-    void this.client.request("SET_ACTIVITY", { pid: process.pid });
+    this.client.request("SET_ACTIVITY", { pid: process.pid });
   }
 
-  public destroy(): void {
+  public destroy() {
     this.currentPresence = null;
 
-    void this.client.destroy();
+    this.client.destroy();
   }
 }

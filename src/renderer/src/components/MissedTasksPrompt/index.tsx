@@ -8,7 +8,7 @@ export const MissedTasksPrompt: FC = () => {
   const [queue, setQueue] = useState<ITask[]>([]);
 
   useEffect(() => {
-    void window.api.tasks.getMissed().then(setQueue);
+    window.api.tasks.getMissed().then(setQueue);
   }, []);
 
   const [task] = queue;
@@ -17,7 +17,7 @@ export const MissedTasksPrompt: FC = () => {
     return null;
   }
 
-  const next = (): void => setQueue((prev) => prev.slice(1));
+  const next = () => setQueue((prev) => prev.slice(1));
 
   return (
     <ModalAlert
@@ -27,12 +27,12 @@ export const MissedTasksPrompt: FC = () => {
       confirmTitle="Run now"
       cancelTitle="Skip"
       onClose={() => {
-        void window.api.tasks.dismissMissed(task.id);
+        window.api.tasks.dismissMissed(task.id);
         next();
       }}
       onConfirm={() => {
-        void window.api.tasks.dismissMissed(task.id);
-        void window.api.tasks.run(task);
+        window.api.tasks.dismissMissed(task.id);
+        window.api.tasks.run(task);
         next();
       }}
     />

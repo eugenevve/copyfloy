@@ -74,7 +74,7 @@ export class TaskStorage {
     return transfer;
   }
 
-  save(tasks: ITask[]): void {
+  save(tasks: ITask[]) {
     const ids = new Set(tasks.map((task) => task.id));
 
     for (const id of this.undecryptableTokens.keys()) {
@@ -90,7 +90,7 @@ export class TaskStorage {
   }
 
   // Saves tasks to a specific JSON file
-  saveToFile(tasks: ITask[], filePath: string): void {
+  saveToFile(tasks: ITask[], filePath: string) {
     try {
       this.ensureDirectory(filePath);
 
@@ -100,7 +100,7 @@ export class TaskStorage {
     }
   }
 
-  saveTransferToFile(transfer: ITaskTransfer, filePath: string): void {
+  saveTransferToFile(transfer: ITaskTransfer, filePath: string) {
     try {
       this.ensureDirectory(filePath);
 
@@ -213,7 +213,7 @@ export class TaskStorage {
   }
 
   // Ensures that the parent directory exists
-  private ensureDirectory(filePath: string): void {
+  private ensureDirectory(filePath: string) {
     const directory = path.dirname(filePath);
 
     if (!fs.existsSync(directory)) {

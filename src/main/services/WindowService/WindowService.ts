@@ -1,8 +1,9 @@
 import { join } from "node:path";
 
 import { is } from "@electron-toolkit/utils";
-import { appState, isWindows } from "@main/utils/environment";
-import iconPath from "@resources/icon.png?asset";
+import { appState, isPackagedWindows, isWindows } from "@main/utils/environment";
+import { iconPath } from "@main/utils/iconPath";
+import packageJson from "@package";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { IWindowState } from "@shared/types/window";
 import { BrowserWindow, screen } from "electron";
@@ -14,6 +15,8 @@ import { SettingsService } from "../SettingsService/SettingsService";
 // Service responsible for creating and managing the main application window
 export class WindowService {
   private mainWindow: BrowserWindow | null = null;
+  private currentDisplayId: number | null = null;
+  private taskbarRefreshTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly settingsService: SettingsService,
@@ -28,6 +31,7 @@ export class WindowService {
     const baseHeight = 540;
 
     const window = new BrowserWindow({
+      title: isPackagedWindows ? packageJson.name : packageJson.devName,
       width: windowState?.width ?? baseWidth,
       height: windowState?.height ?? baseHeight,
       useContentSize: false,
@@ -47,6 +51,7 @@ export class WindowService {
     this.mainWindow = window;
 
     this.restoreWindowState(window, windowState);
+    this.currentDisplayId = screen.getDisplayMatching(window.getBounds()).id;
     this.initWindowEvents(window, isSilentStart);
     this.loadRenderer(window);
 
@@ -54,7 +59,7 @@ export class WindowService {
   }
 
   // Restores the saved window position, size and maximized state
-  private restoreWindowState(window: BrowserWindow, windowState: IWindowState | undefined): void {
+  private restoreWindowState(window: BrowserWindow, windowState: IWindowState | undefined) {
     if (!windowState) {
       return;
     }
@@ -77,7 +82,7 @@ export class WindowService {
   }
 
   // Registers all BrowserWindow events
-  private initWindowEvents(window: BrowserWindow, isSilentStart: boolean): void {
+  private initWindowEvents(window: BrowserWindow, isSilentStart: boolean) {
     const events = new WindowEvents(window, {
       isSilentStart,
 
@@ -87,6 +92,7 @@ export class WindowService {
 
       onMove: () => {
         this.scheduleWindowStateSave();
+        this.refreshTaskbarOnDisplayChange(window);
       },
 
       onMaximize: (isMaximized) => {
@@ -99,6 +105,10 @@ export class WindowService {
 
       onClosed: () => {
         this.windowStateService.cancelPendingSave();
+        if (this.taskbarRefreshTimeout) {
+          clearTimeout(this.taskbarRefreshTimeout);
+          this.taskbarRefreshTimeout = null;
+        }
         this.mainWindow = null;
       },
 
@@ -110,8 +120,41 @@ export class WindowService {
     events.init();
   }
 
+  private refreshTaskbarOnDisplayChange(window: BrowserWindow) {
+    const displayId = screen.getDisplayMatching(window.getBounds()).id;
+
+    if (displayId === this.currentDisplayId) {
+      return;
+    }
+
+    this.currentDisplayId = displayId;
+
+    if (!isWindows) {
+      return;
+    }
+
+    if (this.taskbarRefreshTimeout) {
+      clearTimeout(this.taskbarRefreshTimeout);
+    }
+
+    this.taskbarRefreshTimeout = setTimeout(() => {
+      this.taskbarRefreshTimeout = null;
+
+      if (window.isDestroyed()) {
+        return;
+      }
+
+      window.setSkipTaskbar(true);
+      setTimeout(() => {
+        if (!window.isDestroyed()) {
+          window.setSkipTaskbar(false);
+        }
+      }, 50);
+    }, 150);
+  }
+
   // Handles the window close event according to the current application settings
-  private handleWindowClose(event: Electron.Event): void {
+  private handleWindowClose(event: Electron.Event) {
     const settings = this.settingsService.getSettings();
 
     if (settings.minimizeTray && !appState.isQuitting) {
@@ -121,7 +164,7 @@ export class WindowService {
   }
 
   // Schedules saving the current window state
-  private scheduleWindowStateSave(): void {
+  private scheduleWindowStateSave() {
     this.windowStateService.scheduleSave(() => {
       return this.getCurrentWindowState();
     });
@@ -173,7 +216,7 @@ export class WindowService {
   }
 
   // Blocks DevTools shortcuts in production
-  private handleBeforeInputEvent(event: Electron.Event, input: Electron.Input): void {
+  private handleBeforeInputEvent(event: Electron.Event, input: Electron.Input) {
     const controlOrMeta = process.platform === "darwin" ? input.meta : input.control;
 
     const isDevTools = (controlOrMeta && input.shift && input.key.toLowerCase() === "i") || input.key === "F12";
@@ -184,16 +227,16 @@ export class WindowService {
   }
 
   // Loads the Renderer application
-  private loadRenderer(window: BrowserWindow): void {
+  private loadRenderer(window: BrowserWindow) {
     if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-      void window.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+      window.loadURL(process.env["ELECTRON_RENDERER_URL"]);
     } else {
-      void window.loadFile(join(__dirname, "../renderer/index.html"));
+      window.loadFile(join(__dirname, "../renderer/index.html"));
     }
   }
 
   // Restores the existing window or creates a new one
-  restoreOrCreate(): void {
+  restoreOrCreate() {
     if (!this.mainWindow) {
       this.createMainWindow();
       return;
@@ -213,17 +256,17 @@ export class WindowService {
   }
 
   // Closes the main window
-  close(): void {
+  close() {
     this.mainWindow?.close();
   }
 
   // Minimizes the main window
-  minimize(): void {
+  minimize() {
     this.mainWindow?.minimize();
   }
 
   // Toggles the maximized state
-  toggleMaximize(): void {
+  toggleMaximize() {
     const window = this.mainWindow;
 
     if (!window) {

@@ -16,8 +16,8 @@ export const Tilebar: FC = () => {
   const handleMaximize = () => window.api.window.maximize();
 
   useEffect(() => {
-    void window.api.app.isAdmin().then(setIsAdmin);
-    void window.api.window.isMaximized().then(setIsMaximized);
+    window.api.app.isAdmin().then(setIsAdmin);
+    window.api.window.isMaximized().then(setIsMaximized);
     const unsubscribe = window.api.window.onMaximizedChange(setIsMaximized);
     return unsubscribe;
   }, []);
@@ -25,7 +25,7 @@ export const Tilebar: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        Copyfloy {isPackaged ? "" : "(dev)"} {isAdmin && "(administrator)"}
+        Copyfloy{isPackaged ? undefined : "-dev"} {isAdmin && "(administrator)"}
       </div>
       <div className={styles.controls}>
         <TilebarButton onClick={handleMinimize} tooltip="Minimize" tooltipPlacement={TooltipPlacement.LEFT}>

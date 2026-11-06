@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export const useZoomShortcuts = () => {
   useEffect(() => {
-    void initZoom();
+    initZoom();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!(event.ctrlKey || event.metaKey)) return;

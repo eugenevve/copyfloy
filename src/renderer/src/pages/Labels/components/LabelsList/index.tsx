@@ -41,7 +41,7 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
 
   const displayIds = displayItems.map(({ id }) => id);
   const allIds = allItems.map(({ id }) => id);
-  const handleDragEnd = ({ active, over }: DragEndEvent): void => {
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveId(null);
     if (over && active.id !== over.id) {
       onReorder(arrayMove(allIds, allIds.indexOf(Number(active.id)), allIds.indexOf(Number(over.id))));

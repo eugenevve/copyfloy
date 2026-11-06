@@ -7,7 +7,7 @@ import { UpdaterService } from "./UpdaterService";
 export class UpdaterIpc {
   constructor(private readonly updater: UpdaterService) {}
 
-  init(): void {
+  init() {
     // Check whether a new version is available
     ipcMain.handle(IPC_CHANNELS.updater.check, () => {
       return this.updater.check();
