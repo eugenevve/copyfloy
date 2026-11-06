@@ -10,9 +10,9 @@ export class LabelService {
   private readonly labelStorage: LabelStorage;
   private readonly taskStorage: TaskStorage;
 
-  constructor(taskStorage: TaskStorage) {
+  constructor(taskStorage: TaskStorage, labelStorage: LabelStorage) {
     this.taskStorage = taskStorage;
-    this.labelStorage = new LabelStorage();
+    this.labelStorage = labelStorage;
   }
 
   get() {

@@ -27,9 +27,9 @@ export class TaskService {
   private readonly missedTasks: MissedTaskService;
   private readonly missedTaskIpc: MissedTaskIpc;
 
-  constructor(taskStorage: TaskStorage) {
+  constructor(taskStorage: TaskStorage, labelStorage: LabelStorage) {
     this.taskStorage = taskStorage;
-    this.labelStorage = new LabelStorage();
+    this.labelStorage = labelStorage;
     this.copyService = new CopyService();
 
     this.scheduler = new SchedulerService((task) => {
