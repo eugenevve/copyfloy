@@ -11,7 +11,16 @@ import { CSSProperties, FC } from "react";
 import styles from "./LabelItem.module.css";
 import { ILabelItem } from "./LabelItem.types";
 
-export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, dimmed }) => {
+export const LabelItem: FC<ILabelItem> = ({
+  label,
+  onEdit,
+  onDelete,
+  reorder,
+  dimmed,
+  selected,
+  onSelect,
+  keyboardItemId,
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: label.id,
     disabled: !reorder,
@@ -28,7 +37,18 @@ export const LabelItem: FC<ILabelItem> = ({ label, onEdit, onDelete, reorder, di
   ];
 
   return (
-    <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
+    <div
+      ref={setNodeRef}
+      className={classNames(styles.container, dimmed ? styles.dimmed : "", selected ? styles.selected : "")}
+      style={sortableStyle}
+      data-keyboard-item={keyboardItemId}
+      tabIndex={-1}
+      onFocus={onSelect}
+      onClick={(event) => {
+        onSelect();
+        if (!(event.target instanceof Element && event.target.closest("button"))) event.currentTarget.focus();
+      }}
+    >
       <div className={styles.section}>
         {reorder && <DragButton {...attributes} {...listeners} />}
         <LabelChip name={label.name} color={label.color} />

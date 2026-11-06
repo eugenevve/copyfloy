@@ -6,6 +6,9 @@ export interface ITaskItem {
   labels: ILabel[];
   reorder: boolean;
   dimmed?: boolean;
+  selected?: boolean;
+  onSelect: () => void;
+  keyboardItemId: number;
   progress?: number;
   gitAvailable: boolean | null;
   onRun: () => void;

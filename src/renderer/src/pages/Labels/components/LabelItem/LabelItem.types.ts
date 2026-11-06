@@ -6,4 +6,7 @@ export interface ILabelItem {
   onDelete: () => void;
   reorder: boolean;
   dimmed?: boolean;
+  selected?: boolean;
+  onSelect: () => void;
+  keyboardItemId: number;
 }

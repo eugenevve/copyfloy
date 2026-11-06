@@ -12,6 +12,10 @@
   opacity: var(--opacity-disabled);
 }
 
+.selected {
+  outline: var(--spacing-xxs) solid var(--content-primary);
+}
+
 .content {
   display: flex;
   flex-direction: column;

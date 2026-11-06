@@ -1,3 +1,4 @@
+import { useKeyboardListNavigation } from "@app/hooks/useKeyboardListNavigation";
 import { usePagination } from "@app/hooks/usePagination";
 import { LabelsIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
@@ -26,6 +27,13 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
 
   const allItems = items.toReversed();
   const { visibleItems: displayItems, hasMore, showMore } = usePagination(allItems);
+  const { selectedId, onSelect, listRef } = useKeyboardListNavigation({
+    items: allItems,
+    visibleCount: displayItems.length,
+    showMore,
+    disabled: activeId !== null,
+    actions: { e: onEdit, delete: onDelete },
+  });
 
   if (items.length === 0) {
     return <NoData title="No labels" icon={<LabelsIcon />} />;
@@ -49,13 +57,16 @@ export const LabelsList: FC<ILabelsList> = ({ items, reorder, onEdit, onDelete, 
       onDragCancel={() => setActiveId(null)}
     >
       <SortableContext items={displayIds} strategy={verticalListSortingStrategy}>
-        <div className={styles.container}>
+        <div className={styles.container} ref={listRef}>
           {displayItems.map((item) => (
             <LabelItem
               key={item.id}
               label={item}
               reorder={reorder}
               dimmed={activeId !== null && activeId !== item.id}
+              selected={selectedId === item.id}
+              onSelect={() => onSelect(item.id)}
+              keyboardItemId={item.id}
               onEdit={() => onEdit(item)}
               onDelete={() => onDelete(item)}
             />
