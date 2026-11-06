@@ -57,7 +57,7 @@ export class TaskService {
       return tasks;
     }
 
-    tasks.push({ id: Date.now(), ...newTask });
+    tasks.push({ id: createUniqueId(new Set(tasks.map((task) => task.id))), ...newTask });
     this.taskStorage.save(tasks);
     this.scheduler.rescheduleAll(tasks);
 
