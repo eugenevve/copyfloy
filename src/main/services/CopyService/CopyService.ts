@@ -1,17 +1,14 @@
-import { createReadStream, createWriteStream } from "node:fs";
 import path from "node:path";
-import { pipeline } from "node:stream/promises";
 
 import { Logger } from "@main/utils/logger";
 import { IPC_CHANNELS } from "@shared/constants/ipc";
 import { ReportStatus } from "@shared/types/report";
 import { ITask, TaskType } from "@shared/types/tasks";
-import { BrowserWindow, app } from "electron";
-import fs from "fs-extra";
+import { BrowserWindow } from "electron";
 
-import { createZip } from "./ArchiveService";
-import { ICopyEntry, IOperationStats, IRunningTask } from "./CopyService.types";
-import { cloneRepository, isGitAvailable } from "./GitRepositoryService";
+import { ArchiveRunner, FileCopier, RepositoryRunner } from "./CopyRunners";
+import { IOperationStats, IRunningTask } from "./CopyService.types";
+import { isGitAvailable } from "./GitRepositoryService";
 import { NotificationService } from "../NotificationService/NotificationService";
 import { ReportStorage } from "../ReportService/ReportStorage";
 
@@ -19,6 +16,9 @@ import { ReportStorage } from "../ReportService/ReportStorage";
 export class CopyService {
   private readonly running = new Map<number, IRunningTask>();
   private readonly reportStorage = new ReportStorage();
+  private readonly fileCopier = new FileCopier();
+  private readonly repositoryRunner = new RepositoryRunner();
+  private readonly archiveRunner = new ArchiveRunner();
 
   // Returns progress (0-100) of every task that is currently running
   getRunning(): Record<number, number> {
@@ -56,104 +56,32 @@ export class CopyService {
     let errorMessage: string | undefined;
 
     try {
-      if (task.type === TaskType.REPOSITORY) {
-        const report = (percent: number) => {
-          if (percent > state.percent) {
-            state.percent = percent;
-            this.broadcast(task.id, percent);
-          }
-        };
-
-        if (task.isArchive) {
-          await this.archiveRepository(task, state.controller.signal, report, stats);
-        } else {
-          const clonedPath = await cloneRepository(task, report, state.controller.signal);
-          const entries: ICopyEntry[] = [];
-          await this.collect(clonedPath, clonedPath, undefined, entries);
-          this.applyEntryStats(entries, stats);
-        }
-
-        outcome = ReportStatus.SUCCESS;
-        Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
-
-        if (task.schedule?.notify) {
-          NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
-        }
-
-        return;
-      }
-
-      const destination = path.join(task.target, path.basename(task.source));
-
-      if (task.isArchive) {
-        const archivePath = path.join(task.target, `${path.basename(task.source)}.zip`);
-        const onProgress = (percent: number) => {
-          if (percent > state.percent) {
-            state.percent = percent;
-            this.broadcast(task.id, percent);
-          }
-        };
-
-        Logger.info("CopyService", `Starting backup "${task.name}": "${task.source}" → "${archivePath}"`);
-        await fs.ensureDir(task.target);
-
-        const entries: ICopyEntry[] = [];
-        await this.collect(task.source, path.basename(task.source), task.exceptions, entries, stats);
-        await createZip(entries, archivePath, state.controller.signal, onProgress);
-
-        this.applyEntryStats(entries, stats);
-        outcome = ReportStatus.SUCCESS;
-        Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
-
-        if (task.schedule?.notify) {
-          NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
-        }
-
-        return;
-      }
-
-      Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);
-
-      const entries: ICopyEntry[] = [];
-      await this.collect(task.source, destination, task.exceptions, entries, stats);
-
-      const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
-      let copiedSize = 0;
-
-      const report = () => {
-        const percent = totalSize === 0 ? 0 : Math.min(100, Math.floor((copiedSize / totalSize) * 100));
-
-        if (percent !== state.percent) {
+      const report = (percent: number) => {
+        if (percent > state.percent) {
           state.percent = percent;
           this.broadcast(task.id, percent);
         }
       };
 
-      stats.filesCopied = 0;
-
-      for (const entry of entries) {
-        if (state.controller.signal.aborted) {
-          throw new Error("Aborted");
+      if (task.type === TaskType.REPOSITORY) {
+        if (task.isArchive) {
+          await this.archiveRunner.runRepository(task, state.controller.signal, stats, report);
+        } else {
+          await this.repositoryRunner.run(task, state.controller.signal, stats, report);
         }
-
-        if (entry.isDirectory) {
-          await fs.ensureDir(entry.destination);
-          continue;
-        }
-
-        await fs.ensureDir(path.dirname(entry.destination));
-        await this.copyFile(entry, state.controller.signal, (bytes) => {
-          copiedSize += bytes;
-          report();
-        });
-        stats.filesCopied += 1;
+      } else if (task.isArchive) {
+        const archivePath = path.join(task.target, `${path.basename(task.source)}.zip`);
+        Logger.info("CopyService", `Starting backup "${task.name}": "${task.source}" → "${archivePath}"`);
+        await this.archiveRunner.runFiles(task, state.controller.signal, stats, report);
+      } else {
+        const destination = path.join(task.target, path.basename(task.source));
+        Logger.info("CopyService", `Starting task "${task.name}": "${task.source}" → "${destination}"`);
+        await this.fileCopier.run(task, state.controller.signal, stats, report);
       }
 
-      stats.totalBytes = copiedSize;
       outcome = ReportStatus.SUCCESS;
       Logger.info("CopyService", `Task "${task.name}" completed successfully.`);
 
-      // Show a notification when the task requests it
       if (task.schedule?.notify) {
         NotificationService.show("Successful copying!", `Task: "${task.name}" done!`);
       }
@@ -190,102 +118,11 @@ export class CopyService {
     }
   }
 
-  // Clones into a temp folder, then zips the whole clone (including .git) into the target
-  private async archiveRepository(
-    task: ITask,
-    signal: AbortSignal,
-    onProgress: (percent: number) => void,
-    stats: IOperationStats
-  ) {
-    const tempDir = await fs.mkdtemp(path.join(app.getPath("temp"), "copyfloy-"));
-
-    try {
-      // Clone takes 0-70%, packing takes 70-100%
-      await cloneRepository({ ...task, target: tempDir }, (percent) => onProgress(Math.floor(percent * 0.7)), signal);
-
-      const [repositoryName] = await fs.readdir(tempDir);
-      const entries: ICopyEntry[] = [];
-      await this.collect(path.join(tempDir, repositoryName), repositoryName, undefined, entries);
-      this.applyEntryStats(entries, stats);
-
-      await fs.ensureDir(task.target);
-      await createZip(entries, path.join(task.target, `${repositoryName}.zip`), signal, (percent) =>
-        onProgress(70 + Math.floor(percent * 0.3))
-      );
-    } finally {
-      await fs.remove(tempDir).catch(() => undefined);
-    }
-  }
-
-  private applyEntryStats(entries: ICopyEntry[], stats: IOperationStats) {
-    stats.filesCopied = entries.filter((entry) => !entry.isDirectory).length;
-    stats.totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
-  }
-
-  // Copies one file, removing the partial result if the copy is interrupted
-  private async copyFile(entry: ICopyEntry, signal: AbortSignal, onBytes: (bytes: number) => void) {
-    const readStream = createReadStream(entry.source);
-    readStream.on("data", (chunk) => onBytes(chunk.length));
-
-    try {
-      await pipeline(readStream, createWriteStream(entry.destination), { signal });
-    } catch (error) {
-      await fs.remove(entry.destination).catch(() => undefined);
-      throw error;
-    }
-  }
-
-  // Builds a flat list of everything to copy, skipping excluded paths
-  private async collect(
-    source: string,
-    destination: string,
-    exceptions: string[] | undefined,
-    entries: ICopyEntry[],
-    operationStats?: IOperationStats
-  ) {
-    if (this.isExcluded(source, exceptions)) {
-      if (operationStats) {
-        operationStats.skipped += 1;
-      }
-
-      return;
-    }
-
-    const fileStats = await fs.stat(source);
-
-    if (fileStats.isDirectory()) {
-      entries.push({ source, destination, isDirectory: true, size: 0 });
-
-      for (const name of await fs.readdir(source)) {
-        await this.collect(path.join(source, name), path.join(destination, name), exceptions, entries, operationStats);
-      }
-
-      return;
-    }
-
-    entries.push({ source, destination, isDirectory: false, size: fileStats.size });
-  }
-
   private broadcast(taskId: number, percent: number | null) {
     BrowserWindow.getAllWindows().forEach((window) => {
       if (!window.isDestroyed()) {
         window.webContents.send(IPC_CHANNELS.tasks.progress, { taskId, percent });
       }
-    });
-  }
-
-  // Checks whether a path should be excluded from copying
-  private isExcluded(sourcePath: string, exceptions?: string[]): boolean {
-    if (!exceptions?.length) {
-      return false;
-    }
-
-    const normalizedSource = path.normalize(sourcePath);
-
-    return exceptions.some((exceptionPath) => {
-      const normalizedException = path.normalize(exceptionPath);
-
-      return normalizedSource === normalizedException || normalizedSource.startsWith(normalizedException + path.sep);
     });
   }
 }
