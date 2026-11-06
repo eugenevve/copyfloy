@@ -1,5 +1,6 @@
 import { HeaderTools } from "@app/components/HeaderTools";
 import { PageWrapper } from "@app/components/PageWrapper";
+import { useKeyboardShortcuts } from "@app/hooks/useKeyboardShortcuts";
 import { useLabelFilter } from "@app/hooks/useLabelFilter";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
@@ -24,6 +25,20 @@ export const Labels: FC = () => {
   });
   const { labels, isLoading, fetchLabels, deleteLabel, reorderLabels } = useLabels();
   const { search, setSearch, filteredLabels } = useLabelFilter(labels);
+
+  useKeyboardShortcuts([
+    {
+      key: "mod+f",
+      enabled: !isLabelModal.open,
+      action: () => document.getElementById("label-search")?.focus(),
+    },
+    {
+      key: "mod+n",
+      enabled: !isLabelModal.open && labels.length < MAX_LIST_ITEMS,
+      ignoreInputs: true,
+      action: () => setLabelModal({ open: true, label: null }),
+    },
+  ]);
 
   // Modal Label
   const handleAddLabel = (): void => {
@@ -76,6 +91,7 @@ export const Labels: FC = () => {
       addText="Add label"
       onAdd={handleAddLabel}
       addDisabled={labels.length >= MAX_LIST_ITEMS}
+      searchId="label-search"
       search={search}
       onSearchChange={setSearch}
     />
