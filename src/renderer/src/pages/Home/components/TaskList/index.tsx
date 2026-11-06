@@ -1,3 +1,4 @@
+import { useKeyboardListNavigation } from "@app/hooks/useKeyboardListNavigation";
 import { usePagination } from "@app/hooks/usePagination";
 import { CloneIcon } from "@app/ui/Icons";
 import { NoData } from "@app/ui/NoData";
@@ -41,6 +42,18 @@ export const TaskList: FC<ITaskList> = ({
     .toReversed()
     .sort((first, second) => Number(Boolean(second.isPinned)) - Number(Boolean(first.isPinned)));
   const { visibleItems: displayItems, hasMore, showMore } = usePagination(allItems);
+  const { selectedId, onSelect, listRef } = useKeyboardListNavigation({
+    items: allItems,
+    visibleCount: displayItems.length,
+    showMore,
+    disabled: activeId !== null,
+    actions: {
+      enter: (task) => (progress[task.id] !== undefined ? onStop(task) : onRun(task)),
+      delete: onDelete,
+      "mod+e": onEdit,
+      "mod+s": onSchedule,
+    },
+  });
 
   if (items.length === 0) {
     return <NoData title="No tasks" icon={<CloneIcon />} />;
@@ -77,7 +90,7 @@ export const TaskList: FC<ITaskList> = ({
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <div className={styles.container}>
+      <div className={styles.container} ref={listRef}>
         {[pinnedIds, regularIds].map((ids, index) => (
           <SortableContext key={index} items={ids} strategy={verticalListSortingStrategy}>
             {displayItems
@@ -91,6 +104,9 @@ export const TaskList: FC<ITaskList> = ({
                   gitAvailable={gitAvailable}
                   dimmed={activeId !== null && activeId !== item.id}
                   progress={progress[item.id]}
+                  selected={selectedId === item.id}
+                  onSelect={() => onSelect(item.id)}
+                  keyboardItemId={item.id}
                   onRun={() => onRun(item)}
                   onStop={() => onStop(item)}
                   onSchedule={() => onSchedule(item)}

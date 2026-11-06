@@ -18,6 +18,7 @@ export const HeaderTools: FC<IHeaderTools> = ({
   addText,
   onAdd,
   addDisabled,
+  searchId,
   onRunTasks,
   runTasksDisabled,
   search,
@@ -52,6 +53,7 @@ export const HeaderTools: FC<IHeaderTools> = ({
         </div>
         <div className={styles.section}>
           <Input
+            id={searchId}
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search"

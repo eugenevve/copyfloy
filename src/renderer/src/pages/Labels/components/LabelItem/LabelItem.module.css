@@ -13,6 +13,10 @@
   opacity: var(--opacity-disabled);
 }
 
+.selected {
+  outline: var(--spacing-xxs) solid var(--content-primary);
+}
+
 .section {
   display: flex;
   align-items: center;

@@ -1,0 +1,44 @@
+.title {
+  font-weight: var(--heading);
+}
+
+.container {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  table-layout: fixed;
+}
+
+table th,
+table td {
+  padding: var(--spacing-s);
+  font-weight: var(--heading);
+}
+
+table tr {
+  border-bottom: var(--border-primary);
+}
+
+table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.keys {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.keys div {
+  padding: var(--spacing-xs) var(--spacing-s);
+  border: var(--border-primary);
+  border-radius: var(--spacing-s);
+  background: var(--content-gray-dark);
+  font-size: 14px;
+}

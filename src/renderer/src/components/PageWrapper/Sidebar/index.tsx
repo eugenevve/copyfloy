@@ -1,7 +1,7 @@
 import { ThemeButton } from "@app/theme/ThemeButton";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
-import { ArrowLineIcon, GearIcon, HomeIcon, InfoIcon, LabelsIcon, ReportIcon } from "@app/ui/Icons";
+import { ArrowLineIcon, GearIcon, HomeIcon, InfoIcon, KeyboardIcon, LabelsIcon, ReportIcon } from "@app/ui/Icons";
 import { Line } from "@app/ui/Line";
 import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import { classNames } from "@app/utils/classNames";
@@ -48,6 +48,11 @@ export const Sidebar: FC = () => {
       path: AppPath.REPORT,
       label: "Report",
       icon: <ReportIcon />,
+    },
+    {
+      path: AppPath.SHORTCUTS,
+      label: "Shortcuts",
+      icon: <KeyboardIcon />,
     },
     {
       path: AppPath.ABOUT,

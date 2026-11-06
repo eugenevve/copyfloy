@@ -1,5 +1,6 @@
 import { HeaderTools } from "@app/components/HeaderTools";
 import { PageWrapper } from "@app/components/PageWrapper";
+import { useKeyboardShortcuts } from "@app/hooks/useKeyboardShortcuts";
 import { useLabels } from "@app/hooks/useLabels";
 import { useModal } from "@app/hooks/useModal";
 import { useTaskFilter } from "@app/hooks/useTaskFilter";
@@ -98,6 +99,20 @@ export const Home: FC = () => {
     });
   };
 
+  useKeyboardShortcuts([
+    {
+      key: "mod+f",
+      enabled: !isTaskModal.open && !isInitScheduling,
+      action: () => document.getElementById("task-search")?.focus(),
+    },
+    {
+      key: "mod+n",
+      enabled: !isTaskModal.open && !isInitScheduling && tasks.length < MAX_LIST_ITEMS,
+      ignoreInputs: true,
+      action: () => setTaskModal({ open: true, task: null }),
+    },
+  ]);
+
   const handleEditTask = (task: ITask) => {
     setTaskModal({
       open: true,
@@ -141,6 +156,7 @@ export const Home: FC = () => {
       addText="Add task"
       onAdd={handleAddTask}
       addDisabled={tasks.length >= MAX_LIST_ITEMS}
+      searchId="task-search"
       onRunTasks={() => setRunTasksModalOpen(true)}
       runTasksDisabled={isRunningAll || tasks.length === 0}
       search={search}

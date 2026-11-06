@@ -39,6 +39,9 @@ export const TaskItem: FC<ITaskItem> = ({
   dimmed,
   progress,
   gitAvailable,
+  selected,
+  onSelect,
+  keyboardItemId,
   onRun,
   onStop,
   onEdit,
@@ -88,7 +91,18 @@ export const TaskItem: FC<ITaskItem> = ({
   ];
 
   return (
-    <div ref={setNodeRef} className={classNames(styles.container, dimmed ? styles.dimmed : "")} style={sortableStyle}>
+    <div
+      ref={setNodeRef}
+      className={classNames(styles.container, dimmed ? styles.dimmed : "", selected ? styles.selected : "")}
+      style={sortableStyle}
+      data-keyboard-item={keyboardItemId}
+      tabIndex={-1}
+      onFocus={onSelect}
+      onClick={(event) => {
+        onSelect();
+        if (!(event.target instanceof Element && event.target.closest("button"))) event.currentTarget.focus();
+      }}
+    >
       {reorder && <DragButton {...attributes} {...listeners} />}
       <div className={styles.content}>
         <div className={styles.horizontalContainer}>
