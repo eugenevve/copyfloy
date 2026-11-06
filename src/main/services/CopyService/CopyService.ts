@@ -257,13 +257,7 @@ export class CopyService {
       entries.push({ source, destination, isDirectory: true, size: 0 });
 
       for (const name of await fs.readdir(source)) {
-        await this.collect(
-          path.join(source, name),
-          path.join(destination, name),
-          exceptions,
-          entries,
-          operationStats
-        );
+        await this.collect(path.join(source, name), path.join(destination, name), exceptions, entries, operationStats);
       }
 
       return;

@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
+import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
 import { IAppSettings } from "@shared/types/window";
 import { app } from "electron";
 import fs from "fs-extra";
@@ -27,9 +28,7 @@ export class SettingsStorage {
   // Saving settings to disk
   save(settings: IAppSettings) {
     try {
-      fs.writeJsonSync(this.settingsPath, settings, {
-        spaces: 2,
-      });
+      writeJsonAtomically(this.settingsPath, settings);
     } catch (error) {
       Logger.error("SettingsStorage", "Failed to save settings", error);
     }

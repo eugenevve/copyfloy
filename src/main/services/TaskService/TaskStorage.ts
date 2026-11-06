@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
+import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
 import { ILabel } from "@shared/types/labels";
 import { ITask, RepositoryProvider, TaskType } from "@shared/types/tasks";
 import { ITaskTransfer } from "@shared/types/transfer";
@@ -92,21 +93,19 @@ export class TaskStorage {
   // Saves tasks to a specific JSON file
   saveToFile(tasks: ITask[], filePath: string) {
     try {
-      this.ensureDirectory(filePath);
-
-      fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), "utf-8");
+      writeJsonAtomically(filePath, tasks);
     } catch (error) {
       Logger.error("TaskStorage", `Failed to save tasks to "${filePath}"`, error);
     }
   }
 
-  saveTransferToFile(transfer: ITaskTransfer, filePath: string) {
+  saveTransferToFile(transfer: ITaskTransfer, filePath: string): boolean {
     try {
-      this.ensureDirectory(filePath);
-
-      fs.writeFileSync(filePath, JSON.stringify(transfer, null, 2), "utf-8");
+      writeJsonAtomically(filePath, transfer);
+      return true;
     } catch (error) {
       Logger.error("TaskStorage", `Failed to save transfer to "${filePath}"`, error);
+      return false;
     }
   }
 
@@ -210,14 +209,5 @@ export class TaskStorage {
     const label = value as Record<string, unknown>;
 
     return typeof label.id === "number" && typeof label.name === "string" && typeof label.color === "string";
-  }
-
-  // Ensures that the parent directory exists
-  private ensureDirectory(filePath: string) {
-    const directory = path.dirname(filePath);
-
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory, { recursive: true });
-    }
   }
 }

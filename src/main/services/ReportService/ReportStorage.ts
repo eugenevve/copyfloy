@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Logger } from "@main/utils/logger";
+import { writeJsonAtomically } from "@main/utils/writeJsonAtomically";
 import { MAX_LIST_ITEMS } from "@shared/constants/limits";
 import { IReportRecord, ReportStatus } from "@shared/types/report";
 import { app } from "electron";
@@ -37,8 +38,7 @@ export class ReportStorage {
 
   save(records: IReportRecord[]) {
     try {
-      fs.mkdirSync(path.dirname(this.dataPath), { recursive: true });
-      fs.writeFileSync(this.dataPath, JSON.stringify(records, null, 2), "utf-8");
+      writeJsonAtomically(this.dataPath, records);
     } catch (error) {
       Logger.error("ReportStorage", `Failed to save report to "${this.dataPath}"`, error);
     }
