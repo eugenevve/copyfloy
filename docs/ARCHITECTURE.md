@@ -23,7 +23,7 @@ Application is built on Electron and is split into three layers:
                 │ window.api
 ┌───────────────┴──────────────────────────────────────────┐
 │ Renderer (React)                                         │
-│ Home (tasks), Labels, Report, Settings, About            │
+│ Home (tasks), Labels, Report, Settings, Shortcuts, About │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -131,29 +131,14 @@ The **schedule is not a part of this form.** A task is saved first, and its sche
 
 ### Task execution
 
-A task can be executed in two ways:
+Every way of starting a task ends in the same `CopyService.run()`:
 
 ```text
-Manual execution
-       ↓
-CopyService
-       ↓
-File / Folder / Repository
+Run / Stop button or Enter key   ─┐
+Run tasks (queue in the UI)      ─┤
+Scheduler (node-cron)            ─┼──→ CopyService.run() ──→ File / Folder / Repository
+Missed-run prompt ("Run now")    ─┘
 ```
-
-or:
-
-```text
-Scheduler
-    ↓
-Scheduled Task
-    ↓
-CopyService
-    ↓
-File / Folder / Repository
-```
-
-A third path, a run offered after a missed schedule, ends in the same `CopyService.run()` (see [Missed Runs](#-missed-runs)).
 
 When a task is created, updated, deleted or imported, the scheduler is automatically updated to reflect the current task configuration.
 
@@ -180,6 +165,16 @@ Unregister the run, progress event with null (finished)
 - Progress is a percentage (0-100) broadcast to every window through the `tasks.progress` channel. The UI can also request the progress of all running tasks (`tasks.getRunning`), for example after the window was hidden and shown again.
 - The task card shows the percentage while the task is running, and the **Run** button turns into **Stop**.
 - A repository task whose Git or token is not available cannot be started: its **Run** button is disabled and the reason is shown on the card.
+
+### Running several tasks
+
+The **Run tasks** button in the header of the Home page opens a dialog with two choices: all tasks, or only the tasks that match the current search, type and label filters (disabled when nothing matches).
+
+- The queue exists only in the interface: it calls `tasks.run` for each task in turn and starts the next one when the previous run has finished. The tasks are run in the order of the list - pinned first, then the newest ones.
+- The queue is not stored. If the application is closed before it finishes, the rest of the tasks are not run.
+- An error in one task does not stop the queue; it is recorded in the report as usual. **Stop** on a card cancels only that task, and the queue goes on with the next one.
+- A task that is already running (for example, started by the scheduler) is skipped by the rule above.
+- The button is disabled while the queue is being processed and when there are no tasks.
 
 ### Stopping a task
 
@@ -230,7 +225,7 @@ Every Monday at 03:30
 
 The schedule also carries the `notify` flag. When it is enabled, a system notification is shown after every successful run of the task; for a new schedule it is enabled by default. Errors are always reported regardless of this flag.
 
-The schedule is shown on the task card in a short form, for example `Daily at 12:00`, `Every hour at :30`, `Every 5 min` or `Mon, Wed at 03:30`. The time follows the selected [time format](#-date-and-time-format).
+The schedule is shown on the task card in a short form, for example `Daily at 12:00`, `Every hour at :30`, `Every 5 min` or `Mon, Wed at 03:30`. The time follows the selected [time format](#date-and-time-format).
 
 The application process must remain running for scheduled tasks to execute.
 
@@ -269,7 +264,7 @@ The task is considered missed if the last scheduled time is **later than** the l
 
 ### The prompt
 
-The interface shows a modal **Task skipped** for each missed task, one after another: _Task "…" was not executed on schedule because the application was not running. Run now?_
+The interface shows a modal **Task skipped** for each missed task, one after another: _Task "…" was not executed on schedule because the application was not running. Run it now?_
 
 - **Run now** starts the task and remembers the answer.
 - **Skip** (or closing the dialog) only remembers the answer.
@@ -330,7 +325,7 @@ node_modules/
 
 The excluded paths and their contents will not be copied. A path is excluded if it is equal to an excluded path or is located inside it. Each excluded path that is hit during the walk counts as one skipped item in the report; the contents of an excluded folder are not counted separately.
 
-Exclusions apply to file and folder tasks, including those in archive mode. They are not used for repository tasks.
+Exclusions are applied by the copy and the archive code for any file or folder task, but the interface offers them only for folder tasks (a single file has nothing to exclude). They are not used for repository tasks.
 
 ---
 
@@ -520,7 +515,7 @@ report.json
 ```
 
 - Only the **last 1000** records are kept; older ones are dropped automatically.
-- A record is written for successful and failed runs, whether started manually, by the scheduler or after a missed-run prompt. Runs stopped by the user are not recorded.
+- A record is written for successful and failed runs, whether started manually, from the **Run tasks** queue, by the scheduler or after a missed-run prompt. Runs stopped by the user are not recorded.
 - The task name is saved in the record, so the history stays readable after a task was renamed or deleted.
 - Record IDs are based on the start time; if two runs start in the same millisecond, the ID is increased until it is unique (the IDs are used as list keys in the UI).
 - A damaged or invalid `report.json` is ignored and treated as an empty history.
@@ -540,7 +535,7 @@ The page consists of the summary (tasks, successful and failed operations), the 
 | By weeks | The last 14 days, ending with the latest day that has records; the number of runs per day, days without runs are shown as zero |
 | By hours | 24 hours of one day chosen in a drop-down list that contains only days with records (the newest first)                         |
 
-Labels of the axes and the tooltips follow the selected [date and time format](#-date-and-time-format). Charts are calculated in the interface from the records that were already received; there is no separate request.
+Labels of the axes and the tooltips follow the selected [date and time format](#date-and-time-format). Charts are calculated in the interface from the records that were already received; there is no separate request.
 
 **Table.** The history table shows the task, the start time, the number of copied and skipped files, the duration and the total size. A failed run is highlighted, and the error message is shown on hover. Records are displayed 100 at a time; the next ones are loaded with the **Show more** button.
 
@@ -576,11 +571,13 @@ The Home page shows the list of tasks with the following tools:
 - **Type filter** - all, file, folder or repository.
 - **Label filter** - see [Labels](#-labels).
 
-All three work together: a task is shown if it matches the type, the search text and the labels at the same time. The counter in the header shows the number of tasks that match.
+All three work together: a task is shown if it matches the type, the search text and the labels at the same time. The counter in the header shows the number of tasks that match. The same filters define the second option of the **Run tasks** dialog (see [Running several tasks](#running-several-tasks)).
 
 The list is displayed 100 tasks at a time. The **Show more** button adds the next 100. Drag and drop works on the full list, not only on the visible part.
 
 Each card shows the type icon, the name, the pin button, the progress of a running task, the buttons **Run / Stop**, **Schedule**, **Edit** and **Delete**, the source and the destination, the short text of the schedule and the labels of the task. Deleting a task asks for confirmation.
+
+The list and the card actions can also be controlled from the keyboard, see [Keyboard control](#keyboard-control).
 
 ---
 
@@ -651,7 +648,7 @@ Both services register the path of the **current executable** (`app.getPath("exe
 
 ### Page zoom
 
-- The zoom is changed in 10 % steps from 50 % to 300 % with the buttons on the Settings page or with the keyboard: `Ctrl` + `+` / `-` to change and `Ctrl` + `0` to reset to 100 %.
+- The zoom is changed in 10 % steps from 50 % to 300 % with the buttons on the Settings page or with the keyboard: `Ctrl` + `+` / `-` to change and `Ctrl` + `0` to reset to 100 % (see [Keyboard control](#keyboard-control)).
 - The value is clamped to the allowed range in the main process, applied to the window immediately and saved in `settings.json`.
 
 ---
@@ -851,18 +848,19 @@ The activity is set on startup and shows the application name, a short status an
 
 The renderer is a React application with `HashRouter` and CSS Modules. It contains the following pages:
 
-| Page     | Purpose                                                                                                        |
-| -------- | -------------------------------------------------------------------------------------------------------------- |
-| Home     | Task list: search, filters by type and label, run / stop, progress, pinning, schedule, drag and drop           |
-| Labels   | Creating, editing, deleting, searching and reordering labels                                                   |
-| Report   | Summary, charts and history of task runs                                                                       |
-| Settings | Auto-start, administrator mode, zoom, tray behavior, date and time format, import and export of tasks, updates |
-| About    | Description of the application, its version and a link to the GitHub repository                                |
+| Page      | Purpose                                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Home      | Task list: search, filters by type and label, run / stop, run several tasks, progress, pinning, schedule, drag and drop |
+| Labels    | Creating, editing, deleting, searching and reordering labels                                                            |
+| Report    | Summary, charts and history of task runs                                                                                |
+| Settings  | Auto-start, administrator mode, zoom, tray behavior, date and time format, import and export of tasks, updates          |
+| Shortcuts | Reference of keyboard shortcuts                                                                                         |
+| About     | Description of the application, its version and a link to the GitHub repository                                         |
 
 Common parts of the interface:
 
-- **Header tools** - the title with the counter, the **Add** button, search, the type filter and the label chips; it is shared by the Home and Labels pages.
-- **Modals** - confirmations, alerts and forms are shown through one modal provider. Besides the forms, the **Task skipped** prompt for [missed runs](#-missed-runs) is shown from it at startup.
+- **Header tools** - the title with the counter, the **Add** button, search, the type filter and the label chips; it is shared by the Home and Labels pages. Only the Home page adds the filters and the **Run tasks** button.
+- **Modals** - confirmations, alerts and forms are shown through one modal provider. The **Task skipped** prompt for [missed runs](#-missed-runs) is a separate component that uses the same alert window and is shown at startup.
 - **Pagination** - lists of tasks, labels and report records show 100 items (`PAGE_ITEMS`) at a time, with the **Show more** button.
 - **Drag and drop** - lists are sorted with `@dnd-kit` (pointer and keyboard sensors, movement restricted to the vertical axis and to the list).
 - **Charts** - the Report page uses Recharts with the colors of the current theme.
@@ -870,6 +868,39 @@ Common parts of the interface:
 - **Build-dependent behavior** - widgets read `window.api.app.isPackaged` and `window.api.app.isPortable`: in development the auto-start, administrator and update widgets are disabled or explain that the setting is not available, and the update widget changes its messages for a portable build.
 
 The interface keeps no important data of its own: tasks, labels, settings and reports are always read from and written to the main process through `window.api`. The only values the interface stores itself are the selected theme and the temporary state of filters, search and forms.
+
+### Keyboard control
+
+Keyboard handling lives entirely in the renderer and is built from three small hooks. The **Shortcuts** page (`Ctrl` + `5`) is a static reference of everything below.
+
+| Hook                        | Where it is used      | What it does                                                                       |
+| --------------------------- | --------------------- | ---------------------------------------------------------------------------------- |
+| `useKeyboardShortcuts`      | App, Home, Labels     | Page-level shortcuts: switching pages, creating an item, focusing the search field |
+| `useKeyboardListNavigation` | Task list, label list | Selection of an item with the arrow keys and actions on the selected item          |
+| `useZoomShortcuts`          | App                   | Page zoom                                                                          |
+
+**Page shortcuts.** A shortcut is described by a key, an action and two optional flags: `enabled` and `ignoreInputs`. The `mod+` prefix means `Ctrl` (or `Cmd`). The hook does nothing while a modal window is open (an element with `aria-modal="true"`) or when `Alt` or `Shift` is pressed. With `ignoreInputs` a shortcut is skipped when the focus is in a text field, so typing is never intercepted.
+
+| Shortcut             | Action                                                                                 | Scope        |
+| -------------------- | -------------------------------------------------------------------------------------- | ------------ |
+| `Ctrl` + `1` ... `6` | Home, Labels, Settings, Report, Shortcuts, About                                       | App          |
+| `Ctrl` + `N`         | Create a task / a label (disabled when the limit of 1000 is reached or a form is open) | Home, Labels |
+| `Ctrl` + `F`         | Focus the search field (works from a text field too)                                   | Home, Labels |
+
+**List navigation.** `↑` / `↓` select the previous or the next item and move the focus to its card; if there is no selection yet, the first or the last item is chosen. If the selection goes beyond the visible part, the next pages are loaded automatically (**Show more**). `Esc` clears the selection. Actions are a map from a key to a handler and are applied to the selected item only:
+
+| Key          | Task list                                 | Label list                      |
+| ------------ | ----------------------------------------- | ------------------------------- |
+| `Enter`      | Run the task, or stop it if it is running | -                               |
+| `Ctrl` + `E` | Edit                                      | Edit                            |
+| `Ctrl` + `S` | Open the schedule dialog                  | -                               |
+| `Delete`     | Delete (after the confirmation)           | Delete (after the confirmation) |
+
+The navigation is ignored while a modal window is open, while an item is being dragged, when the focus is in a text field and for action keys when the focus is on a button (so `Enter` on a button keeps its normal meaning).
+
+**Zoom.** `useZoomShortcuts` listens to `Ctrl` + `+` / `-` / `0` (the numeric keypad works too) for the whole application. Unlike the page shortcuts it is not blocked by modal windows or text fields.
+
+When a shortcut is added or changed, the list in `src/renderer/src/pages/Shortcuts/index.tsx` has to be updated by hand: it is not generated from the handlers.
 
 ---
 
@@ -925,6 +956,7 @@ Responsible for:
 
 Helpers:
 
+- `CopyRunners` - the runners of the three kinds of work: `FileCopier` (copy of a file or a folder), `RepositoryRunner` (clone or update of a repository) and `ArchiveRunner` (ZIP archive); `CopyService` chooses one of them by the type of the task and the `isArchive` flag
 - `GitRepositoryService` - clone and update of GitHub / GitLab repositories, authentication for private repositories, progress parsing
 - `ArchiveService` - writing entries to a ZIP file with progress and cancellation support
 
@@ -997,14 +1029,15 @@ Helpers: `WindowEvents` (window events), `WindowStateService` (saving and restor
 
 Shared helpers of the main process (`src/main/utils`):
 
-| Utility             | Purpose                                                                                    |
-| ------------------- | ------------------------------------------------------------------------------------------ |
-| `Logger`            | Console logging with levels and scopes                                                     |
-| `environment`       | Platform flags (`isWindows`, `isPackagedWindows`) and the application state (`isQuitting`) |
-| `exePath`           | Path of the current executable, used by auto-start and the administrator flag              |
-| `isPortable`        | Detection of the portable build                                                            |
-| `checkIsAdmin`      | Check of administrator rights                                                              |
-| `reorderDisplayIds` | Validation and saving order of a reordered list of tasks or labels                         |
+| Utility               | Purpose                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `Logger`              | Console logging with levels and scopes                                                     |
+| `environment`         | Platform flags (`isWindows`, `isPackagedWindows`) and the application state (`isQuitting`) |
+| `exePath`             | Path of the current executable, used by auto-start and the administrator flag              |
+| `isPortable`          | Detection of the portable build                                                            |
+| `checkIsAdmin`        | Check of administrator rights                                                              |
+| `reorderDisplayIds`   | Validation and saving order of a reordered list of tasks or labels                         |
+| `writeJsonAtomically` | Writing of JSON files, used by the storages                                                |
 
 ---
 
