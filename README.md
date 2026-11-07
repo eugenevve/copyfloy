@@ -199,8 +199,8 @@ npm run dev
 | `npm run lint:fix`      | Lint JavaScript/TypeScript and apply automatic fixes                                                           |
 | `npm run lint:css`      | Lint CSS with Stylelint                                                                                        |
 | `npm run lint:css:fix`  | Lint CSS and apply automatic fixes                                                                             |
-| `npm run icons`         | Generate `resources/icon.ico` and `resources/icon.png` from `resources/icon.svg`                               |
-| `npm run icons-check`   | Print the sizes stored in `resources/icon.ico`                                                                 |
+| `npm run icons`         | Generate `icon-dev` and `icon-prod` (`.ico` and `.png`) in `resources/` from the `.svg` files                  |
+| `npm run icons-check`   | Check the sizes in the `.ico` files and the presence of the `.png` files                                       |
 
 In development mode the app stores its data in a separate `<name>-dev` folder, so it never touches the data of the installed version.
 
