@@ -81,23 +81,16 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 - Optional **ZIP archive** instead of a copy: `<destination>\<name>.zip`
 - Live progress for running tasks and a **Stop** button to cancel them
 - Pin important tasks to the top of the list
-- Reorder tasks by drag and drop, with the mouse or the keyboard (within the pinned / regular group; available when no search or filter is active)
-- Search tasks and filter them by type (file / folder / repository) and by labels (several labels can be selected at once)
-- Schedule of a task is shown right on its card
+- Reorder tasks by drag and drop, with the mouse or the keyboard
+- Search tasks and filter them by type (file / folder / repository) and by labels
 - Up to 1000 tasks and 1000 labels; lists show the first 100 items, the rest is loaded with the **Show more** button
 - Confirmation before deleting a task or closing a form with unsaved changes
 
-**Exclusions**
+**Exclusions and archives**
 
-- Exclude specific files and folders from a copy or an archive (folder tasks): choose what to add - a **file** or a **folder** - and then select one or several of them in the dialog
-- An excluded folder is skipped together with all of its contents
-
-**ZIP archives**
-
-- Any task can be switched to _Create ZIP archive instead of copying_
-- Files and folders: the source is packed into `<destination>\<source name>.zip`; exclusions are applied, an existing archive with the same name is replaced
-- Repositories: the whole repository, including `.git`, is packed into `<destination>\<repository name>.zip`
-- Progress is shown while packing; a stopped or failed run leaves no incomplete archive behind
+- Exclude specific files and folders from a copy or an archive (file and folder tasks); an excluded folder is skipped together with all of its contents
+- Files and folders are packed into `<destination>\<source name>.zip`, repositories (including `.git`) into `<destination>\<repository name>.zip`; an existing archive with the same name is replaced
+- A stopped or failed run leaves no incomplete archive behind
 
 **Git repositories**
 
@@ -116,7 +109,7 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 
 - Every N minutes (1-60), hourly, daily or on selected days of the week
 - The schedule is configured in a separate dialog (the clock button on the task card) and can be switched off per task
-- Optional system notification after a successful run, enabled by default (also for repository tasks); failures are always reported
+- Optional system notification after a successful run, enabled by default; failures are always reported
 - Scheduled tasks run only while the app is running - the tray keeps it alive after the window is closed
 
 **Missed runs**
@@ -130,7 +123,7 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 
 - A separate **Report** page with the number of tasks, successful and failed operations
 - Charts of successful and failed runs: **By weeks** (14 days ending with the latest day that has records) and **By hours** (24 hours of a selected day)
-- History table: task, start time, copied files, skipped files (excluded paths), duration, total size; failed runs are highlighted and show the error on hover
+- History table: task, start time, copied files, skipped files, duration, total size; failed runs are highlighted and show the error on hover
 - Records are stored in `report.json` (the last 1000 are kept) and can be cleared with one click
 
 **Labels**
@@ -138,6 +131,13 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 - Colored labels with a name, managed on a separate page with search
 - Reorder labels by drag and drop
 - Several labels per task; deleting a label removes it from every task
+
+**Keyboard shortcuts**
+
+- Switch pages with `Ctrl` + `1`-`6`; create, search, edit, schedule and delete tasks and labels without the mouse
+- Select a task or a label with `↑` / `↓`, run or stop the selected task with `Enter`, clear the selection with `Esc`
+- Shortcuts are ignored while a dialog is open; page shortcuts are also ignored in text fields
+- The full list is on the **Shortcuts** page (`Ctrl` + `5`)
 
 **Import and export**
 
@@ -150,14 +150,13 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 
 - Light, dark or system theme, switched with one button in the sidebar
 - Date format (`DD/MM/YYYY`, `MM/DD/YYYY`, `YYYY-MM-DD` and other variants with `/`, `.` or `-`) and 12 / 24-hour time format; the choice is applied to the task list, the report and the charts
-- Page zoom (50-300 %) with a reset button and keyboard shortcuts: `Ctrl` + `+` / `-` / `0`
+- Page zoom (50-300 %) with a reset button and the shortcuts `Ctrl` + `+` / `-` / `0`
 
 **Windows integration**
 
-- Windows on x64 and ARM64, as an installed or a portable application
 - System tray icon (click to open, right-click for the _Open_ / _Close_ menu)
 - Optional minimize-to-tray when the window is closed (enabled by default)
-- Optional auto-start with Windows and optional run as administrator. When both are on, the app is launched at logon through a Windows scheduled task, so the elevated start is not blocked. Both options take effect only in the packaged build.
+- Optional auto-start with Windows and optional run as administrator (packaged build only). When both are on, the app is launched at logon through a Windows scheduled task, so the elevated start is not blocked
 - Single instance: launching the app a second time restores the existing window
 - Window state, sidebar state and page zoom are remembered between launches
 - Discord Rich Presence status in the user's Discord profile
@@ -165,7 +164,7 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 **Updates**
 
 - Built-in updater (`electron-updater`) with releases published on GitHub
-- **Installed version:** updates are checked, downloaded and installed manually from the Settings page; the app restarts itself after the installation
+- **Installed version:** updates are checked, downloaded and installed from the Settings page; the app restarts itself after the installation
 - **Portable version:** the check works, but nothing is downloaded or installed. When a new version is found, the app shows a message with a link to the Releases page - download the new ZIP archive and replace the application files
 
 All data is stored locally as JSON files in Electron's `userData` directory (`tasks.json`, `labels.json`, `settings.json`, `report.json`, `missed-dismissed.json`). The selected theme is stored in the local storage of the application window.
@@ -176,7 +175,7 @@ All data is stored locally as JSON files in Electron's `userData` directory (`ta
 
 ## 🛠 Getting Started
 
-**Requirements:** Windows, [Node.js](https://nodejs.org/) 22.22 or newer and npm. [Git](https://git-scm.com/) is optional and needed only for repository tasks.
+**Requirements:** Windows, [Node.js](https://nodejs.org/) 24 or newer and npm. [Git](https://git-scm.com/) is optional and needed only for repository tasks.
 
 ```bash
 git clone https://github.com/eugenevve/copyfloy.git
@@ -203,62 +202,16 @@ npm run dev
 
 In development mode the app stores its data in a separate `<name>-dev` folder, so it never touches the data of the installed version.
 
----
+Build results are written to the `dist` directory. Packaging settings live in the `build` section of `package.json`.
 
-<br />
+### Releasing
 
-## 📦 Building for Windows
-
-```bash
-npm run build:win       # installer for x64 only
-npm run build:win:all   # everything: installer + portable archives, x64 and ARM64
-```
-
-Both commands run the linters, build the app and package it with `electron-builder`. The result is written to the `dist` directory:
-
-```text
-dist/Copyfloy-setup-<version>.exe                  # installer (NSIS)
-dist/Copyfloy-setup-<version>.exe.blockmap         # data for differential updates
-dist/Copyfloy-portable-<version>-x64.zip           # portable, Intel / AMD
-dist/Copyfloy-portable-<version>-arm64.zip         # portable, Windows on ARM
-dist/latest.yml                                    # update metadata for electron-updater
-```
-
-`build:win:all` produces all of the files above. When both architectures are built, the NSIS installer is a single file that contains x64 and ARM64 versions and installs the matching one. `build:win` builds only the x64 installer.
-
-The packaging settings live in the `build` section of `package.json`. The installer provides a selectable installation directory (per-user install), a desktop shortcut, application icons, an uninstaller and the MIT license text.
-
-### Installed and portable builds
-
-The application detects the portable build at startup: the NSIS installer puts `Uninstall <name>.exe` next to the executable, and the ZIP build has no such file. The only difference in behavior is the update process (see **Updates** in [Features](#-features)): the portable build does not download or install updates by itself.
-
----
-
-<br />
-
-## 🚢 Releases
-
-Releases are created by the **Release** workflow in GitHub Actions (`.github/workflows/release.yml`). It is started manually (`workflow_dispatch`) and works only on the `main` branch.
-
-```text
-1. Prepare  - reads the version from package.json, stops if a release with this version
-              already exists, generates the release notes
-2. Build    - npm ci, npm run build:win:all on Windows, checks that all files exist
-              and that latest.yml references the installer
-3. Release  - creates the GitHub release with the installer, the blockmap, both
-              portable archives and latest.yml
-```
-
-To publish a new release:
+A release is created manually by the **Release** workflow (`.github/workflows/release.yml`) and only on `main`:
 
 1. Raise the `version` in `package.json` and commit it with the version number as the commit message (`X.Y.Z`).
 2. Run the **Release** workflow on `main`.
 
-Notes:
-
-- The **release notes** list the commit subjects made since the previous version commit (a commit whose whole message is `X.Y.Z`). Commits that are themselves version bumps are not listed. Subjects that end with a pull request number (`(#123)`) are listed as they are; for the others the commit hash is appended. The notes end with the installation instructions and the warnings from `.github/release-footer.md`.
-- The result of the run is also shown as the **Release build** status next to the commit.
-- The built-in updater reads releases from the GitHub repository set in the `build.publish` section of `package.json`.
+The workflow builds all Windows packages and publishes them as a GitHub release. The release notes are the commit subjects since the previous version commit. Details are in the [Architecture Documentation](./docs/ARCHITECTURE.md).
 
 ---
 
@@ -268,18 +221,13 @@ Notes:
 
 ```text
 src/
-├── main/            # Electron main process
-│   ├── services/    # AppService, CopyService, DiscordService, LabelService,
-│   │                # NotificationService, ReportService, SchedulerService
-│   │                # (incl. MissedTaskService), SettingsService, TaskService,
-│   │                # TrayService, UpdaterService, WindowService
-│   └── utils/
+├── main/            # Electron main process: services, storage, scheduling, tray, updates
 ├── preload/         # Secure bridge between main and renderer
-├── renderer/        # React UI: Home (tasks), Labels, Report, Settings, About
+├── renderer/        # React UI: Home (tasks), Labels, Report, Settings, Shortcuts, About
 └── shared/          # Code used by both sides: IPC channel names, types, constants
 ```
 
-- **Main process** - the core logic: copying, scheduling, storage, tray, updates, system integration. Most services follow one pattern: a service with its logic, an `Ipc` class that exposes it, and a `Storage` class for its JSON file.
+- **Main process** - the core logic. Most services follow one pattern: a service with its logic, an `Ipc` class that exposes it, and a `Storage` class for its JSON file.
 - **Preload** - exposes a restricted `window.api` to the UI.
 - **Renderer** - the React interface. It has no direct access to Node.js and talks to the main process only through IPC. All channels are listed in `src/shared/constants/ipc.ts`.
 
