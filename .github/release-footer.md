@@ -7,12 +7,11 @@
 
 > [!WARNING]
 > **Experimental - not ready for public use.**
-> This application is under active development and may contain bugs or incomplete features.
-> It may change without notice and is not recommended for production use.
+> This application is under active development and may contain bugs or incomplete features. It may change without notice and is not recommended for production use.
 
 ---
 
-> [!WARNING]
+> [!Important]
 > **Windows Security Notice**
 > Application is currently distributed without a code-signing certificate.
 >
