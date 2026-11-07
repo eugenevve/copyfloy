@@ -80,6 +80,7 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 - Copy a single file, an entire folder (recursively) or a Git repository
 - Optional **ZIP archive** instead of a copy: `<destination>\<name>.zip`
 - Live progress for running tasks and a **Stop** button to cancel them
+- **Run tasks** button: run all tasks, or only those that match the current filters, one after another
 - Pin important tasks to the top of the list
 - Reorder tasks by drag and drop, with the mouse or the keyboard
 - Search tasks and filter them by type (file / folder / repository) and by labels
@@ -88,7 +89,7 @@ Ready-made builds are published on the [Releases](https://github.com/eugenevve/c
 
 **Exclusions and archives**
 
-- Exclude specific files and folders from a copy or an archive (file and folder tasks); an excluded folder is skipped together with all of its contents
+- Exclude specific files and folders from a copy or an archive (folder tasks); an excluded folder is skipped together with all of its contents
 - Files and folders are packed into `<destination>\<source name>.zip`, repositories (including `.git`) into `<destination>\<repository name>.zip`; an existing archive with the same name is replaced
 - A stopped or failed run leaves no incomplete archive behind
 
