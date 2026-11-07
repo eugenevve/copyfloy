@@ -32,6 +32,8 @@ Application is built on Electron and is split into three layers:
 - **Renderer** - the React interface. It has no direct access to Node.js and talks to the main process only through IPC.
 - **Shared** - code used by both sides: IPC channel names, types (`ITask`, `ILabel`, `IReport`, ...) and constants (limits, zoom range).
 
+Imports use path aliases that are configured in `electron.vite.config.ts` and in the `tsconfig` files: `@main` (main process), `@app` (renderer), `@shared` (code shared by all layers), `@package` (`package.json`, used for the version and the application name) and `@resources` (main process only).
+
 Most main-process services follow one pattern:
 
 ```text
@@ -47,7 +49,7 @@ The entry point is `src/main/index.ts`:
 1. In development mode `userData` is redirected to a separate `<name>-dev` directory, so a development build never touches the data of the installed application. This happens before any service is created, because storages resolve their paths at construction.
 2. The services are created while the module is loaded. `SettingsService` reads `settings.json` in its constructor and immediately re-applies the saved auto-start setting (see [Auto-start and run as administrator](#auto-start-and-run-as-administrator)).
 3. A single-instance lock is requested. If the lock is not acquired, the second process exits; the running instance receives the `second-instance` event and restores its window.
-4. After `app.whenReady()` the application ID is configured (`AppUserModelId`, needed for Windows notifications and the taskbar), the services are initialized (tasks, scheduler and missed-run detection, labels, reports, updater, Discord), and then IPC handlers are registered.
+4. After `app.whenReady()` the application ID is configured (`AppUserModelId`, needed for Windows notifications and the taskbar; the packaged and the development builds use different IDs, `appId` and `appIdDev` from `package.json`), the services are initialized (tasks, scheduler and missed-run detection, labels, reports, updater, Discord), and then IPC handlers are registered.
 5. The main window is created, and the services that depend on it (tray, updater events) are initialized.
 6. When the interface is ready, it asks the main process for the runs that were missed while the application was closed (see [Missed Runs](#-missed-runs)).
 
@@ -65,7 +67,13 @@ On exit (`before-quit`) the application marks itself as quitting, so that the wi
 
 ## 🔌 IPC
 
-All channel names are declared in one place, `src/shared/constants/ipc.ts`, and are used by both the main process and the preload script. The interface never calls `ipcRenderer` directly; it uses `window.api`.
+All channel names are declared in one place, `src/shared/constants/ipc.ts`, and are used by both the main process and the preload script. Names have the form `group:action` (`tasks:run`, `settings:get-zoom`); the file dialogs of the task form are in the `tasks` group but are named `dialog:*`. The interface never calls `ipcRenderer` directly; it uses `window.api`.
+
+The preload script (`src/preload`) consists of three files:
+
+- `api.ts` - the shape of `window.api`: the groups `app`, `window`, `settings`, `tasks`, `labels`, `report` and `updater`. `app.appVersion` is taken from `package.json`.
+- `ipc.ts` - three helpers: `invoke` (a request with a result) and `receive` / `receiveNoData` (a subscription to a message from the main process). A subscription returns a function that removes the listener, so a component can unsubscribe when it is unmounted.
+- `index.ts` - exposes `window.api` and `window.electron` through `contextBridge`. The second one is the API of Electron Toolkit extended with `shell.openExternal`.
 
 | Group      | Purpose                                                                                                                     |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -221,9 +229,9 @@ Every Monday at 03:30
 30 3 * * 1
 ```
 
-`SchedulerService` keeps one cron job per task (`task ID → job`). Whenever tasks change, all jobs are stopped and recreated from the current list (`rescheduleAll`). Tasks without a schedule, or with the schedule disabled, get no job. If a schedule cannot be converted to a valid cron expression, the task is skipped and a warning is written to the log.
+`SchedulerService` keeps one cron job per task (`task ID → job`). Whenever tasks change, all jobs are stopped and recreated from the current list (`rescheduleAll`). Tasks without a schedule, or with the schedule disabled, get no job. If a schedule cannot be converted to a valid cron expression (for example a weekly schedule without days), the task is skipped and a warning is written to the log. In `days` Monday is `1` and Sunday is `7`; for cron Sunday is converted to `0`.
 
-The schedule also carries the `notify` flag. When it is enabled, a system notification is shown after every successful run of the task; for a new schedule it is enabled by default. Errors are always reported regardless of this flag.
+The schedule also carries the `notify` flag. When it is enabled, a system notification is shown after every successful run of the task - `CopyService` checks the flag for every run, so it also applies to runs started by hand, from the **Run tasks** queue or from the missed-run prompt. For a new schedule it is enabled by default. Errors are always reported regardless of this flag.
 
 The schedule is shown on the task card in a short form, for example `Daily at 12:00`, `Every hour at :30`, `Every 5 min` or `Mon, Wed at 03:30`. The time follows the selected [time format](#date-and-time-format).
 
@@ -345,11 +353,11 @@ Result        E:\Backup\Documents.zip
 
 - Exclusions are applied while the source tree is collected, so excluded paths do not get into the archive.
 - Paths inside the archive start with the source name (`Documents/...`).
-- An existing archive with the same name is replaced.
+- An existing archive with the same name is replaced. The file is overwritten when packing starts, so if the run fails or is stopped, the old archive is lost together with the incomplete new one.
 
 **Repositories**
 
-The repository is first cloned into a temporary folder and then packed:
+The repository is first cloned into a temporary folder (in the system temp directory, with the prefix `copyfloy-`) and then packed:
 
 ```text
 Clone into a temporary folder   0-70 %
@@ -394,6 +402,10 @@ git pull --ff-only --progress
 - The first run clones the repository.
 - Next runs update the existing clone with a fast-forward-only `pull`. Nothing is overwritten or reset: if the local clone cannot be fast-forwarded, the run fails with the message from `git`.
 - The remote of an existing clone is always compared with the task's URL, so a task can never write into a repository that belongs to another project.
+
+### Statistics
+
+After a clone or a pull, the files of the whole working directory (including `.git`) are counted and saved to the report; exclusions are not used.
 
 ### Progress
 
@@ -475,7 +487,9 @@ Tasks can also be exported manually to another JSON file and imported later.
 
 This makes it possible to back up or transfer task configurations between installations.
 
-Task export files include both tasks and labels.
+Task export files include both tasks and labels. The file is written through a save dialog (the suggested name is `tasks.json` in the Documents folder) as `{ "tasks": [...], "labels": [...] }`.
+
+Import is done in two steps. The user first chooses the mode in the **Import** dialog, then the file dialog opens. The main process reads and validates the file (`tasks.import`) and returns its content to the interface, which passes it back together with the chosen mode (`tasks.saveBulk`); the merging is done in the main process.
 
 - **Access tokens are not exported.** After importing a private repository task, the token has to be entered again.
 - Import offers two modes: **add** the imported tasks to the existing ones or **replace** the existing tasks. If the file contains no tasks, nothing is replaced.
@@ -484,7 +498,7 @@ Task export files include both tasks and labels.
 - Files in the legacy format (a plain array of tasks without labels) are still accepted.
 - The result is truncated to the limit of 1000 tasks and 1000 labels.
 - After an import the scheduler is rebuilt for the resulting list of tasks.
-- A file with an invalid structure is rejected, and the interface shows an **Import error**.
+- A file with an invalid structure is rejected, and the interface shows an **Import error**. Besides the structure of tasks and labels, the file is rejected if it declares a `version` other than `1` or if it contains duplicate label IDs.
 
 ---
 
@@ -518,9 +532,9 @@ report.json
 - A record is written for successful and failed runs, whether started manually, from the **Run tasks** queue, by the scheduler or after a missed-run prompt. Runs stopped by the user are not recorded.
 - The task name is saved in the record, so the history stays readable after a task was renamed or deleted.
 - Record IDs are based on the start time; if two runs start in the same millisecond, the ID is increased until it is unique (the IDs are used as list keys in the UI).
-- A damaged or invalid `report.json` is ignored and treated as an empty history.
+- A damaged or invalid `report.json` is ignored and treated as an empty history; the next record replaces the damaged file.
 
-`ReportService` returns the history together with the summary: the current number of tasks, the number of successful runs and the number of failed runs. Records are returned from the newest to the oldest. The history can be cleared from the Report page after a confirmation.
+The report is served by `ReportIpc`, which returns the history together with the summary: the current number of tasks, the number of successful runs and the number of failed runs. The counters are calculated from the stored records, so they cover at most the last 1000 runs and are reset when the history is cleared. Records are returned from the newest to the oldest. The history can be cleared from the Report page after a confirmation.
 
 The history is also the source of information for [Missed Runs](#-missed-runs).
 
@@ -545,7 +559,7 @@ Labels of the axes and the tooltips follow the selected [date and time format](#
 
 ## 🏷 Labels
 
-Labels help organize tasks visually. Each label has a numeric ID, a name, and a color, and a task can reference multiple labels through `labelsIds`.
+Labels help organize tasks visually. Each label has a numeric ID (the creation time), a name, and a color, and a task can reference multiple labels through `labelsIds`.
 
 Labels are stored separately from tasks as JSON in the Electron `userData` directory:
 
@@ -639,10 +653,11 @@ Both services register the path of the **current executable** (`app.getPath("exe
 
 ### Window
 
-- The window is frameless; the title bar buttons (minimize, maximize, close) are drawn by the interface and call the main process through IPC.
+- The window is frameless; the title bar is drawn by the interface. Its buttons (minimize, maximize, close) call the main process through IPC, and the maximize button follows the real state of the window (`window.maximizedChange`). The title shows `Copyfloy` (`Copyfloy-dev` in development) and the mark `(administrator)` when the process has administrator rights.
 - The base size of the window is 720 × 540. It is also the minimum size: the window cannot be made smaller.
-- Position, size and maximized state are saved (with a delay, so the file is not written on every pixel of a resize) and restored on the next launch. If the saved position is no longer visible, for example a monitor was disconnected, the window is centered. While the window is minimized or full screen, the previously saved state is kept.
+- Position, size and maximized state are saved (with a delay of 0.5 s, so the file is not written on every pixel of a resize) and restored on the next launch. If the saved position is no longer on one of the connected displays, for example a monitor was disconnected, the window is centered. While the window is minimized or full screen, the previously saved state is kept.
 - On displays with a scale factor above 100 % Windows reports the borders of a resized window differently, so the real window bounds are saved in this case.
+- When the window is moved to another display, the taskbar button is refreshed (it is hidden and shown again after a short pause), because Windows may otherwise keep the wrong scale of the taskbar entry.
 - Developer tools are available only in development mode; the shortcuts `Ctrl` + `Shift` + `I` and `F12` are blocked in the packaged application.
 - Links that the interface tries to open in a new window are opened in the default browser of the system.
 
@@ -784,8 +799,9 @@ Notes:
 
 - The names are set by `artifactName` (`nsis.artifactName` for the installer, `win.artifactName` for the archives).
 - The installer is not one-click: the user can choose the installation folder; it installs for the current user (not per machine), creates a desktop shortcut and a shortcut named after the application, and shows the MIT license. It also writes `Uninstall <name>.exe` - the file by which the installed build is recognized.
-- The icon of the application is also copied next to the executable (`extraResources`, `icon.png`), for the window and the tray.
-- The icons are generated from `resources/icon.svg` by `npm run icons`; `npm run icons-check` prints the sizes stored in `icon.ico`.
+- There are two sets of icons: `icon-prod.*` for the packaged Windows build and `icon-dev.*` for development, so the two are easy to tell apart in the taskbar and the tray. `iconPath` chooses the file at runtime.
+- `icon-prod.ico` is used for the executable, the installer and the uninstaller; `icon-prod.png` is also copied next to the executable (`extraResources`) for the window, the tray and the notifications.
+- The icons are generated from `resources/icon-dev.svg` and `resources/icon-prod.svg` by `npm run icons` (an `.ico` with the sizes 16-256 and a 512 px `.png` for each variant); `npm run icons-check` verifies the sizes of both `.ico` files and the presence of the `.png` files.
 
 ---
 
@@ -861,6 +877,7 @@ Common parts of the interface:
 
 - **Header tools** - the title with the counter, the **Add** button, search, the type filter and the label chips; it is shared by the Home and Labels pages. Only the Home page adds the filters and the **Run tasks** button.
 - **Modals** - confirmations, alerts and forms are shown through one modal provider. The **Task skipped** prompt for [missed runs](#-missed-runs) is a separate component that uses the same alert window and is shown at startup.
+- **Sidebar** - the navigation between pages; it can be collapsed to icons, and its state is saved in `settings.json` (it is read synchronously before the first render, so there is no flicker). The theme button is at the bottom of the sidebar.
 - **Pagination** - lists of tasks, labels and report records show 100 items (`PAGE_ITEMS`) at a time, with the **Show more** button.
 - **Drag and drop** - lists are sorted with `@dnd-kit` (pointer and keyboard sensors, movement restricted to the vertical axis and to the list).
 - **Charts** - the Report page uses Recharts with the colors of the current theme.
@@ -920,6 +937,8 @@ All persistent data is stored locally as JSON files in Electron's `userData` dir
 
 The selected theme is not in these files: it is stored in the local storage of the application window.
 
+The files are written atomically (`writeJsonAtomically`): the data is first written to a temporary file in the same folder and then renamed, so a crash or a power loss cannot leave a half-written file. Every storage validates what it reads. A damaged `labels.json`, `report.json` or `settings.json` is not repaired: it is read as empty (settings: defaults), the error is logged, and the next save replaces the file.
+
 In development mode the directory is `<appData>/<name>-dev`, separate from the installed application. The installed and the portable builds use the same directory.
 
 ---
@@ -934,7 +953,7 @@ The main process is organized into dedicated services, each responsible for a sp
 
 Responsible for:
 
-- Configuring the application ID (`AppUserModelId`) at startup
+- Configuring the application ID (`AppUserModelId`) at startup, different for the packaged and the development builds
 - Information about the application package: whether it is packaged and whether it is a portable build
 - Information about granted administrator privileges (`net session` on Windows)
 
@@ -968,7 +987,7 @@ Responsible for:
 
 ### `NotificationService`
 
-Provides success and error notifications for task execution.
+Shows native system notifications with the application icon: a success notification (only when the `notify` flag of the task is on) and an error notification (always).
 
 ### `LabelService`
 
@@ -976,7 +995,7 @@ Manages label storage and IPC operations: retrieval, creation, updates, deletion
 
 ### `ReportService`
 
-Provides the history of task runs and the summary (tasks, successful and failed runs) to the interface, and clears the history on request. Records are written by `CopyService` through `ReportStorage`.
+The `ReportService` folder contains `ReportIpc`, which provides the history of task runs and the summary (tasks, successful and failed runs) to the interface and clears the history on request, and `ReportStorage`, which reads and writes `report.json`. There is no separate service class. Records are written by `CopyService` through `ReportStorage`.
 
 ### `SchedulerService`
 
@@ -1013,7 +1032,7 @@ Coordinates the task-related services:
 
 ### `TrayService`
 
-Handles the Windows system tray integration.
+Handles the Windows system tray integration: the icon with the tooltip (the application name, with `-dev` in development), the click and right-click handlers and the **Open** / **Close** menu.
 
 ### `UpdaterService`
 
@@ -1029,15 +1048,16 @@ Helpers: `WindowEvents` (window events), `WindowStateService` (saving and restor
 
 Shared helpers of the main process (`src/main/utils`):
 
-| Utility               | Purpose                                                                                    |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| `Logger`              | Console logging with levels and scopes                                                     |
-| `environment`         | Platform flags (`isWindows`, `isPackagedWindows`) and the application state (`isQuitting`) |
-| `exePath`             | Path of the current executable, used by auto-start and the administrator flag              |
-| `isPortable`          | Detection of the portable build                                                            |
-| `checkIsAdmin`        | Check of administrator rights                                                              |
-| `reorderDisplayIds`   | Validation and saving order of a reordered list of tasks or labels                         |
-| `writeJsonAtomically` | Writing of JSON files, used by the storages                                                |
+| Utility               | Purpose                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `Logger`              | Console logging with levels and scopes                                                                 |
+| `environment`         | Platform flags (`isWindows`, `isPackagedWindows`) and the application state (`isQuitting`)             |
+| `exePath`             | Path of the current executable, used by auto-start and the administrator flag                          |
+| `isPortable`          | Detection of the portable build                                                                        |
+| `checkIsAdmin`        | Check of administrator rights                                                                          |
+| `reorderDisplayIds`   | Validation and saving order of a reordered list of tasks or labels                                     |
+| `writeJsonAtomically` | Writing of a JSON file through a temporary file and a rename, used by all storages                     |
+| `iconPath`            | Path of the application icon: `icon-prod.png` for the packaged Windows build, `icon-dev.png` otherwise |
 
 ---
 
@@ -1045,7 +1065,8 @@ Shared helpers of the main process (`src/main/utils`):
 
 ## 🔒 Security
 
-- The renderer runs without direct access to Node.js; everything goes through the limited `window.api` of the preload script and IPC channels declared in one place (`src/shared/constants/ipc.ts`).
+- The renderer runs without direct access to Node.js; everything goes through the limited `window.api` of the preload script, which is exposed with `contextBridge`, and IPC channels declared in one place (`src/shared/constants/ipc.ts`).
+- Data files are written atomically, so a failure in the middle of a write does not destroy the previous content.
 - Access tokens of private repositories are encrypted with `safeStorage`, are never exported and are never put into a command line or a URL.
 - Repository URLs are strictly validated: only `https` and only `github.com` / `gitlab.com`, with no embedded credentials.
 - A repository task never overwrites a foreign repository and never deletes an existing folder on cancellation.
