@@ -32,6 +32,7 @@
   <img src="./resources/readme/Settings.png" />
   <img src="./resources/readme/Report-weeks.png" />
   <img src="./resources/readme/Report-hours.png" />
+  <img src="./resources/readme/Shortcuts.png" />
 </details>
 
 <br />
