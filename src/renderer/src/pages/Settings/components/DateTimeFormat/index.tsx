@@ -1,4 +1,5 @@
 import { Select } from "@app/ui/Select";
+import { SelectKind } from "@app/ui/Select/Select.types";
 import { getDateTimeFormat, setDateTimeFormat, subscribeDateTimeFormat } from "@app/utils/dateTimeFormatState";
 import { DateFormat, TimeFormat } from "@shared/types/settings";
 import { FC, useSyncExternalStore } from "react";
@@ -28,12 +29,14 @@ export const DateTimeFormatWidget: FC = () => {
   return (
     <WidgetContainer title="Date & Time Format">
       <Select
+        kind={SelectKind.SECONDARY}
         label="Date format"
         value={format.dateFormat}
         options={DATE_FORMAT_OPTIONS}
         onChange={(dateFormat) => setDateTimeFormat({ ...format, dateFormat: dateFormat as DateFormat })}
       />
       <Select
+        kind={SelectKind.SECONDARY}
         label="Time format"
         value={format.timeFormat}
         options={TIME_FORMAT_OPTIONS}

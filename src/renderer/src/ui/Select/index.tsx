@@ -3,11 +3,21 @@ import { FC, useEffect, useId, useRef, useState } from "react";
 
 import styles from "./Select.module.css";
 import { Button } from "../Button";
+import { SelectKind } from "./Select.types";
 import { ISelect } from "./Select.types";
 import { ButtonKind } from "../Button/Button.types";
 import { CheckIcon, ChevronIcon } from "../Icons";
 
-export const Select: FC<ISelect> = ({ label, value, onChange, options, placeholder, disabled, className }) => {
+export const Select: FC<ISelect> = ({
+  kind = SelectKind.PRIMARY,
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  disabled,
+  className,
+}) => {
   const fieldId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((option) => option.value === value);
@@ -34,7 +44,11 @@ export const Select: FC<ISelect> = ({ label, value, onChange, options, placehold
       <Button
         id={fieldId}
         kind={ButtonKind.SECONDARY}
-        className={classNames(styles.select, isOpen ? styles.active : "")}
+        className={classNames(
+          styles.select,
+          isOpen ? styles.active : "",
+          kind === SelectKind.PRIMARY ? "" : styles.secondary
+        )}
         onClick={() => setIsOpen((prev) => !prev)}
         disabled={disabled}
       >

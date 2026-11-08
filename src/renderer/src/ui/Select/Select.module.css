@@ -25,6 +25,10 @@
   transform: none !important;
 }
 
+.secondary {
+  background: var(--background-secondary);
+}
+
 .icon {
   transition: var(--transition);
 }
