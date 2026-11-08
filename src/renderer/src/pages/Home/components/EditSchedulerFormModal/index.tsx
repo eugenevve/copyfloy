@@ -2,32 +2,47 @@ import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { Checkbox } from "@app/ui/Checkbox";
 import { DaysSelector } from "@app/ui/DaysSelector";
-import { Input } from "@app/ui/Input";
 import { Line } from "@app/ui/Line";
 import { Modal } from "@app/ui/Modal";
 import { Select } from "@app/ui/Select";
+import { getDateTimeFormat, subscribeDateTimeFormat } from "@app/utils/dateTimeFormatState";
 import { TYPE_OPTIONS_SCHEDULE } from "@app/utils/options";
+import {
+  SCHEDULE_HOUR_OPTIONS_12,
+  SCHEDULE_HOUR_OPTIONS_24,
+  SCHEDULE_MERIDIEM_OPTIONS,
+  SCHEDULE_MINUTE_OPTIONS,
+  ScheduleMeridiemEnum,
+} from "@app/utils/scheduleTimeOptions";
 import { ScheduleType } from "@shared/types/schedule";
+import { TimeFormat } from "@shared/types/settings";
 import { ITask } from "@shared/types/tasks";
-import { ChangeEvent, FC, useState } from "react";
+import { FC, useState, useSyncExternalStore } from "react";
 
 import styles from "./EditSchedulerFormModal.module.css";
 import { IEditSchedulerFormModal } from "./EditSchedulerFormModal.types";
 
 export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialData, onClose, onSaved }) => {
   const { showConfirm } = useModal();
+  const dateTimeFormat = useSyncExternalStore(subscribeDateTimeFormat, getDateTimeFormat);
+  const isTwelveHour = dateTimeFormat.timeFormat === TimeFormat.TWELVE_HOUR;
+  const storedHours = initialData.schedule?.hours ?? (isTwelveHour ? 0 : 12);
+  const initialMeridiem: ScheduleMeridiemEnum = storedHours < 12 ? ScheduleMeridiemEnum.AM : ScheduleMeridiemEnum.PM;
+  const initialTwelveHour = storedHours % 12 || 12;
 
   const initialValues = {
     type: initialData.schedule?.type || ScheduleType.DISABLED,
-    hours: String(initialData.schedule?.hours ?? 12),
+    hours: isTwelveHour ? String(initialTwelveHour) : String(storedHours),
+    meridiem: initialMeridiem,
     minutes: String(initialData.schedule?.minutes ?? 0),
-    interval: String(initialData.schedule?.interval ?? 5),
+    interval: String(Math.min(Math.max(initialData.schedule?.interval ?? 5, 1), 59)),
     days: initialData.schedule?.days || [],
     notify: initialData.schedule?.notify ?? true,
   };
 
   const [type, setType] = useState(initialValues.type);
   const [hours, setHours] = useState(initialValues.hours);
+  const [meridiem, setMeridiem] = useState(initialValues.meridiem);
   const [minutes, setMinutes] = useState(initialValues.minutes);
   const [interval, setInterval] = useState(initialValues.interval);
   const [days, setDays] = useState(initialValues.days);
@@ -36,22 +51,26 @@ export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialDat
   const isDirty =
     type !== initialValues.type ||
     hours !== initialValues.hours ||
+    meridiem !== initialValues.meridiem ||
     minutes !== initialValues.minutes ||
     interval !== initialValues.interval ||
     notify !== initialValues.notify ||
     JSON.stringify(days) !== JSON.stringify(initialValues.days);
 
-  const handleNumericChange = (event: ChangeEvent<HTMLInputElement>, max: number, setter: (v: string) => void) => {
-    const raw = event.target.value.replace(/\D/g, "");
+  const handleMeridiemChange = (value: string) => {
+    setMeridiem(value === String(ScheduleMeridiemEnum.PM) ? ScheduleMeridiemEnum.PM : ScheduleMeridiemEnum.AM);
+  };
 
-    if (!raw) {
-      setter("");
-      return;
+  const getScheduleHours = () => {
+    if (!isTwelveHour) {
+      return Number(hours);
     }
 
-    if (Number(raw) <= max) {
-      setter(raw);
+    if (meridiem === ScheduleMeridiemEnum.AM) {
+      return Number(hours) % 12;
     }
+
+    return Number(hours) === 12 ? 12 : Number(hours) + 12;
   };
 
   const handleSubmit = async () => {
@@ -59,17 +78,17 @@ export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialDat
 
     switch (type) {
       case ScheduleType.DAILY:
-        schedule.hours = parseInt(hours) || 0;
+        schedule.hours = getScheduleHours();
         schedule.minutes = parseInt(minutes) || 0;
         break;
       case ScheduleType.HOURLY:
         schedule.minutes = parseInt(minutes) || 0;
         break;
       case ScheduleType.MINUTES:
-        schedule.interval = parseInt(interval) || 5;
+        schedule.interval = Math.min(Math.max(parseInt(interval) || 5, 1), 59);
         break;
       case ScheduleType.WEEKLY:
-        schedule.hours = parseInt(hours) || 0;
+        schedule.hours = getScheduleHours();
         schedule.minutes = parseInt(minutes) || 0;
         schedule.days = days;
         break;
@@ -99,15 +118,32 @@ export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialDat
       />
       {(type === ScheduleType.DAILY || type === ScheduleType.WEEKLY) && (
         <>
-          <Input label="Hours" value={hours} onChange={(e) => handleNumericChange(e, 23, setHours)} />
-          <Input label="Minutes" value={minutes} onChange={(e) => handleNumericChange(e, 59, setMinutes)} />
+          <div className={styles.inputs}>
+            <Select
+              label="Hour"
+              value={hours}
+              onChange={setHours}
+              options={isTwelveHour ? SCHEDULE_HOUR_OPTIONS_12[meridiem] : SCHEDULE_HOUR_OPTIONS_24}
+              className={styles.selectHour}
+            />
+            {isTwelveHour && (
+              <Select
+                label="AM/PM"
+                value={meridiem}
+                onChange={handleMeridiemChange}
+                options={SCHEDULE_MERIDIEM_OPTIONS}
+                className={styles.selectFormate}
+              />
+            )}
+          </div>
+          <Select label="Minutes" value={minutes} onChange={setMinutes} options={SCHEDULE_MINUTE_OPTIONS} />
         </>
       )}
       {type === ScheduleType.HOURLY && (
-        <Input label="Minute of the hour" value={minutes} onChange={(e) => handleNumericChange(e, 59, setMinutes)} />
+        <Select label="Minute of the hour" value={minutes} onChange={setMinutes} options={SCHEDULE_MINUTE_OPTIONS} />
       )}
       {type === ScheduleType.MINUTES && (
-        <Input label="Interval (1-60 min)" value={interval} onChange={(e) => handleNumericChange(e, 60, setInterval)} />
+        <Select label="Interval" value={interval} onChange={setInterval} options={SCHEDULE_MINUTE_OPTIONS.slice(1)} />
       )}
       {type === ScheduleType.WEEKLY && <DaysSelector selectedDays={days} onChange={setDays} />}
       <Line />

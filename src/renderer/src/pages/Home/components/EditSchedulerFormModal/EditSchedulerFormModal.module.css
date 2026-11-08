@@ -1,3 +1,16 @@
+.inputs {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.selectHour {
+  width: 100%;
+}
+
+.selectFormate {
+  min-width: 100px;
+}
+
 .button {
   margin-left: auto;
 }
