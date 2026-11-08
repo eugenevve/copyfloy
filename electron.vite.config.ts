@@ -1,5 +1,6 @@
 import { resolve } from "path";
 
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "electron-vite";
 
 export default defineConfig({
@@ -22,11 +23,16 @@ export default defineConfig({
     },
   },
   renderer: {
+    plugins: [react()],
     resolve: {
       alias: {
         "@app": resolve("src/renderer/src"),
         "@shared": resolve("src/shared"),
       },
+    },
+    server: {
+      host: "127.0.0.1",
+      port: 5173,
     },
   },
 });
