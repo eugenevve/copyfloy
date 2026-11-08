@@ -54,7 +54,7 @@ export const Select: FC<ISelect> = ({ label, value, onChange, options, placehold
               }}
             >
               {option.label}
-              {option.value === value && <CheckIcon />}
+              {option.value === value && <CheckIcon className={styles.checkIcon} />}
             </Button>
           ))}
         </div>

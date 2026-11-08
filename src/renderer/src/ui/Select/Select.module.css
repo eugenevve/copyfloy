@@ -54,3 +54,8 @@
   background: var(--content-gray-light);
   opacity: 1 !important;
 }
+
+.checkIcon {
+  width: 20px;
+  height: 20px;
+}
