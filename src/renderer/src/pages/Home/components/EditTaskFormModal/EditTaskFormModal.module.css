@@ -4,9 +4,19 @@
   gap: var(--spacing-l);
 }
 
-.radioGroup {
-  flex-direction: row;
+.labels {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-s);
+}
+
+.selects {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.select {
+  flex: 1;
 }
 
 .group {
@@ -21,12 +31,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-}
-
-.labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-s);
 }
 
 .button {

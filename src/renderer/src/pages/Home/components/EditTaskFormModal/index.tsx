@@ -6,7 +6,6 @@ import { Checkbox } from "@app/ui/Checkbox";
 import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
 import { Modal } from "@app/ui/Modal";
-import { RadioGroup } from "@app/ui/RadioGroup";
 import { Select } from "@app/ui/Select";
 import { REPOSITORY_PROVIDER_OPTIONS, TYPE_OPTIONS_EDIT, VISIBILITY_OPTIONS } from "@app/utils/options";
 import { ScheduleType } from "@shared/types/schedule";
@@ -193,15 +192,12 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
               <div className={styles.hint}>No labels created</div>
             )}
           </div>
-          <RadioGroup
-            options={TYPE_OPTIONS_EDIT.map((option) => ({
-              ...option,
-              disabled: option.value === TaskType.REPOSITORY && gitAvailable === false,
-            }))}
+          <Select
+            label="Task type"
+            options={TYPE_OPTIONS_EDIT}
             value={type}
             disabled={isEditMode}
-            onChange={handleTypeChange}
-            className={styles.radioGroup}
+            onChange={(value) => handleTypeChange(value as TaskType)}
           />
           {gitAvailable === false && (
             <div className={styles.hint}>
@@ -210,18 +206,22 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
           )}
           {type === TaskType.REPOSITORY ? (
             <>
-              <Select
-                label="Service"
-                value={repositoryProvider}
-                options={REPOSITORY_PROVIDER_OPTIONS}
-                onChange={(value) => setRepositoryProvider(value as RepositoryProvider)}
-              />
-              <RadioGroup
-                options={VISIBILITY_OPTIONS}
-                value={isPrivate ? RepositoryVisibility.PRIVATE : RepositoryVisibility.PUBLIC}
-                onChange={(value) => setIsPrivate(value === RepositoryVisibility.PRIVATE)}
-                className={styles.radioGroup}
-              />
+              <div className={styles.selects}>
+                <Select
+                  label="Service"
+                  value={repositoryProvider}
+                  options={REPOSITORY_PROVIDER_OPTIONS}
+                  onChange={(value) => setRepositoryProvider(value as RepositoryProvider)}
+                  className={styles.select}
+                />
+                <Select
+                  label="Visibility"
+                  options={VISIBILITY_OPTIONS}
+                  value={isPrivate ? RepositoryVisibility.PRIVATE : RepositoryVisibility.PUBLIC}
+                  onChange={(value) => setIsPrivate((value as RepositoryVisibility) === RepositoryVisibility.PRIVATE)}
+                  className={styles.select}
+                />
+              </div>
               <Input
                 label="Repository HTTPS URL"
                 value={source}
