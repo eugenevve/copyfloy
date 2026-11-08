@@ -5,8 +5,8 @@ import { ButtonKind } from "@app/ui/Button/Button.types";
 import { Checkbox } from "@app/ui/Checkbox";
 import { Input } from "@app/ui/Input";
 import { LabelChip } from "@app/ui/LabelChip";
+import { Line } from "@app/ui/Line";
 import { Modal } from "@app/ui/Modal";
-import { RadioGroup } from "@app/ui/RadioGroup";
 import { Select } from "@app/ui/Select";
 import { REPOSITORY_PROVIDER_OPTIONS, TYPE_OPTIONS_EDIT, VISIBILITY_OPTIONS } from "@app/utils/options";
 import { ScheduleType } from "@shared/types/schedule";
@@ -167,113 +167,114 @@ export const EditTaskFormModal: FC<IEditTaskFormModal> = ({ initialData, onClose
   return (
     <>
       <Modal title={isEditMode ? "Edit task" : "New task"} onClose={handleClose}>
-        <div className={styles.container}>
-          <Input
-            label="Task name"
-            value={name}
-            onChange={handleNameChange}
-            placeholder="Example: Photo backup"
-            maxLength={100}
-          />
-          <div className={styles.section}>
-            <div>Labels</div>
-            {labels.length > 0 ? (
-              <div className={styles.labels}>
-                {labels.toReversed().map((label) => (
-                  <LabelChip
-                    key={label.id}
-                    selected={labelsIds.includes(label.id)}
-                    name={label.name}
-                    color={label.color}
-                    onClick={() => handleLabelChange(label.id)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className={styles.hint}>No labels created</div>
-            )}
-          </div>
-          <RadioGroup
-            options={TYPE_OPTIONS_EDIT.map((option) => ({
-              ...option,
-              disabled: option.value === TaskType.REPOSITORY && gitAvailable === false,
-            }))}
-            value={type}
-            disabled={isEditMode}
-            onChange={handleTypeChange}
-            className={styles.radioGroup}
-          />
-          {gitAvailable === false && (
-            <div className={styles.hint}>
-              To access the Repository functionality, install Git and ensure it is available in your PATH.
+        <Input
+          label="Task name"
+          value={name}
+          onChange={handleNameChange}
+          placeholder="Example: Photo backup"
+          maxLength={100}
+        />
+        <div className={styles.section}>
+          <div>Labels</div>
+          {labels.length > 0 ? (
+            <div className={styles.labels}>
+              {labels.toReversed().map((label) => (
+                <LabelChip
+                  key={label.id}
+                  selected={labelsIds.includes(label.id)}
+                  name={label.name}
+                  color={label.color}
+                  onClick={() => handleLabelChange(label.id)}
+                />
+              ))}
             </div>
+          ) : (
+            <div className={styles.hint}>No labels created</div>
           )}
-          {type === TaskType.REPOSITORY ? (
-            <>
+        </div>
+        <Line />
+        <Select
+          label="Task type"
+          options={TYPE_OPTIONS_EDIT}
+          value={type}
+          disabled={isEditMode}
+          onChange={(value) => handleTypeChange(value as TaskType)}
+        />
+        {gitAvailable === false && (
+          <div className={styles.hint}>
+            To access the Repository functionality, install Git and ensure it is available in your PATH.
+          </div>
+        )}
+        {type === TaskType.REPOSITORY ? (
+          <>
+            <div className={styles.selects}>
               <Select
                 label="Service"
                 value={repositoryProvider}
                 options={REPOSITORY_PROVIDER_OPTIONS}
                 onChange={(value) => setRepositoryProvider(value as RepositoryProvider)}
+                className={styles.select}
               />
-              <RadioGroup
+              <Select
+                label="Visibility"
                 options={VISIBILITY_OPTIONS}
                 value={isPrivate ? RepositoryVisibility.PRIVATE : RepositoryVisibility.PUBLIC}
-                onChange={(value) => setIsPrivate(value === RepositoryVisibility.PRIVATE)}
-                className={styles.radioGroup}
+                onChange={(value) => setIsPrivate((value as RepositoryVisibility) === RepositoryVisibility.PRIVATE)}
+                className={styles.select}
               />
-              <Input
-                label="Repository HTTPS URL"
-                value={source}
-                onChange={(event) => setSource(event.target.value)}
-                placeholder="https://github.com/owner/repository.git"
-              />
-              {isPrivate && (
-                <Input
-                  type="password"
-                  label="Access token"
-                  value={accessToken}
-                  onChange={(event) => setAccessToken(event.target.value)}
-                  placeholder="Personal access token"
-                />
-              )}
-            </>
-          ) : (
-            <div className={styles.group}>
-              <Input
-                label="Original path"
-                value={source}
-                placeholder={type === TaskType.FOLDER ? "Folder path" : "File path"}
-                readOnly
-              />
-              <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.SOURCE)}>
-                Review
-              </Button>
             </div>
-          )}
+            <Input
+              label="Repository HTTPS URL"
+              value={source}
+              onChange={(event) => setSource(event.target.value)}
+              placeholder="https://github.com/owner/repository.git"
+            />
+            {isPrivate && (
+              <Input
+                type="password"
+                label="Access token"
+                value={accessToken}
+                onChange={(event) => setAccessToken(event.target.value)}
+                placeholder="Personal access token"
+              />
+            )}
+          </>
+        ) : (
           <div className={styles.group}>
-            <Input label="Destination Path" value={target} readOnly placeholder="Folder path" />
-            <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.TARGET)}>
+            <Input
+              label="Original path"
+              value={source}
+              placeholder={type === TaskType.FOLDER ? "Folder path" : "File path"}
+              readOnly
+            />
+            <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.SOURCE)}>
               Review
             </Button>
           </div>
-          {type === TaskType.FOLDER && (
-            <div className={styles.section}>
-              <div>Exceptions</div>
-              <ExceptionsList items={exceptions} sourcePath={source} onRemove={handleRemoveException} />
-              {source && (
-                <Button
-                  kind={ButtonKind.SECONDARY}
-                  onClick={() => setChoiceOpen(true)}
-                  disabled={!source}
-                  className={styles.button}
-                >
-                  Add a file or folder
-                </Button>
-              )}
-            </div>
-          )}
+        )}
+        <div className={styles.group}>
+          <Input label="Destination Path" value={target} readOnly placeholder="Folder path" />
+          <Button kind={ButtonKind.PRIMARY} onClick={() => handleSelectPath(FormField.TARGET)}>
+            Review
+          </Button>
         </div>
+        {type === TaskType.FOLDER && (
+          <div className={styles.section}>
+            <div>Exceptions</div>
+            <ExceptionsList items={exceptions} sourcePath={source} onRemove={handleRemoveException} />
+            {source && (
+              <Button
+                kind={ButtonKind.SECONDARY}
+                onClick={() => setChoiceOpen(true)}
+                disabled={!source}
+                className={styles.button}
+              >
+                Add a file or folder
+              </Button>
+            )}
+          </div>
+        )}
+        <Line />
         <Checkbox
           label="Create ZIP archive instead of copying"
           checked={isArchive}

@@ -1,7 +1,6 @@
 import { useModal } from "@app/hooks/useModal";
 import { Button } from "@app/ui/Button";
 import { Checkbox } from "@app/ui/Checkbox";
-import { DaysSelector } from "@app/ui/DaysSelector";
 import { Line } from "@app/ui/Line";
 import { Modal } from "@app/ui/Modal";
 import { Select } from "@app/ui/Select";
@@ -21,6 +20,7 @@ import { FC, useState, useSyncExternalStore } from "react";
 
 import styles from "./EditSchedulerFormModal.module.css";
 import { IEditSchedulerFormModal } from "./EditSchedulerFormModal.types";
+import { DaysSelector } from "../DaysSelector";
 
 export const EditSchedulerFormModal: FC<IEditSchedulerFormModal> = ({ initialData, onClose, onSaved }) => {
   const { showConfirm } = useModal();

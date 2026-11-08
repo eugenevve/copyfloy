@@ -25,6 +25,10 @@
   transform: none !important;
 }
 
+.secondary {
+  background: var(--background-secondary);
+}
+
 .icon {
   transition: var(--transition);
 }
@@ -34,15 +38,19 @@
 }
 
 .dropdown {
-  position: absolute;
-  top: calc(100% + var(--spacing-s));
-  right: 0;
-  left: 0;
-  padding: var(--spacing-s);
+  position: fixed;
   border: var(--border-secondary);
   border-radius: var(--spacing-l);
   background: var(--content-gray-dark);
+  max-height: 200px;
+  overflow: hidden;
   z-index: var(--z-base);
+}
+
+.options {
+  padding: var(--spacing-s);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .option {
@@ -53,4 +61,9 @@
 .option:hover {
   background: var(--content-gray-light);
   opacity: 1 !important;
+}
+
+.checkIcon {
+  width: 20px;
+  height: 20px;
 }
