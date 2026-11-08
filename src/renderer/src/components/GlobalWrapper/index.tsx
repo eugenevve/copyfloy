@@ -1,8 +1,8 @@
 import { FC } from "react";
 
+import { Tilebar } from "./components/Tilebar";
 import styles from "./GlobalWrapper.module.css";
 import { IGlobalWrapper } from "./GlobalWrapper.types";
-import { Tilebar } from "./Tilebar";
 
 export const GlobalWrapper: FC<IGlobalWrapper> = ({ children }) => {
   return (
