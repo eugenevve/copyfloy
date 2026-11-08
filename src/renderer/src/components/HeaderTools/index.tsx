@@ -1,5 +1,4 @@
 import { useHorizontalScroll } from "@app/hooks/useHorizontalScroll";
-import { InfoApp } from "@app/pages/Home/components/InfoApp";
 import { Button } from "@app/ui/Button";
 import { ButtonKind } from "@app/ui/Button/Button.types";
 import { ChevronIcon } from "@app/ui/Icons";
@@ -11,6 +10,7 @@ import { FC } from "react";
 
 import styles from "./HeaderTools.module.css";
 import { IHeaderTools } from "./HeaderTools.types";
+import { InfoApp } from "./InfoApp";
 
 export const HeaderTools: FC<IHeaderTools> = ({
   title,
