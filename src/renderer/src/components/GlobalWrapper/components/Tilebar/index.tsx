@@ -1,10 +1,10 @@
 import { CloneIcon, LineIcon, SquareIcon, XmarkIcon } from "@app/ui/Icons";
-import { TilebarButton } from "@app/ui/TilebarButton";
-import { TilebarButtonKind } from "@app/ui/TilebarButton/TilebarButton.types";
 import { TooltipPlacement } from "@app/ui/Tooltip/Tooltip.types";
 import { FC, useEffect, useState } from "react";
 
 import styles from "./Tilebar.module.css";
+import { TilebarButton } from "../TilebarButton";
+import { TilebarButtonKind } from "../TilebarButton/TilebarButton.types";
 
 export const Tilebar: FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
