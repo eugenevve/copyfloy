@@ -57,30 +57,28 @@ export const EditLabelFormModal: FC<IEditLabelFormModal> = ({ initialData, onClo
 
   return (
     <Modal title={isEditMode ? "Edit label" : "Create label"} onClose={handleClose}>
-      <div className={styles.container}>
-        <Input
-          label="Label name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Example: work"
-          maxLength={40}
-        />
-        <div className={styles.section}>
-          {LABEL_COLORS.map((labelColor) => (
-            <ColorCircle
-              key={labelColor.code}
-              color={labelColor.code}
-              label={labelColor.label}
-              selected={color === labelColor.code}
-              onClick={() => setColor(labelColor.code)}
-            />
-          ))}
-        </div>
-        <LabelChip name={name || "Label"} color={color} />
-        <Button disabled={!name} onClick={() => handleSubmit()} className={styles.button}>
-          Save
-        </Button>
+      <Input
+        label="Label name"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        placeholder="Example: work"
+        maxLength={40}
+      />
+      <div className={styles.section}>
+        {LABEL_COLORS.map((labelColor) => (
+          <ColorCircle
+            key={labelColor.code}
+            color={labelColor.code}
+            label={labelColor.label}
+            selected={color === labelColor.code}
+            onClick={() => setColor(labelColor.code)}
+          />
+        ))}
       </div>
+      <LabelChip name={name || "Label"} color={color} />
+      <Button disabled={!name} onClick={() => handleSubmit()} className={styles.button}>
+        Save
+      </Button>
     </Modal>
   );
 };
